@@ -60,13 +60,13 @@ Use it when:
 Example:
 
 ```bash
-tools/ai-ready-bootstrap/bin/ai-ready audit /path/to/repo
+bin/ai-ready audit /path/to/repo
 ```
 
 Optional report file:
 
 ```bash
-tools/ai-ready-bootstrap/bin/ai-ready audit /path/to/repo \
+bin/ai-ready audit /path/to/repo \
   --report-path /tmp/ai-ready-audit.md
 ```
 
@@ -77,7 +77,7 @@ Use it when the repo does not yet have a canonical AI layer.
 Example:
 
 ```bash
-tools/ai-ready-bootstrap/bin/ai-ready install /path/to/repo \
+bin/ai-ready install /path/to/repo \
   --runtimes codex,claude \
   --project-type android
 ```
@@ -98,7 +98,7 @@ Use it when the repo already has AI-related files and you want to normalize it.
 Example:
 
 ```bash
-tools/ai-ready-bootstrap/bin/ai-ready standardize /path/to/repo \
+bin/ai-ready standardize /path/to/repo \
   --runtimes codex,claude,copilot \
   --yes
 ```
@@ -124,7 +124,7 @@ Current automatic detection:
 If detection is not what you want, force it:
 
 ```bash
-tools/ai-ready-bootstrap/bin/ai-ready install /path/to/repo \
+bin/ai-ready install /path/to/repo \
   --project-type android \
   --runtimes codex
 ```
@@ -185,12 +185,21 @@ The tool records detected `user.name` and `user.email` in `.ai/context/repositor
 If you want the tool to apply them locally:
 
 ```bash
-tools/ai-ready-bootstrap/bin/ai-ready install /path/to/repo \
+bin/ai-ready install /path/to/repo \
   --runtimes codex \
   --git-name "Michel Marques" \
   --git-email "marques.jm@icloud.com" \
   --apply-git-config
 ```
+
+### Branch Policy
+
+This repo itself follows GitFlow-style intent:
+
+- `develop` is the working default branch
+- `main` is kept for release-ready state
+- feature work happens on short-lived branches
+- changes merge back into `develop` first
 
 ## Files Generated In The Target Repo
 
@@ -235,7 +244,7 @@ If you want to hand this to an Android teammate, there are two valid modes:
 ### Mode B: Execute Directly
 
 ```bash
-tools/ai-ready-bootstrap/bin/ai-ready install ~/Developer/android-repo \
+bin/ai-ready install ~/Developer/android-repo \
   --runtimes codex,claude \
   --project-type android \
   --git-name "Michel Marques" \
@@ -267,3 +276,13 @@ That split is intentional:
 
 - README = quick start
 - MANUAL = operating model and reasoning
+
+## CI
+
+The repo now includes a GitHub Actions workflow in `.github/workflows/ci.yml`.
+
+It validates:
+
+- `bash -n bin/ai-ready`
+- install flow on a fresh Android-like temp repo
+- standardize flow on a temp repo with pre-existing AI files

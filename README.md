@@ -2,6 +2,8 @@
 
 Bootstrap, audit, and standardize an AI-Ready layer in an existing software repository.
 
+Private repo: `iMark21/ai-ready-bootstrap`
+
 This tool is deliberately runtime-neutral at the core:
 
 - `.ai/` is the canonical layer
@@ -29,15 +31,15 @@ The problem is repo bootstrapping across teams and runtimes, so the best primiti
 
 ```bash
 # Read-only inspection
-tools/ai-ready-bootstrap/bin/ai-ready audit /path/to/repo
+bin/ai-ready audit /path/to/repo
 
 # Fresh install
-tools/ai-ready-bootstrap/bin/ai-ready install /path/to/repo \
+bin/ai-ready install /path/to/repo \
   --runtimes codex,claude \
   --project-type android
 
 # Normalize an existing setup
-tools/ai-ready-bootstrap/bin/ai-ready standardize /path/to/repo \
+bin/ai-ready standardize /path/to/repo \
   --runtimes all \
   --yes
 ```
@@ -57,13 +59,13 @@ Examples:
 
 ```bash
 # Codex only
-tools/ai-ready-bootstrap/bin/ai-ready install ../my-repo --runtimes codex
+bin/ai-ready install ../my-repo --runtimes codex
 
 # Codex + Claude
-tools/ai-ready-bootstrap/bin/ai-ready install ../my-repo --runtimes codex,claude
+bin/ai-ready install ../my-repo --runtimes codex,claude
 
 # Copilot only
-tools/ai-ready-bootstrap/bin/ai-ready install ../my-repo --runtimes copilot
+bin/ai-ready install ../my-repo --runtimes copilot
 ```
 
 ## What It Generates
@@ -104,12 +106,32 @@ The tool mirrors the ai-workspace discipline:
 - commit format: `[branch_name] type: "title"`
 - no AI `Co-Authored-By` trailers
 
+## Branch Strategy
+
+- `develop` is the default working branch
+- `main` is reserved for release-ready history
+- day-to-day work should happen on `feature/*`, `fix/*`, `chore/*`, or `docs/*`
+- merge back into `develop`
+- promote to `main` only through an explicit release step
+
+## CI
+
+GitHub Actions validates:
+
+- shell syntax for `bin/ai-ready`
+- fresh-install smoke tests
+- standardize-mode smoke tests
+
+Workflow file:
+
+- `.github/workflows/ci.yml`
+
 ## Typical Android Flow
 
 ```bash
-tools/ai-ready-bootstrap/bin/ai-ready audit ~/Developer/android-app
+bin/ai-ready audit ~/Developer/android-app
 
-tools/ai-ready-bootstrap/bin/ai-ready install ~/Developer/android-app \
+bin/ai-ready install ~/Developer/android-app \
   --runtimes codex,claude \
   --project-type android \
   --git-name "Michel Marques" \
@@ -120,10 +142,10 @@ tools/ai-ready-bootstrap/bin/ai-ready install ~/Developer/android-app \
 ## Existing AI-Ready Repo Flow
 
 ```bash
-tools/ai-ready-bootstrap/bin/ai-ready audit ~/Developer/android-app \
+bin/ai-ready audit ~/Developer/android-app \
   --report-path /tmp/android-ai-audit.md
 
-tools/ai-ready-bootstrap/bin/ai-ready standardize ~/Developer/android-app \
+bin/ai-ready standardize ~/Developer/android-app \
   --runtimes codex,claude,copilot \
   --yes
 ```

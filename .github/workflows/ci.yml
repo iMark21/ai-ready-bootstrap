@@ -1,0 +1,72 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - develop
+      - main
+      - "feature/**"
+      - "fix/**"
+      - "chore/**"
+      - "docs/**"
+  pull_request:
+    branches:
+      - develop
+      - main
+
+jobs:
+  validate-cli:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Bash syntax
+        run: bash -n bin/ai-ready
+
+      - name: Fresh install smoke test
+        shell: bash
+        run: |
+          set -euo pipefail
+          repo="$(mktemp -d)"
+          mkdir -p "$repo/app/src/main"
+          touch "$repo/settings.gradle.kts" "$repo/app/src/main/AndroidManifest.xml"
+          git -C "$repo" init
+
+          bin/ai-ready install "$repo" \
+            --runtimes codex,claude \
+            --project-type android \
+            --git-name "CI Bot" \
+            --git-email "ci@example.com" \
+            --apply-git-config \
+            --non-interactive
+
+          test -f "$repo/.ai/README.md"
+          test -f "$repo/.ai/rules/kotlin.md"
+          test -f "$repo/.ai/rules/compose.md"
+          test -f "$repo/AGENTS.md"
+          test -f "$repo/CLAUDE.md"
+          test -f "$repo/.githooks/pre-commit"
+
+      - name: Standardize smoke test
+        shell: bash
+        run: |
+          set -euo pipefail
+          repo="$(mktemp -d)"
+          mkdir -p "$repo/.github/instructions"
+          touch "$repo/AGENTS.md" "$repo/CLAUDE.md" "$repo/.github/copilot-instructions.md" "$repo/.github/instructions/old.instructions.md"
+          git -C "$repo" init
+
+          bin/ai-ready standardize "$repo" \
+            --runtimes copilot \
+            --project-type generic \
+            --yes \
+            --non-interactive
+
+          test -f "$repo/.ai/README.md"
+          test -f "$repo/.github/copilot-instructions.md"
+          test -f "$repo/.github/instructions/code.instructions.md"
+          test ! -f "$repo/AGENTS.md"
+          test ! -f "$repo/CLAUDE.md"
+          find "$repo/.ai/archive" -type f | grep -q .
