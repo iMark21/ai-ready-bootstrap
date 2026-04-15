@@ -461,6 +461,11 @@ must stay thin and must not drift from what is defined here.
 7. \`.ai/decision-framework.md\`
 8. The relevant files under \`.ai/rules/\`, \`.ai/agents/\`, and \`.ai/skills/\`
 
+## First Pass Workflow
+
+If \`.ai/context.md\` still shows a pending bootstrap status or the context files are still generic templates,
+run \`.ai/agents/proj-context-bootstrap.md\` before planning features or editing product code.
+
 ## Installed Runtimes
 
 - $(
@@ -506,6 +511,7 @@ render_context_md() {
 | Language | $(language_label) |
 | UI Stack | $(ui_stack_label) |
 | Installed Runtimes | $(runtime_list_pretty) |
+| Context Bootstrap Status | Pending first-pass grounding |
 | Generated | $(timestamp_now) |
 
 ## Why This Exists
@@ -519,6 +525,7 @@ $(platform_summary)
 
 ## Immediate Follow-Up
 
+- Run \`.ai/agents/proj-context-bootstrap.md\` to ground these files in the real repository
 - Replace generic placeholders in the files under \`.ai/context/\`
 - Document the actual module layout and feature inventory
 - Record real anti-patterns and gotchas in \`.ai/context/recent-changes.md\`
@@ -936,6 +943,51 @@ Use this flow when the area is unfamiliar.
 EOF
 }
 
+render_agent_context_bootstrap_md() {
+  cat <<EOF
+# Agent: Context Bootstrap
+
+Use this flow immediately after \`install\` or \`standardize\` when the canonical \`.ai/context*\` files are still template-generated.
+
+## Mission
+
+Ground the AI layer in the real repository before implementation work begins.
+
+## Required Inputs
+
+- repository root structure
+- build and dependency files
+- module or package boundaries
+- test entry points and verification commands
+- obvious feature areas
+- known integration surfaces such as networking, persistence, analytics, and background work
+
+## Update These Files
+
+- \`.ai/context.md\`
+- \`.ai/context/architecture.md\`
+- \`.ai/context/dependencies.md\`
+- \`.ai/context/features.md\`
+- \`.ai/context/repository.md\`
+- \`.ai/context/recent-changes.md\`
+
+## Rules
+
+- infer only from evidence in the repository
+- do not invent architecture details you cannot support
+- if something is unclear, leave an explicit open question instead of hallucinating
+- do not implement product code in this pass unless the user explicitly asks for it
+- identify the real test and build commands if they exist
+
+## Completion Criteria
+
+- \`.ai/context.md\` no longer reads like a generic template
+- the architecture, dependencies, and features files reference real modules or paths
+- \`Context Bootstrap Status\` in \`.ai/context.md\` is changed from pending to grounded
+- \`.ai/context/recent-changes.md\` records that the first-pass context bootstrap happened
+EOF
+}
+
 render_agent_feature_md() {
   cat <<EOF
 # Agent: Feature Planning
@@ -1050,6 +1102,24 @@ Use this at sprint start, after large merges, or before major planning.
 EOF
 }
 
+render_skill_context_bootstrap_md() {
+  cat <<EOF
+# Skill: Context Bootstrap
+
+Use this immediately after a fresh AI-Ready install or standardize pass.
+
+## Checklist
+
+- identify the build system and primary entry points
+- map modules, packages, or targets
+- identify the real UI stack and state-management pattern
+- identify the data layer, persistence layer, and integration surfaces
+- identify test commands or test directories
+- rewrite the generated \`.ai/context*\` files so they reflect the real repository
+- leave explicit open questions where evidence is missing
+EOF
+}
+
 render_skill_feature_scaffold_md() {
   cat <<EOF
 # Skill: Feature Scaffold
@@ -1094,6 +1164,9 @@ Read order:
 6. \`.ai/decision-framework.md\`
 7. The relevant files under \`.ai/rules/\`, \`.ai/agents/\`, and \`.ai/skills/\`
 
+First pass rule:
+- if \`.ai/context.md\` still shows \`Pending first-pass grounding\`, run \`.ai/agents/proj-context-bootstrap.md\` before implementation work
+
 Do not maintain duplicate workflow logic here.
 EOF
 }
@@ -1112,6 +1185,9 @@ Read order:
 5. \`.ai/context/repository.md\`
 6. \`.ai/decision-framework.md\`
 7. The relevant files under \`.ai/rules/\`, \`.ai/agents/\`, and \`.ai/skills/\`
+
+First pass rule:
+- if \`.ai/context.md\` still shows \`Pending first-pass grounding\`, run \`.ai/agents/proj-context-bootstrap.md\` before implementation work
 
 Do not duplicate routing, workflow, or checklists here.
 EOF
@@ -1132,6 +1208,9 @@ Before editing:
 5. Read \`.ai/context/repository.md\`
 6. Read \`.ai/decision-framework.md\`
 7. Follow the matching instruction file in \`.github/instructions/\`
+
+First pass rule:
+- if \`.ai/context.md\` still shows \`Pending first-pass grounding\`, follow \`.ai/agents/proj-context-bootstrap.md\` before implementation work
 
 Do not create a second source of truth under \`.github/\`.
 EOF
@@ -1157,6 +1236,7 @@ Read order:
 7. The relevant files under \`.ai/rules/\`, \`.ai/agents/\`, and \`.ai/skills/\`
 
 If \`AI-READY.md\` exists, use it as the universal adapter layer for non-native runtimes.
+If \`.ai/context.md\` still shows \`Pending first-pass grounding\`, run \`.ai/agents/proj-context-bootstrap.md\` first.
 Do not duplicate workflow logic inside Cursor-specific files.
 EOF
 }
@@ -1183,6 +1263,7 @@ Treat \`.ai/\` as canonical.
 
 - Do not create a second source of truth outside \`.ai/\`
 - Prefer existing project conventions over generic best practices
+- If \`.ai/context.md\` still shows \`Pending first-pass grounding\`, run \`.ai/agents/proj-context-bootstrap.md\` first
 - If key architecture details are still placeholders, audit the repo first and update \`.ai/context/\`
 - After meaningful work, update \`.ai/context/recent-changes.md\`
 
@@ -1257,12 +1338,14 @@ write_canonical_files() {
   write_file "$TARGET_REPO/.ai/rules/analytics.md" "$(render_analytics_rule_md)" "$overwrite"
   write_file "$TARGET_REPO/.ai/rules/data.md" "$(render_data_rule_md)" "$overwrite"
   write_file "$TARGET_REPO/.ai/agents/proj-explore.md" "$(render_agent_explore_md)" "$overwrite"
+  write_file "$TARGET_REPO/.ai/agents/proj-context-bootstrap.md" "$(render_agent_context_bootstrap_md)" "$overwrite"
   write_file "$TARGET_REPO/.ai/agents/proj-feature.md" "$(render_agent_feature_md)" "$overwrite"
   write_file "$TARGET_REPO/.ai/agents/proj-code.md" "$(render_agent_code_md)" "$overwrite"
   write_file "$TARGET_REPO/.ai/agents/proj-verify.md" "$(render_agent_verify_md)" "$overwrite"
   write_file "$TARGET_REPO/.ai/agents/proj-fix.md" "$(render_agent_fix_md)" "$overwrite"
   write_file "$TARGET_REPO/.ai/agents/proj-tech.md" "$(render_agent_tech_md)" "$overwrite"
   write_file "$TARGET_REPO/.ai/agents/proj-spike.md" "$(render_agent_spike_md)" "$overwrite"
+  write_file "$TARGET_REPO/.ai/skills/context-bootstrap.md" "$(render_skill_context_bootstrap_md)" "$overwrite"
   write_file "$TARGET_REPO/.ai/skills/context-refresh.md" "$(render_skill_context_refresh_md)" "$overwrite"
   write_file "$TARGET_REPO/.ai/skills/feature-scaffold.md" "$(render_skill_feature_scaffold_md)" "$overwrite"
   write_file "$TARGET_REPO/.ai/skills/migration-audit.md" "$(render_skill_migration_audit_md)" "$overwrite"
@@ -1351,6 +1434,31 @@ $recommendation
 EOF
 }
 
+print_first_pass_guidance() {
+  log ""
+  log "Next recommended first pass:"
+
+  if has_runtime codex; then
+    log "- Codex: open the repo and ask it to read AGENTS.md, then execute .ai/agents/proj-context-bootstrap.md before implementation work."
+  fi
+
+  if has_runtime claude; then
+    log "- Claude Code: open the repo and ask it to read CLAUDE.md, then execute .ai/agents/proj-context-bootstrap.md before implementation work."
+  fi
+
+  if has_runtime copilot; then
+    log "- Copilot: start from .github/copilot-instructions.md and run the context bootstrap flow before code changes."
+  fi
+
+  if has_runtime cursor; then
+    log "- Cursor: let .cursor/rules/ai-ready.mdc route into .ai/, then execute .ai/agents/proj-context-bootstrap.md first."
+  fi
+
+  if has_runtime generic; then
+    log "- Generic AI: start from AI-READY.md and execute .ai/agents/proj-context-bootstrap.md before implementation work."
+  fi
+}
+
 run_audit() {
   local report
   report="$(build_audit_report)"
@@ -1376,6 +1484,7 @@ run_install() {
   apply_git_identity_if_needed
 
   log "AI-Ready install complete for $TARGET_REPO"
+  print_first_pass_guidance
 }
 
 run_standardize() {
@@ -1415,6 +1524,7 @@ run_standardize() {
   apply_git_identity_if_needed
 
   log "AI-Ready standardization complete for $TARGET_REPO"
+  print_first_pass_guidance
 }
 
 parse_args() {

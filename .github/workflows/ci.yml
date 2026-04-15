@@ -57,10 +57,13 @@ jobs:
           test -f "$repo/.ai/README.md"
           test -f "$repo/.ai/rules/kotlin.md"
           test -f "$repo/.ai/rules/compose.md"
+          test -f "$repo/.ai/agents/proj-context-bootstrap.md"
           test -f "$repo/AGENTS.md"
           test -f "$repo/CLAUDE.md"
           test -f "$repo/AI-READY.md"
           test -f "$repo/.ai/agents/proj-verify.md"
+          test -f "$repo/.ai/skills/context-bootstrap.md"
+          grep -q 'Pending first-pass grounding' "$repo/.ai/context.md"
           test -f "$repo/.githooks/pre-commit"
 
       - name: iOS install smoke test
@@ -83,10 +86,13 @@ jobs:
           test -f "$repo/.ai/README.md"
           test -f "$repo/.ai/rules/swift.md"
           test -f "$repo/.ai/rules/swiftui.md"
+          test -f "$repo/.ai/agents/proj-context-bootstrap.md"
           test -f "$repo/AGENTS.md"
           test -f "$repo/CLAUDE.md"
           test -f "$repo/AI-READY.md"
           test -f "$repo/.ai/agents/proj-verify.md"
+          test -f "$repo/.ai/skills/context-bootstrap.md"
+          grep -q 'Pending first-pass grounding' "$repo/.ai/context.md"
 
       - name: Standardize smoke test
         shell: bash
@@ -107,7 +113,10 @@ jobs:
           test -f "$repo/.github/copilot-instructions.md"
           test -f "$repo/.github/instructions/code.instructions.md"
           test -f "$repo/AI-READY.md"
+          test -f "$repo/.ai/agents/proj-context-bootstrap.md"
           test -f "$repo/.ai/agents/proj-verify.md"
+          test -f "$repo/.ai/skills/context-bootstrap.md"
+          grep -q 'Pending first-pass grounding' "$repo/.ai/context.md"
           test ! -f "$repo/AGENTS.md"
           test ! -f "$repo/CLAUDE.md"
           test ! -f "$repo/.cursor/rules/ai-ready.mdc"

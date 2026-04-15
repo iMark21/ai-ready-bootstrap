@@ -60,6 +60,12 @@ It contains:
 - agent playbooks
 - deterministic skills
 
+Immediately after generation, `.ai/context.md` starts in a pending state:
+
+- `Context Bootstrap Status | Pending first-pass grounding`
+
+That status is the trigger for the first-pass context bootstrap workflow.
+
 ### Runtime Adapters
 
 Adapters are intentionally thin.
@@ -204,6 +210,7 @@ What it does:
 - writes only the runtime adapters you selected
 - optionally installs Git hooks
 - optionally applies local git user name and email
+- prints the recommended first-pass context-bootstrap step for the selected runtimes
 
 ### 3. Standardize
 
@@ -225,6 +232,7 @@ What it does:
 - rewrites the selected runtime adapters
 - removes unselected adapters from the active root
 - preserves a backup before overwrite
+- prints the recommended first-pass context-bootstrap step for the selected runtimes
 
 ## Generated Files In The Target Repo
 
@@ -268,6 +276,7 @@ They are not background services. They define which working mode the AI should u
 | Agent File | Responsibility |
 | --- | --- |
 | `.ai/agents/proj-explore.md` | explore an unfamiliar area before planning or coding |
+| `.ai/agents/proj-context-bootstrap.md` | replace the generated `.ai/context*` templates with real repository knowledge on the first pass |
 | `.ai/agents/proj-feature.md` | create the file-level implementation plan for a feature |
 | `.ai/agents/proj-code.md` | execute the approved plan in small steps |
 | `.ai/agents/proj-verify.md` | verify acceptance criteria, run tests, and report residual risk |
@@ -279,20 +288,36 @@ They are not background services. They define which working mode the AI should u
 
 | Skill File | Responsibility |
 | --- | --- |
+| `.ai/skills/context-bootstrap.md` | checklist for grounding `.ai/context*` in the real repository immediately after install |
 | `.ai/skills/context-refresh.md` | refresh architecture, dependencies, features, and recent changes |
 | `.ai/skills/feature-scaffold.md` | create the minimum feature scaffold in the repository style |
 | `.ai/skills/migration-audit.md` | estimate and structure a migration before execution |
+
+### First-Pass Context Bootstrap Workflow
+
+This is the first workflow the runtime should execute if `Context Bootstrap Status` is still pending.
+
+| Step | Agent / File | Result |
+| --- | --- | --- |
+| 1 | runtime adapter such as `AGENTS.md`, `CLAUDE.md`, or `AI-READY.md` | the AI is redirected into `.ai/` |
+| 2 | `.ai/context.md` | pending bootstrap status is detected |
+| 3 | `.ai/agents/proj-context-bootstrap.md` | real architecture, dependencies, features, and repo workflow are gathered from evidence |
+| 4 | `.ai/skills/context-bootstrap.md` | consistent checklist is applied to the first pass |
+| 5 | `.ai/context.md` and `.ai/context/recent-changes.md` | bootstrap status is changed from pending to grounded and the pass is recorded |
+
+This first pass should update documentation, not product code, unless the user explicitly asks for code changes too.
 
 ### Real Feature Workflow
 
 | Step | Agent / File | Result |
 | --- | --- | --- |
 | 1 | runtime adapter such as `AGENTS.md`, `CLAUDE.md`, or `AI-READY.md` | the AI is redirected into `.ai/` |
-| 2 | `.ai/agents/proj-explore.md` | relevant files, architecture pattern, and risks are identified |
-| 3 | `.ai/agents/proj-feature.md` | the implementation plan is created |
-| 4 | `.ai/agents/proj-code.md` | the code is written |
-| 5 | `.ai/agents/proj-verify.md` and `.ai/rules/testing.md` | tests and checks are run |
-| 6 | `.ai/skills/context-refresh.md` and `.ai/context/recent-changes.md` | the repo memory is updated |
+| 2 | `.ai/agents/proj-context-bootstrap.md` if bootstrap is still pending | generated templates are grounded in the real repo |
+| 3 | `.ai/agents/proj-explore.md` | relevant files, architecture pattern, and risks are identified |
+| 4 | `.ai/agents/proj-feature.md` | the implementation plan is created |
+| 5 | `.ai/agents/proj-code.md` | the code is written |
+| 6 | `.ai/agents/proj-verify.md` and `.ai/rules/testing.md` | tests and checks are run |
+| 7 | `.ai/skills/context-refresh.md` and `.ai/context/recent-changes.md` | the repo memory is updated |
 
 ### Real Bug Workflow
 
@@ -319,6 +344,7 @@ If the runtime supports sub-agents, these phases can be split.
 If it does not, the same runtime still follows the same sequence:
 
 - understand the area
+- ground the generated AI context in the real repo when needed
 - plan
 - code
 - verify

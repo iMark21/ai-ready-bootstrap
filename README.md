@@ -125,6 +125,8 @@ Use `generic` when:
 | `.ai/context/recent-changes.md` | short-term memory of important repo changes and gotchas |
 | `.ai/decision-framework.md` | how to approach features, fixes, refactors, migrations, analytics, new dependencies |
 
+`context.md` starts with `Context Bootstrap Status | Pending first-pass grounding` so the runtime knows the first job is to ground the template in the real repository.
+
 ### Rules
 
 These are the guardrails the AI should follow when editing code.
@@ -145,6 +147,7 @@ These are not background daemons. They are Markdown playbooks that tell the AI w
 | Agent File | Why It Exists |
 | --- | --- |
 | `.ai/agents/proj-explore.md` | audit an unfamiliar area before planning or coding |
+| `.ai/agents/proj-context-bootstrap.md` | replace the generated `.ai/context*` templates with real repo-specific knowledge on the first pass |
 | `.ai/agents/proj-feature.md` | turn a known feature goal into a file-level implementation plan |
 | `.ai/agents/proj-code.md` | execute an approved plan in small verified steps |
 | `.ai/agents/proj-verify.md` | verify behavior, run tests, and report residual risk before merge |
@@ -158,6 +161,7 @@ These are deterministic prompts/checklists the AI can reuse for common operation
 
 | Skill File | Why It Exists |
 | --- | --- |
+| `.ai/skills/context-bootstrap.md` | checklist for grounding `.ai/context*` in the real repo immediately after install |
 | `.ai/skills/context-refresh.md` | refresh architecture, dependencies, feature map, and recent changes after major repo drift |
 | `.ai/skills/feature-scaffold.md` | create the minimum feature boilerplate in the repo's style |
 | `.ai/skills/migration-audit.md` | estimate and structure migrations such as legacy UI to modern UI or callbacks to structured async |
@@ -199,10 +203,24 @@ This is the part that often gets misunderstood:
 2. it installs a canonical skeleton plus repo-working conventions
 3. the selected AI runtime reads its adapter
 4. that adapter redirects the runtime into `.ai/`
-5. the first useful task is usually an audit pass that replaces placeholders with real repo knowledge
+5. if `Context Bootstrap Status` is still pending, the runtime executes `.ai/agents/proj-context-bootstrap.md`
 6. from then on, the AI should keep using `.ai/` as the operating memory of the project
 
 So the generated `agents` and `skills` are not meant to be "executed" as independent software. They are working modes and reusable prompts stored as files so the AI behaves consistently.
+
+## First-Pass Context Bootstrap Workflow
+
+This is the new default immediately after `install` or `standardize`.
+
+| Step | Agent / File | Output |
+| --- | --- | --- |
+| Adapter intake | `AGENTS.md`, `CLAUDE.md`, `AI-READY.md`, or equivalent | runtime is redirected into `.ai/` |
+| Bootstrap trigger | `.ai/context.md` | runtime sees `Pending first-pass grounding` |
+| Bootstrap execution | `.ai/agents/proj-context-bootstrap.md` | real architecture, dependencies, features, repository workflow, and open questions |
+| Bootstrap checklist | `.ai/skills/context-bootstrap.md` | ensures the same evidence-gathering path is followed every time |
+| Completion | `.ai/context.md` and `.ai/context/recent-changes.md` | bootstrap status changed from pending to grounded and first pass recorded |
+
+This first pass should not implement product code unless the user explicitly asks for it. Its job is to turn the generated AI layer into a repo-specific control plane.
 
 ## Real Workflows
 
@@ -221,6 +239,7 @@ If the runtime supports sub-agents, you can split some phases. If not, the same 
 | Phase | Agent / File | Who Does It | Output |
 | --- | --- | --- | --- |
 | Intake | `AGENTS.md`, `CLAUDE.md`, `AI-READY.md`, or equivalent | active runtime | boots from `.ai/` |
+| First-pass grounding | `.ai/agents/proj-context-bootstrap.md` and `.ai/skills/context-bootstrap.md` | bootstrap mode | real repo context replaces the template if bootstrap is still pending |
 | Repo discovery | `.ai/agents/proj-explore.md` | exploration mode | file map, patterns, risks, reusable references |
 | Implementation plan | `.ai/agents/proj-feature.md` | planning mode | files to touch, state/data boundaries, tests, analytics impact |
 | Coding | `.ai/agents/proj-code.md` | execution mode | code changes in small verified steps |
@@ -249,6 +268,7 @@ If the runtime supports sub-agents, you can split some phases. If not, the same 
 
 In practice:
 
+- `proj-context-bootstrap` turns the generated template into a repo-specific AI layer
 - `proj-explore` creates the understanding of the area
 - `proj-feature` or `proj-tech` creates the implementation plan
 - `proj-code` writes the code
