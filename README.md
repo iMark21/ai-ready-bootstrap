@@ -300,8 +300,8 @@ sequenceDiagram
 ai-ready install ~/Developer/android-app \
   --runtimes codex,claude,generic \
   --project-type android \
-  --git-name "Michel Marques" \
-  --git-email "marques.jm@icloud.com" \
+  --git-name "Name Surname" \
+  --git-email "mail@emailme.com" \
   --apply-git-config
 ```
 
@@ -311,8 +311,8 @@ ai-ready install ~/Developer/android-app \
 ai-ready install ~/Developer/ios-app \
   --runtimes codex,claude,generic \
   --project-type ios \
-  --git-name "Michel Marques" \
-  --git-email "marques.jm@icloud.com" \
+  --git-name "Name Surname" \
+  --git-email "mail@emailme.com" \
   --apply-git-config
 ```
 
