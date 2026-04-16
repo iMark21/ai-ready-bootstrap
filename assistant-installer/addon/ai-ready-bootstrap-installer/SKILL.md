@@ -179,11 +179,36 @@ Treat `.ai/` as canonical.
 Audit this repository against the canonical `.ai/` layer, summarize the real architecture and gaps, and then propose the smallest safe set of updates before changing code.
 ```
 
-7. Stop after install and summarize:
+7. Stop after install and summarize. Then show the user what they can do right now.
+
+   Summary:
    - project type detected
    - adapters created
-   - open questions
-   - recommended next workflow
+   - key repo facts used to ground the files
+   - open questions that still need confirmation
+
+   Then show concrete, copy-paste-ready examples using the real project — not
+   generic placeholders. Use real module names, real feature areas, and real
+   problems noticed during the audit. For example:
+
+   "Your AI-Ready layer is installed. Try it now:
+
+    - To add a new feature:
+      'Use agent-explore. I want to add [a real feature for this repo].'
+
+    - To fix a bug:
+      'Use agent-fix. [a plausible bug based on what you saw in the code].'
+
+    - To investigate a refactor:
+      'Use agent-spike. Is it worth [a real refactor opportunity you noticed]?'
+
+    - To refresh the context after a big merge:
+      'Use the context-refresh skill.'
+
+    These agents read the .ai/ layer you just installed, so the AI already
+    knows your architecture, conventions, and recent changes before acting."
+
+   The user should be able to copy one of these and run it immediately.
 
 ## Rules
 
@@ -203,3 +228,4 @@ Audit this repository against the canonical `.ai/` layer, summarize the real arc
 - existing AI files were archived before overwrite when needed
 - no web searches were performed during the install
 - the install summary clearly calls out what is still unknown
+- the user has at least three concrete copy-paste prompts to try immediately
