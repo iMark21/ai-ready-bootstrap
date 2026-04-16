@@ -2,6 +2,12 @@
 
 All notable changes to AI-Ready Bootstrap are documented here.
 
+## [0.3.3] - 2026-04-17
+
+### Added
+- PROMPT.md and SKILL.md now end with concrete copy-paste-ready examples using real project context. After install the AI shows the user three or more prompts they can run immediately — using real module names and real opportunities noticed during the audit, not generic placeholders.
+- "Done means" checklist in SKILL.md updated: install is not complete until the user has actionable next steps.
+
 ## [0.3.2] - 2026-04-16
 
 ### Fixed

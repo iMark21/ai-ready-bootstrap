@@ -209,11 +209,36 @@ STEP 5 — Do not do any of these.
 - Do not create a second source of truth outside .ai/
 
 ─────────────────────────────────────────
-STEP 6 — When you finish, summarize:
+STEP 6 — When you finish, summarize and show the user what to do next.
 ─────────────────────────────────────────
+First, summarize:
 - project type detected
 - runtimes installed
 - key repo facts used to ground the files
 - open questions that still need confirmation
-- recommended next workflow (feature work, bug fixing, or refactoring)
+
+Then show the user what they can do RIGHT NOW with the installed system.
+Give them concrete, copy-paste-ready examples using their actual project,
+not generic placeholders. For example:
+
+  "Your AI-Ready layer is installed. Try it now:
+
+   - To add a new feature:
+     'Use agent-explore. I want to add [a real feature that makes sense for this repo].'
+
+   - To fix a bug:
+     'Use agent-fix. [describe a plausible bug based on what you saw in the code].'
+
+   - To investigate a refactor:
+     'Use agent-spike. Is it worth [a real refactor opportunity you noticed during the audit]?'
+
+   - To refresh the context after a big merge:
+     'Use the context-refresh skill.'
+
+   These agents read the .ai/ layer you just installed, so the AI already
+   knows your architecture, conventions, and recent changes before acting."
+
+Adapt the examples to the real project. Use real module names, real feature areas,
+and real problems you noticed during the audit. The user should be able to copy
+one of these and run it immediately.
 ```
