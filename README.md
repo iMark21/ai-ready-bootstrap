@@ -4,7 +4,7 @@ Your AI assistant writes better code when it actually knows your project.
 
 AI-Ready Bootstrap adds a structured context layer to any existing repository so that Codex, Claude Code, Copilot, Cursor — or any AI — stops guessing and starts following your real architecture, conventions, and decisions from the first prompt.
 
-No dependencies. One command. Any AI runtime. Any tech stack.
+No dependencies. Any AI runtime. Any tech stack.
 
 ## Does this sound familiar?
 
@@ -38,7 +38,7 @@ All generated automatically. Agents are Markdown playbooks — they work with an
 
 ## The structure is always the same. The content is yours.
 
-Without ai-ready-bootstrap, asking Claude or Codex to "set up an AI layer" produces something different every time — whatever the model decides that session.
+Without ai-ready-bootstrap, asking an AI to "set up an AI layer" produces something different every time — whatever the model decides that session.
 
 With ai-ready-bootstrap, every installation produces the same skeleton:
 
@@ -50,69 +50,51 @@ With ai-ready-bootstrap, every installation produces the same skeleton:
 
 The **structure** is deterministic. The **content** is filled with real knowledge from your repository.
 
-## Install it in 30 seconds
+## Install it
 
-Pick the AI you use.
+There are two ways. Pick the one that fits your setup.
 
-### Claude Code
+### Option 1 — Let your AI do it (any AI)
 
-Tell Claude Code (in your project):
+Paste this into your AI assistant — Codex, Claude Code, Copilot, Cursor, or any other:
 
 ```
 Fetch https://raw.githubusercontent.com/iMark21/ai-ready-bootstrap/main/assistant-installer/PROMPT.md
 and follow the complete installation workflow defined there for this repository.
 ```
 
-Claude fetches the exact ai-ready-bootstrap spec, audits your repo, and generates a grounded `.ai/` layer with the standard 8 agents, 4 skills, and 5 context files — filled with real project knowledge.
+The AI fetches the ai-ready-bootstrap spec, **asks you which AI runtime(s) you want**, audits the repo, and generates a grounded `.ai/` layer with real project knowledge — not generic placeholders.
 
-### Codex
+> If your AI cannot fetch URLs directly, download the file first:
+> ```bash
+> curl -sO https://raw.githubusercontent.com/iMark21/ai-ready-bootstrap/main/assistant-installer/PROMPT.md
+> ```
+> Then tell your AI: `Read PROMPT.md in this directory and follow the installation workflow.` Delete it when done.
 
-```bash
-# Copy the installer skill
-git clone https://github.com/iMark21/ai-ready-bootstrap.git /tmp/ai-ready-bootstrap
-cp -r /tmp/ai-ready-bootstrap/assistant-installer/addon/ai-ready-bootstrap-installer/ ~/.codex/skills/
-```
+**Codex power user:** install the skill add-on once and skip the prompt every time — see [assistant-installer/addon/README.md](assistant-installer/addon/README.md).
 
-Then in Codex, open your project and say:
-
-```
-Use the ai-ready-bootstrap-installer skill in this repository.
-```
-
-Codex runs the same structured audit and generates an identical `.ai/` layer.
-
-### Copilot, Cursor, or another AI
+### Option 2 — Use the CLI (deterministic, no AI at install time)
 
 ```bash
 # Install the CLI
 git clone https://github.com/iMark21/ai-ready-bootstrap.git /tmp/ai-ready-bootstrap
 cd /tmp/ai-ready-bootstrap && bash install.sh
 
-# Generate the AI layer
-ai-ready install /path/to/your-repo --runtimes copilot,generic
-# or: --runtimes cursor,generic
-# or: --runtimes all
+# Bootstrap your project
+ai-ready install /path/to/your-repo \
+  --runtimes claude,generic \
+  --project-type ios
 ```
 
-Then open the project in your AI and say:
+The CLI generates the canonical structure deterministically. After install, tell your AI to ground the context files with real repo knowledge:
 
 ```
-Read AI-READY.md and the .ai/ layer. The context files are templates —
+Read CLAUDE.md and the .ai/ layer. The context files are templates —
 audit the repository, replace the placeholders with real project knowledge,
 and summarize what you found.
 ```
 
-### Not sure which AI / want full control
-
-```bash
-git clone https://github.com/iMark21/ai-ready-bootstrap.git /tmp/ai-ready-bootstrap
-cd /tmp/ai-ready-bootstrap && bash install.sh
-ai-ready install /path/to/your-repo --runtimes generic
-```
-
-This creates `.ai/` plus `AI-READY.md` — a universal adapter that works with any tool. Add more runtime adapters later.
-
-### Batch / CI installs
+Batch or CI installs:
 
 ```bash
 ai-ready install /path/to/your-repo \

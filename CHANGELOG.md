@@ -2,6 +2,11 @@
 
 All notable changes to AI-Ready Bootstrap are documented here.
 
+## [0.3.1] - 2026-04-16
+
+### Changed
+- README install section collapsed from four per-AI blocks into two options: "Let your AI do it (any AI)" and "Use the CLI". The AI-assisted path is now a single universal prompt that works with Codex, Claude Code, Copilot, Cursor, or any other AI — the spec is fetched from PROMPT.md and the workflow asks which runtimes to use.
+
 ## [0.2.1] - 2026-04-16
 
 ### Changed
