@@ -21,62 +21,49 @@ AI-Ready Bootstrap solves all of these. It gives your repository a canonical `.a
 When you install AI-Ready, your repo gets a team of specialized agents that follow a structured workflow:
 
 ```
-┌─────────────┐     ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
-│   Explore   │────>│    Plan     │────>│    Code     │────>│   Verify    │
-│             │     │             │     │             │     │             │
-│ Maps the    │     │ Creates a   │     │ Implements  │     │ Runs tests, │
-│ area before │     │ file-level  │     │ step by     │     │ checks      │
-│ you touch   │     │ plan with   │     │ step, stops │     │ criteria,   │
-│ anything    │     │ tests and   │     │ if blocked  │     │ flags risks │
-│             │     │ trade-offs  │     │             │     │             │
-└─────────────┘     └─────────────┘     └─────────────┘     └─────────────┘
+┌──────────────────┐   ┌──────────────────┐   ┌──────────────────┐   ┌──────────────────┐
+│  agent-explore   │──>│   agent-plan     │──>│   agent-code     │──>│  agent-verify    │
+│                  │   │                  │   │                  │   │                  │
+│ Maps the area    │   │ File-level plan  │   │ Step-by-step     │   │ Tests, criteria, │
+│ before you touch │   │ with tests and   │   │ implementation.  │   │ residual risk.   │
+│ anything         │   │ trade-offs       │   │ Stops if blocked │   │                  │
+└──────────────────┘   └──────────────────┘   └──────────────────┘   └──────────────────┘
 ```
 
-Plus specialized agents for **bug fixes** (`proj-fix`), **refactors** (`proj-tech`), and **investigations** (`proj-spike`).
+Plus specialized agents for **bug fixes** (`agent-fix`), **refactors** (`agent-tech`), and **investigations** (`agent-spike`).
 
 Plus reusable skills: **context refresh**, **feature scaffold**, **migration audit**.
 
-All of this is generated automatically. The agents are Markdown playbooks — they work with any AI, not just one vendor.
+All generated automatically. Agents are Markdown playbooks — they work with any AI, not just one vendor.
+
+## The structure is always the same. The content is yours.
+
+Without ai-ready-bootstrap, asking Claude or Codex to "set up an AI layer" produces something different every time — whatever the model decides that session.
+
+With ai-ready-bootstrap, every installation produces the same skeleton:
+
+- 8 agents with defined responsibilities
+- 4 reusable skills
+- 5 context files for architecture, dependencies, features, repository workflow, and recent changes
+- Scoped rules by file type
+- Thin runtime adapters for each AI tool
+
+The **structure** is deterministic. The **content** is filled with real knowledge from your repository.
 
 ## Install it in 30 seconds
 
-Pick the AI you use and follow the corresponding block.
+Pick the AI you use.
 
 ### Claude Code
 
-Paste this prompt inside your project:
+Tell Claude Code (in your project):
 
 ```
-I want to convert this project into an AI-Ready repository.
-
-Your job is not to write product code yet. Your job is to build the operational
-layer so that any future AI can work on this repo with real context.
-
-Do it in this order:
-0. Before creating files, ask me which AI runtimes I want to use in this repo.
-   At minimum ask whether the target is Codex, Claude Code, GitHub Copilot,
-   or a multi-runtime system.
-1. Audit the repo: stack, architecture, modules, build files, tests, CI,
-   existing AI files.
-2. Propose an AI-Ready structure adapted to this repo:
-   - a canonical layer in .ai/
-   - context files (context.md, architecture.md, dependencies.md, features.md,
-     recent-changes.md)
-   - scoped rules by file type
-   - specialized agents
-   - repeatable skills
-   - runtime adapters only for the runtimes chosen
-3. Generate the files with real content from the repo, not generic placeholders.
-4. Use the real architecture and conventions of the repo.
-   Do not invent layers that do not exist.
-5. When done, deliver:
-   - list of files created
-   - decisions taken
-   - open assumptions
-   - recommendations for the next iteration
+Fetch https://raw.githubusercontent.com/iMark21/ai-ready-bootstrap/main/assistant-installer/PROMPT.md
+and follow the complete installation workflow defined there for this repository.
 ```
 
-Claude audits the repo, creates `.ai/`, and fills the context with real project knowledge in one pass.
+Claude fetches the exact ai-ready-bootstrap spec, audits your repo, and generates a grounded `.ai/` layer with the standard 8 agents, 4 skills, and 5 context files — filled with real project knowledge.
 
 ### Codex
 
@@ -92,7 +79,7 @@ Then in Codex, open your project and say:
 Use the ai-ready-bootstrap-installer skill in this repository.
 ```
 
-Codex runs the same structured audit and generates a grounded `.ai/` layer.
+Codex runs the same structured audit and generates an identical `.ai/` layer.
 
 ### Copilot, Cursor, or another AI
 
@@ -123,7 +110,7 @@ cd /tmp/ai-ready-bootstrap && bash install.sh
 ai-ready install /path/to/your-repo --runtimes generic
 ```
 
-This creates `.ai/` plus `AI-READY.md` — a universal adapter that works with any tool. You can add more runtime adapters later.
+This creates `.ai/` plus `AI-READY.md` — a universal adapter that works with any tool. Add more runtime adapters later.
 
 ### Batch / CI installs
 
@@ -142,27 +129,25 @@ After install, your AI has context and a structured workflow. Here is what worki
 
 **Step 1 — Explore the area:**
 
-Tell your AI:
-
-> Use the proj-explore agent. I need to add a login screen with email and password.
+> Use agent-explore. I need to add a login screen with email and password.
 
 The AI reads `.ai/context/architecture.md`, maps your existing auth code, finds reusable patterns, and reports back — before writing a single line.
 
 **Step 2 — Plan:**
 
-> Use the proj-feature agent. Plan the login screen feature.
+> Use agent-plan. Plan the login screen feature.
 
 You get a file-level plan: which files to create, which to modify, what tests to add, what state pattern to use. Review and approve before any code is written.
 
 **Step 3 — Implement:**
 
-> Use the proj-code agent. Implement the approved plan.
+> Use agent-code. Implement the approved plan.
 
 The AI codes task by task. If a step fails, it stops and reports instead of bulldozing ahead.
 
 **Step 4 — Verify:**
 
-> Use the proj-verify agent. Verify the login feature.
+> Use agent-verify. Verify the login feature.
 
 Tests run, acceptance criteria are checked, and any residual risk is documented.
 
@@ -170,35 +155,41 @@ The feature is now recorded in `.ai/features/login.md` — so next time anyone (
 
 ### Example: fixing a bug
 
-Tell your AI:
+> Use agent-fix. The total is not updating when I remove an item from the cart.
 
-> Use the proj-fix agent. The total is not updating when I remove an item from the cart.
-
-The AI loads the project context, finds the root cause, writes a failing test, applies the smallest safe fix, verifies the test passes, and records the gotcha in `.ai/context/recent-changes.md`.
+The AI loads the project context, finds the root cause, writes a failing test, applies the smallest safe fix, verifies it passes, and records the gotcha in `.ai/context/recent-changes.md`.
 
 ### Example: should I refactor this?
 
-> Use the proj-spike agent. Is it worth extracting the payment logic into its own module?
+> Use agent-spike. Is it worth extracting the payment logic into its own module?
 
-You get a structured analysis: pros, cons, estimated effort, risks, dependencies, and a recommendation (proceed, pivot, or abandon). No code is written — just a decision document.
+You get a structured analysis: pros, cons, estimated effort, risks, and a recommendation — proceed, pivot, or abandon. No code written, just a decision document.
 
 ## What gets installed
 
 ```
 .ai/
-├── context.md              # what the product does and how it is built
+├── context.md                   # what the product does and how it is built
 ├── context/
-│   ├── architecture.md     # layers, modules, data flow
-│   ├── dependencies.md     # libraries, SDKs, versions
-│   ├── features.md         # feature inventory and status
-│   ├── repository.md       # git workflow, CI, branching
-│   └── recent-changes.md   # what changed recently, gotchas
-├── decision-framework.md   # standard patterns for common changes
-├── rules/                  # guardrails by file type (language, UI, tests, data...)
-├── agents/                 # the 8 workflow playbooks described above
-├── skills/                 # 4 reusable checklists
-├── features/               # memory per completed feature
-└── archive/                # past plans and fixes
+│   ├── architecture.md          # layers, modules, data flow
+│   ├── dependencies.md          # libraries, SDKs, versions
+│   ├── features.md              # feature inventory and status
+│   ├── repository.md            # git workflow, CI, branching
+│   └── recent-changes.md        # what changed recently, gotchas
+├── decision-framework.md        # standard patterns for common changes
+├── rules/                       # guardrails by file type
+├── agents/
+│   ├── agent-explore.md
+│   ├── agent-plan.md
+│   ├── agent-code.md
+│   ├── agent-verify.md
+│   ├── agent-fix.md
+│   ├── agent-tech.md
+│   ├── agent-spike.md
+│   └── agent-context-bootstrap.md
+├── skills/                      # 4 reusable checklists
+├── features/                    # memory per completed feature
+└── archive/                     # past plans and fixes
 ```
 
 Plus a thin adapter at the root for your AI runtime (`AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`, `.cursor/rules/ai-ready.mdc`, or `AI-READY.md`).
