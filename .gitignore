@@ -1,1 +1,14 @@
+# macOS
 .DS_Store
+
+# Editor
+.idea/
+.vscode/
+*.swp
+*~
+
+# Logs
+*.log
+
+# Temp test repos created by smoke tests or local development
+/tmp/ai-ready-test-*/
