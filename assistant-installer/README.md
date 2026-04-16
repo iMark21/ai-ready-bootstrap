@@ -1,5 +1,7 @@
 # Assistant installer pack
 
+AI-Ready Bootstrap gives any repository a canonical `.ai/` context layer that AI assistants can read before acting. This pack lets you install that layer using the AI you already work with — instead of running a CLI command.
+
 Use this pack when you want AI-Ready Bootstrap to be installed by the AI you already use instead of by the CLI.
 
 ## The stupid-simple path

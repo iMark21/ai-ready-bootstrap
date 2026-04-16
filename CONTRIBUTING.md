@@ -1,5 +1,9 @@
 # Contributing
 
+Contributions are welcome. Bug reports, feature requests, new runtime adapters, additional project type support, and documentation improvements are all useful.
+
+If you are unsure whether something is a good fit, open an issue first to discuss it before writing code.
+
 ## Branching
 
 - `develop` is the default integration branch
