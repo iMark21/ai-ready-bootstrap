@@ -16,6 +16,28 @@ The operating model is:
 4. keep Git governance and repository conventions explicit
 5. if the repo already has AI files, audit first and standardize instead of blindly overwriting
 
+## Installation modes
+
+There are now two supported ways to use AI-Ready Bootstrap.
+
+| Mode | Best when | Result |
+| --- | --- | --- |
+| AI-assisted install | you already work inside an AI with local repo access and want the files grounded from the first pass | the AI audits the repo first and writes a repo-specific `.ai/` layer |
+| CLI install | you want deterministic scaffolding, repeatable shell commands, or non-interactive runs | the CLI generates the canonical frame and the repo then runs the first-pass grounding workflow |
+
+### AI-assisted install
+
+Use the files under [`assistant-installer/`](assistant-installer/README.md):
+
+- [`assistant-installer/SKILL.md`](assistant-installer/SKILL.md) if the runtime supports custom skills or reusable playbooks
+- [`assistant-installer/PROMPT.md`](assistant-installer/PROMPT.md) if the runtime only supports pasted prompts or custom instructions
+
+This path is intended to create the same canonical shape as the CLI, but with grounded `.ai/context*` content from repository evidence instead of template-first placeholders.
+
+### CLI install
+
+Use this when you want the repo bootstrapped from the shell and you are comfortable with the generated layer being grounded immediately afterward by the first-pass context bootstrap flow.
+
 ## Installing The CLI
 
 If you have access to the repo:
@@ -40,6 +62,8 @@ If you prefer not to install globally yet, run:
 ```bash
 bin/ai-ready --help
 ```
+
+If you want the installed files to be repo-specific from the start instead of template-first, prefer the AI-assisted install path above.
 
 ## Core Model
 
