@@ -45,12 +45,9 @@ There are now two supported ways to use AI-Ready Bootstrap.
 
 ### AI-assisted install
 
-Use the files under [`assistant-installer/`](assistant-installer/README.md):
+Paste [`assistant-installer/PROMPT.md`](assistant-installer/PROMPT.md) into your AI assistant — Codex, Claude Code, Copilot, Cursor, or any other.
 
-- [`assistant-installer/SKILL.md`](assistant-installer/SKILL.md) if the runtime supports custom skills or reusable playbooks
-- [`assistant-installer/PROMPT.md`](assistant-installer/PROMPT.md) if the runtime only supports pasted prompts or custom instructions
-
-This path is intended to create the same canonical shape as the CLI, but with grounded `.ai/context*` content from repository evidence instead of template-first placeholders.
+The prompt asks which runtime(s) you want, audits the repo, and generates a grounded `.ai/` layer with real project knowledge — not template-first placeholders. All adapter formats are embedded in the prompt; no web searches needed.
 
 ### CLI install
 

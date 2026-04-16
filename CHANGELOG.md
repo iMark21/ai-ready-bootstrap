@@ -2,6 +2,14 @@
 
 All notable changes to AI-Ready Bootstrap are documented here.
 
+## [0.4.0] - 2026-04-17
+
+### Changed
+- `assistant-installer/SKILL.md` removed. PROMPT.md is now the single universal installer — it works identically with Codex, Claude Code, Copilot, Cursor, or any other AI, and is self-contained with all adapter formats embedded.
+- `assistant-installer/addon/` removed. The Codex skill add-on was a convenience wrapper for an install that runs once per repo. The prompt is sufficient.
+- `assistant-installer/README.md` simplified from a routing table to a plain explanation of PROMPT.md.
+- README and MANUAL.md updated to remove all references to SKILL.md and the addon.
+
 ## [0.3.3] - 2026-04-17
 
 ### Added

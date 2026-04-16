@@ -71,8 +71,6 @@ The AI fetches the ai-ready-bootstrap spec, **asks you which AI runtime(s) you w
 > ```
 > Then tell your AI: `Read PROMPT.md in this directory and follow the installation workflow.` Delete it when done.
 
-**Codex power user:** install the skill add-on once and skip the prompt every time — see [assistant-installer/addon/README.md](assistant-installer/addon/README.md).
-
 ### Option 2 — Use the CLI (deterministic, no AI at install time)
 
 ```bash
