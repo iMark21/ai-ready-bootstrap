@@ -317,14 +317,14 @@ They are not background services. They define which working mode the AI should u
 
 | Agent File | Responsibility |
 | --- | --- |
-| `.ai/agents/proj-explore.md` | explore an unfamiliar area before planning or coding |
-| `.ai/agents/proj-context-bootstrap.md` | replace the generated `.ai/context*` templates with real repository knowledge on the first pass |
-| `.ai/agents/proj-feature.md` | create the file-level implementation plan for a feature |
-| `.ai/agents/proj-code.md` | execute the approved plan in small steps |
-| `.ai/agents/proj-verify.md` | verify acceptance criteria, run tests, and report residual risk |
-| `.ai/agents/proj-fix.md` | reproduce and isolate defects before applying the smallest safe fix |
-| `.ai/agents/proj-tech.md` | structure refactors and technical cleanup |
-| `.ai/agents/proj-spike.md` | run a time-boxed investigation and recommend a direction |
+| `.ai/agents/agent-explore.md` | explore an unfamiliar area before planning or coding |
+| `.ai/agents/agent-context-bootstrap.md` | replace the generated `.ai/context*` templates with real repository knowledge on the first pass |
+| `.ai/agents/agent-plan.md` | create the file-level implementation plan for a feature |
+| `.ai/agents/agent-code.md` | execute the approved plan in small steps |
+| `.ai/agents/agent-verify.md` | verify acceptance criteria, run tests, and report residual risk |
+| `.ai/agents/agent-fix.md` | reproduce and isolate defects before applying the smallest safe fix |
+| `.ai/agents/agent-tech.md` | structure refactors and technical cleanup |
+| `.ai/agents/agent-spike.md` | run a time-boxed investigation and recommend a direction |
 
 ### Generated Skills
 
@@ -343,7 +343,7 @@ This is the first workflow the runtime should execute if `Context Bootstrap Stat
 | --- | --- | --- |
 | 1 | runtime adapter such as `AGENTS.md`, `CLAUDE.md`, or `AI-READY.md` | the AI is redirected into `.ai/` |
 | 2 | `.ai/context.md` | pending bootstrap status is detected |
-| 3 | `.ai/agents/proj-context-bootstrap.md` | real architecture, dependencies, features, and repo workflow are gathered from evidence |
+| 3 | `.ai/agents/agent-context-bootstrap.md` | real architecture, dependencies, features, and repo workflow are gathered from evidence |
 | 4 | `.ai/skills/context-bootstrap.md` | consistent checklist is applied to the first pass |
 | 5 | `.ai/context.md` and `.ai/context/recent-changes.md` | bootstrap status is changed from pending to grounded and the pass is recorded |
 
@@ -354,30 +354,30 @@ This first pass should update documentation, not product code, unless the user e
 | Step | Agent / File | Result |
 | --- | --- | --- |
 | 1 | runtime adapter such as `AGENTS.md`, `CLAUDE.md`, or `AI-READY.md` | the AI is redirected into `.ai/` |
-| 2 | `.ai/agents/proj-context-bootstrap.md` if bootstrap is still pending | generated templates are grounded in the real repo |
-| 3 | `.ai/agents/proj-explore.md` | relevant files, architecture pattern, and risks are identified |
-| 4 | `.ai/agents/proj-feature.md` | the implementation plan is created |
-| 5 | `.ai/agents/proj-code.md` | the code is written |
-| 6 | `.ai/agents/proj-verify.md` and `.ai/rules/testing.md` | tests and checks are run |
+| 2 | `.ai/agents/agent-context-bootstrap.md` if bootstrap is still pending | generated templates are grounded in the real repo |
+| 3 | `.ai/agents/agent-explore.md` | relevant files, architecture pattern, and risks are identified |
+| 4 | `.ai/agents/agent-plan.md` | the implementation plan is created |
+| 5 | `.ai/agents/agent-code.md` | the code is written |
+| 6 | `.ai/agents/agent-verify.md` and `.ai/rules/testing.md` | tests and checks are run |
 | 7 | `.ai/skills/context-refresh.md` and `.ai/context/recent-changes.md` | the repo memory is updated |
 
 ### Real Bug Workflow
 
 | Step | Agent / File | Result |
 | --- | --- | --- |
-| 1 | `.ai/agents/proj-fix.md` | reproduction and root-cause framing |
-| 2 | `.ai/agents/proj-code.md` | smallest safe code change |
-| 3 | `.ai/agents/proj-verify.md` | regression and risk check |
+| 1 | `.ai/agents/agent-fix.md` | reproduction and root-cause framing |
+| 2 | `.ai/agents/agent-code.md` | smallest safe code change |
+| 3 | `.ai/agents/agent-verify.md` | regression and risk check |
 | 4 | `.ai/context/recent-changes.md` | bug and constraint memory recorded |
 
 ### Real Refactor Or Migration Workflow
 
 | Step | Agent / File | Result |
 | --- | --- | --- |
-| 1 | `.ai/agents/proj-spike.md` or `.ai/skills/migration-audit.md` | options, effort, and risk |
-| 2 | `.ai/agents/proj-tech.md` | sequence and safety net |
-| 3 | `.ai/agents/proj-code.md` | incremental refactor or migration |
-| 4 | `.ai/agents/proj-verify.md` | regression validation |
+| 1 | `.ai/agents/agent-spike.md` or `.ai/skills/migration-audit.md` | options, effort, and risk |
+| 2 | `.ai/agents/agent-tech.md` | sequence and safety net |
+| 3 | `.ai/agents/agent-code.md` | incremental refactor or migration |
+| 4 | `.ai/agents/agent-verify.md` | regression validation |
 
 ### Practical Interpretation
 
