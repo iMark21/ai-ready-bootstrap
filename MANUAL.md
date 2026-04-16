@@ -1,5 +1,23 @@
 # AI-Ready Bootstrap Manual
 
+## Quick start
+
+```bash
+# 1. Install the CLI
+git clone https://github.com/iMark21/ai-ready-bootstrap.git
+cd ai-ready-bootstrap && bash install.sh
+
+# 2. Bootstrap your project
+ai-ready install /path/to/your-repo \
+  --runtimes claude,generic \
+  --project-type ios
+
+# 3. Tell your AI (example for Claude Code):
+# "Read CLAUDE.md and the .ai/ layer. Ground the context with real repo knowledge."
+```
+
+Done. Your AI now has architecture, conventions, and workflow memory for that repository.
+
 ## Purpose
 
 This tool exists for a common problem:
@@ -402,8 +420,8 @@ Use this when the repo clearly needs an AI-Ready layer now.
 bin/ai-ready install ~/Developer/android-repo \
   --runtimes codex,claude,generic \
   --project-type android \
-  --git-name "Michel Marques" \
-  --git-email "marques.jm@icloud.com" \
+  --git-name "Your Name" \
+  --git-email "you@example.com" \
   --apply-git-config
 ```
 
@@ -413,8 +431,8 @@ bin/ai-ready install ~/Developer/android-repo \
 bin/ai-ready install ~/Developer/ios-repo \
   --runtimes codex,claude,generic \
   --project-type ios \
-  --git-name "Michel Marques" \
-  --git-email "marques.jm@icloud.com" \
+  --git-name "Your Name" \
+  --git-email "you@example.com" \
   --apply-git-config
 ```
 
@@ -484,8 +502,8 @@ If you want the tool to apply them locally:
 ```bash
 bin/ai-ready install /path/to/repo \
   --runtimes generic \
-  --git-name "Michel Marques" \
-  --git-email "marques.jm@icloud.com" \
+  --git-name "Your Name" \
+  --git-email "you@example.com" \
   --apply-git-config
 ```
 
@@ -517,3 +535,15 @@ That gives you:
 - first-class adapters for the chosen tools
 - a universal fallback adapter for any other AI
 - a single `.ai/` canon that survives runtime changes
+
+## The core idea
+
+The system is runtime-agnostic. AI-Ready works on any tech project if you define these five things well:
+
+1. Product context and architecture
+2. Precise rules by file type or module
+3. A decision framework for common changes
+4. Specialized agents or flows by task type
+5. Useful memory of what has already been done
+
+The stack, the language, and the AI runtime can all change. These five pieces are what makes a repository legible to any assistant from the first session.
