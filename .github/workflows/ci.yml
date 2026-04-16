@@ -23,7 +23,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Bash syntax
-        run: bash -n bin/ai-ready
+        run: bash -n bin/agentlayer
 
       - name: Installer syntax
         run: bash -n install.sh
@@ -34,8 +34,8 @@ jobs:
           set -euo pipefail
           bin_dir="$(mktemp -d)"
           bash install.sh --bin-dir "$bin_dir"
-          test -x "$bin_dir/ai-ready" -o -L "$bin_dir/ai-ready"
-          "$bin_dir/ai-ready" --help >/dev/null
+          test -x "$bin_dir/agentlayer" -o -L "$bin_dir/agentlayer"
+          "$bin_dir/agentlayer" --help >/dev/null
 
       - name: Fresh install smoke test
         shell: bash
@@ -46,7 +46,7 @@ jobs:
           touch "$repo/settings.gradle.kts" "$repo/app/src/main/AndroidManifest.xml"
           git -C "$repo" init
 
-          bin/ai-ready install "$repo" \
+          bin/agentlayer install "$repo" \
             --runtimes codex,claude,generic \
             --project-type android \
             --git-name "CI Bot" \
@@ -60,7 +60,7 @@ jobs:
           test -f "$repo/.ai/agents/agent-context-bootstrap.md"
           test -f "$repo/AGENTS.md"
           test -f "$repo/CLAUDE.md"
-          test -f "$repo/AI-READY.md"
+          test -f "$repo/AGENTLAYER.md"
           test -f "$repo/.ai/agents/agent-verify.md"
           test -f "$repo/.ai/skills/context-bootstrap.md"
           grep -q 'Pending first-pass grounding' "$repo/.ai/context.md"
@@ -75,7 +75,7 @@ jobs:
           touch "$repo/Podfile"
           git -C "$repo" init
 
-          bin/ai-ready install "$repo" \
+          bin/agentlayer install "$repo" \
             --runtimes codex,claude,generic \
             --project-type ios \
             --git-name "CI Bot" \
@@ -89,7 +89,7 @@ jobs:
           test -f "$repo/.ai/agents/agent-context-bootstrap.md"
           test -f "$repo/AGENTS.md"
           test -f "$repo/CLAUDE.md"
-          test -f "$repo/AI-READY.md"
+          test -f "$repo/AGENTLAYER.md"
           test -f "$repo/.ai/agents/agent-verify.md"
           test -f "$repo/.ai/skills/context-bootstrap.md"
           grep -q 'Pending first-pass grounding' "$repo/.ai/context.md"
@@ -100,10 +100,10 @@ jobs:
           set -euo pipefail
           repo="$(mktemp -d)"
           mkdir -p "$repo/.github/instructions" "$repo/.cursor/rules"
-          touch "$repo/AGENTS.md" "$repo/CLAUDE.md" "$repo/AI-READY.md" "$repo/.github/copilot-instructions.md" "$repo/.github/instructions/old.instructions.md" "$repo/.cursor/rules/ai-ready.mdc"
+          touch "$repo/AGENTS.md" "$repo/CLAUDE.md" "$repo/AGENTLAYER.md" "$repo/.github/copilot-instructions.md" "$repo/.github/instructions/old.instructions.md" "$repo/.cursor/rules/agentlayer.mdc"
           git -C "$repo" init
 
-          bin/ai-ready standardize "$repo" \
+          bin/agentlayer standardize "$repo" \
             --runtimes copilot,generic \
             --project-type generic \
             --yes \
@@ -112,12 +112,12 @@ jobs:
           test -f "$repo/.ai/README.md"
           test -f "$repo/.github/copilot-instructions.md"
           test -f "$repo/.github/instructions/code.instructions.md"
-          test -f "$repo/AI-READY.md"
+          test -f "$repo/AGENTLAYER.md"
           test -f "$repo/.ai/agents/agent-context-bootstrap.md"
           test -f "$repo/.ai/agents/agent-verify.md"
           test -f "$repo/.ai/skills/context-bootstrap.md"
           grep -q 'Pending first-pass grounding' "$repo/.ai/context.md"
           test ! -f "$repo/AGENTS.md"
           test ! -f "$repo/CLAUDE.md"
-          test ! -f "$repo/.cursor/rules/ai-ready.mdc"
+          test ! -f "$repo/.cursor/rules/agentlayer.mdc"
           find "$repo/.ai/archive" -type f | grep -q .

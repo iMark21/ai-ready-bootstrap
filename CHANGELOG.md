@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to AI-Ready Bootstrap are documented here.
+All notable changes to agentlayer are documented here.
 
 ## [0.4.0] - 2026-04-17
 
@@ -20,9 +20,9 @@ All notable changes to AI-Ready Bootstrap are documented here.
 
 ### Fixed
 - PROMPT.md and SKILL.md now require the AI to ask which runtime(s) the user wants BEFORE creating any files. Previously the `[auto]` default caused the AI to install all runtimes and search the web for Copilot and Cursor adapter formats.
-- All adapter format templates are now embedded inline in PROMPT.md and SKILL.md. The AI no longer needs to search the web to know the correct format for CLAUDE.md, AGENTS.md, copilot-instructions.md, .mdc, or AI-READY.md.
+- All adapter format templates are now embedded inline in PROMPT.md and SKILL.md. The AI no longer needs to search the web to know the correct format for CLAUDE.md, AGENTS.md, copilot-instructions.md, .mdc, or AGENTLAYER.md.
 - Added explicit "Do not search the web" rule to both files.
-- Synced addon/ai-ready-bootstrap-installer/SKILL.md with parent SKILL.md.
+- Synced addon/agentlayer-installer/SKILL.md with parent SKILL.md.
 
 ## [0.3.1] - 2026-04-16
 
@@ -60,12 +60,12 @@ All notable changes to AI-Ready Bootstrap are documented here.
 
 ### Added
 - Explicit Codex skill-install path via `assistant-installer/addon/README.md`
-- Ready-to-copy add-on package at `assistant-installer/addon/ai-ready-bootstrap-installer/`
+- Ready-to-copy add-on package at `assistant-installer/addon/agentlayer-installer/`
 
 ## [0.1.0] - 2026-04-16
 
 ### Added
-- CLI (`bin/ai-ready`) with `audit`, `install`, and `standardize` commands
+- CLI (`bin/agentlayer`) with `audit`, `install`, and `standardize` commands
 - Multi-runtime selection: Codex, Claude Code, Copilot, Cursor, generic
 - Project type detection: Android, iOS, web, backend, generic
 - Canonical `.ai/` layer with context, rules, agents, and skills

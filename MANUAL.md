@@ -1,14 +1,14 @@
-# AI-Ready Bootstrap Manual
+# agentlayer Manual
 
 ## Quick start
 
 ```bash
 # 1. Install the CLI
-git clone https://github.com/iMark21/ai-ready-bootstrap.git
-cd ai-ready-bootstrap && bash install.sh
+git clone https://github.com/iMark21/agentlayer.git
+cd agentlayer && bash install.sh
 
 # 2. Bootstrap your project
-ai-ready install /path/to/your-repo \
+agentlayer install /path/to/your-repo \
   --runtimes claude,generic \
   --project-type ios
 
@@ -22,7 +22,7 @@ Done. Your AI now has architecture, conventions, and workflow memory for that re
 
 This tool exists for a common problem:
 
-- many repos still have no AI-Ready layer at all
+- many repos still have no agentlayer layer at all
 - some repos already have partial files such as `AGENTS.md`, `CLAUDE.md`, or Copilot instructions
 - teams want one canonical system, but different developers use different AI runtimes
 
@@ -36,7 +36,7 @@ The operating model is:
 
 ## Installation modes
 
-There are now two supported ways to use AI-Ready Bootstrap.
+There are now two supported ways to use agentlayer.
 
 | Mode | Best when | Result |
 | --- | --- | --- |
@@ -58,13 +58,13 @@ Use this when you want the repo bootstrapped from the shell and you are comforta
 If you have access to the repo:
 
 ```bash
-git clone git@github.com:iMark21/ai-ready-bootstrap.git
-cd ai-ready-bootstrap
+git clone git@github.com:iMark21/agentlayer.git
+cd agentlayer
 bash install.sh
-ai-ready --help
+agentlayer --help
 ```
 
-The installer places `ai-ready` in `~/.local/bin` by default.
+The installer places `agentlayer` in `~/.local/bin` by default.
 
 You can override that:
 
@@ -75,7 +75,7 @@ bash install.sh --bin-dir "$HOME/bin"
 If you prefer not to install globally yet, run:
 
 ```bash
-bin/ai-ready --help
+bin/agentlayer --help
 ```
 
 If you want the installed files to be repo-specific from the start instead of template-first, prefer the AI-assisted install path above.
@@ -114,8 +114,8 @@ Adapters are intentionally thin.
 | `codex` | `AGENTS.md` | Codex entry point |
 | `claude` | `CLAUDE.md` | Claude Code entry point |
 | `copilot` | `.github/copilot-instructions.md` plus `.github/instructions/` | GitHub Copilot entry point |
-| `cursor` | `.cursor/rules/ai-ready.mdc` | Cursor entry point |
-| `generic` | `AI-READY.md` | Universal adapter for any AI |
+| `cursor` | `.cursor/rules/agentlayer.mdc` | Cursor entry point |
+| `generic` | `AGENTLAYER.md` | Universal adapter for any AI |
 
 This avoids the usual failure mode where every runtime has a different truth.
 
@@ -151,7 +151,7 @@ The generated iOS guidance is Swift and SwiftUI oriented and explicitly covers:
 If detection is not what you want, force it:
 
 ```bash
-bin/ai-ready install /path/to/repo \
+bin/agentlayer install /path/to/repo \
   --project-type ios \
   --runtimes codex,claude,generic
 ```
@@ -194,7 +194,7 @@ This expands to:
 
 ### Universal Generic Mode
 
-`generic` installs `AI-READY.md`.
+`generic` installs `AGENTLAYER.md`.
 
 Use it when:
 
@@ -219,14 +219,14 @@ Use it when:
 Example:
 
 ```bash
-bin/ai-ready audit /path/to/repo
+bin/agentlayer audit /path/to/repo
 ```
 
 Optional report file:
 
 ```bash
-bin/ai-ready audit /path/to/repo \
-  --report-path /tmp/ai-ready-audit.md
+bin/agentlayer audit /path/to/repo \
+  --report-path /tmp/agentlayer-audit.md
 ```
 
 ### 2. Install
@@ -236,7 +236,7 @@ Use it when the repo does not yet have a canonical AI layer.
 Example:
 
 ```bash
-bin/ai-ready install /path/to/repo \
+bin/agentlayer install /path/to/repo \
   --runtimes codex,claude,generic \
   --project-type android
 ```
@@ -258,7 +258,7 @@ Use it when the repo already has AI-related files and you want to normalize it.
 Example:
 
 ```bash
-bin/ai-ready standardize /path/to/repo \
+bin/agentlayer standardize /path/to/repo \
   --runtimes codex,claude,copilot,generic \
   --yes
 ```
@@ -301,8 +301,8 @@ What it does:
 - `CLAUDE.md`
 - `.github/copilot-instructions.md`
 - `.github/instructions/`
-- `.cursor/rules/ai-ready.mdc`
-- `AI-READY.md`
+- `.cursor/rules/agentlayer.mdc`
+- `AGENTLAYER.md`
 
 ## Agents, Skills, And Real Workflow
 
@@ -338,7 +338,7 @@ This is the first workflow the runtime should execute if `Context Bootstrap Stat
 
 | Step | Agent / File | Result |
 | --- | --- | --- |
-| 1 | runtime adapter such as `AGENTS.md`, `CLAUDE.md`, or `AI-READY.md` | the AI is redirected into `.ai/` |
+| 1 | runtime adapter such as `AGENTS.md`, `CLAUDE.md`, or `AGENTLAYER.md` | the AI is redirected into `.ai/` |
 | 2 | `.ai/context.md` | pending bootstrap status is detected |
 | 3 | `.ai/agents/agent-context-bootstrap.md` | real architecture, dependencies, features, and repo workflow are gathered from evidence |
 | 4 | `.ai/skills/context-bootstrap.md` | consistent checklist is applied to the first pass |
@@ -350,7 +350,7 @@ This first pass should update documentation, not product code, unless the user e
 
 | Step | Agent / File | Result |
 | --- | --- | --- |
-| 1 | runtime adapter such as `AGENTS.md`, `CLAUDE.md`, or `AI-READY.md` | the AI is redirected into `.ai/` |
+| 1 | runtime adapter such as `AGENTS.md`, `CLAUDE.md`, or `AGENTLAYER.md` | the AI is redirected into `.ai/` |
 | 2 | `.ai/agents/agent-context-bootstrap.md` if bootstrap is still pending | generated templates are grounded in the real repo |
 | 3 | `.ai/agents/agent-explore.md` | relevant files, architecture pattern, and risks are identified |
 | 4 | `.ai/agents/agent-plan.md` | the implementation plan is created |
@@ -404,7 +404,7 @@ Use this when a teammate wants to review the plan before any files are generated
 
 ### Mode B: Execute Directly
 
-Use this when the repo clearly needs an AI-Ready layer now.
+Use this when the repo clearly needs an agentlayer layer now.
 
 1. choose runtimes
 2. run `install` or `standardize`
@@ -414,7 +414,7 @@ Use this when the repo clearly needs an AI-Ready layer now.
 ## Android Example
 
 ```bash
-bin/ai-ready install ~/Developer/android-repo \
+bin/agentlayer install ~/Developer/android-repo \
   --runtimes codex,claude,generic \
   --project-type android \
   --git-name "Your Name" \
@@ -425,7 +425,7 @@ bin/ai-ready install ~/Developer/android-repo \
 ## iOS Example
 
 ```bash
-bin/ai-ready install ~/Developer/ios-repo \
+bin/agentlayer install ~/Developer/ios-repo \
   --runtimes codex,claude,generic \
   --project-type ios \
   --git-name "Your Name" \
@@ -436,7 +436,7 @@ bin/ai-ready install ~/Developer/ios-repo \
 ## Generic Any-AI Example
 
 ```bash
-bin/ai-ready install ~/Developer/tech-repo \
+bin/agentlayer install ~/Developer/tech-repo \
   --runtimes generic \
   --project-type generic
 ```
@@ -444,7 +444,7 @@ bin/ai-ready install ~/Developer/tech-repo \
 That gives the repository:
 
 - a canonical `.ai/` layer
-- `AI-READY.md` as a universal adapter
+- `AGENTLAYER.md` as a universal adapter
 - documented Git workflow
 - a handoff path that does not depend on a single AI vendor
 
@@ -461,13 +461,13 @@ Read AGENTS.md and the canonical .ai layer. Audit the repository, map the real a
 ### Claude Code Prompt
 
 ```text
-Read CLAUDE.md and the canonical .ai layer. Summarize the real module layout, identify missing context, update the AI-Ready docs so they match the repository, and then suggest the next safe changes.
+Read CLAUDE.md and the canonical .ai layer. Summarize the real module layout, identify missing context, update the agentlayer docs so they match the repository, and then suggest the next safe changes.
 ```
 
 ### Generic AI Prompt
 
 ```text
-Read AI-READY.md and .ai/README.md. Use the repository itself to infer the true architecture, dependencies, and workflows, update the placeholder AI context files, and propose a minimal-risk plan before making code changes.
+Read AGENTLAYER.md and .ai/README.md. Use the repository itself to infer the true architecture, dependencies, and workflows, update the placeholder AI context files, and propose a minimal-risk plan before making code changes.
 ```
 
 These prompts are important when the repository had no AI system before bootstrap. The tool creates the frame; the AI still needs to ground that frame in the real codebase.
@@ -497,7 +497,7 @@ The tool records detected `user.name` and `user.email` in `.ai/context/repositor
 If you want the tool to apply them locally:
 
 ```bash
-bin/ai-ready install /path/to/repo \
+bin/agentlayer install /path/to/repo \
   --runtimes generic \
   --git-name "Your Name" \
   --git-email "you@example.com" \
@@ -508,10 +508,10 @@ bin/ai-ready install /path/to/repo \
 
 GitHub Actions validates:
 
-- shell syntax for `bin/ai-ready`
+- shell syntax for `bin/agentlayer`
 - Android fresh-install smoke tests
 - iOS fresh-install smoke tests
-- standardize-mode smoke tests including `AI-READY.md`
+- standardize-mode smoke tests including `AGENTLAYER.md`
 
 ## Practical Recommendation
 
@@ -535,7 +535,7 @@ That gives you:
 
 ## The core idea
 
-The system is runtime-agnostic. AI-Ready works on any tech project if you define these five things well:
+The system is runtime-agnostic. agentlayer works on any tech project if you define these five things well:
 
 1. Product context and architecture
 2. Precise rules by file type or module

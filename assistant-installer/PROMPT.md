@@ -1,7 +1,7 @@
 Use this prompt in any AI tool that can read and edit the target repository locally.
 
 ```text
-Install the canonical AI-Ready layer in this repository.
+Install the canonical agentlayer layer in this repository.
 
 ─────────────────────────────────────────
 STEP 0 — MANDATORY. DO THIS BEFORE ANYTHING ELSE.
@@ -33,7 +33,7 @@ Inspect:
 - module, package, target, or workspace boundaries
 - test directories and CI configuration
 - any existing AI-related files (AGENTS.md, CLAUDE.md, .github/copilot-instructions.md,
-  .cursor/rules/, AI-READY.md, .ai/)
+  .cursor/rules/, AGENTLAYER.md, .ai/)
 
 Detect the project type from evidence: android, ios, web, backend, or generic.
 If AI-related files already exist, archive them under .ai/archive/ai-assisted-bootstrap-<timestamp>/
@@ -147,9 +147,9 @@ First pass rule:
 Do not create a second source of truth under `.github/`.
 --- END ---
 
---- CURSOR adapter (file: .cursor/rules/ai-ready.mdc) ---
+--- CURSOR adapter (file: .cursor/rules/agentlayer.mdc) ---
 ---
-description: AI-Ready adapter for Cursor
+description: agentlayer adapter for Cursor
 globs:
 alwaysApply: true
 ---
@@ -169,7 +169,7 @@ If `.ai/context.md` still shows `Pending first-pass grounding`, run `.ai/agents/
 Do not duplicate workflow logic inside Cursor-specific files.
 --- END ---
 
---- GENERIC adapter (file: AI-READY.md) ---
+--- GENERIC adapter (file: AGENTLAYER.md) ---
 # Generic AI Adapter
 
 Use this file when the runtime does not have a native repo adapter format, or when you want one universal entry point that works across multiple tools.
@@ -221,7 +221,7 @@ Then show the user what they can do RIGHT NOW with the installed system.
 Give them concrete, copy-paste-ready examples using their actual project,
 not generic placeholders. For example:
 
-  "Your AI-Ready layer is installed. Try it now:
+  "Your agentlayer layer is installed. Try it now:
 
    - To add a new feature:
      'Use agent-explore. I want to add [a real feature that makes sense for this repo].'

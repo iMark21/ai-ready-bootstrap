@@ -12,7 +12,7 @@
 
 ## Checklist
 
-- [ ] `bash -n bin/ai-ready` passes
+- [ ] `bash -n bin/agentlayer` passes
 - [ ] `bash -n install.sh` passes
 - [ ] Smoke tests pass locally (or CI is green)
 - [ ] README and MANUAL updated if behavior changed

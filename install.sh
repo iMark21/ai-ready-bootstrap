@@ -2,14 +2,14 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-SOURCE_BIN="$SCRIPT_DIR/bin/ai-ready"
+SOURCE_BIN="$SCRIPT_DIR/bin/agentlayer"
 BIN_DIR="${HOME}/.local/bin"
 LINK_MODE="symlink"
 FORCE=0
 
 usage() {
   cat <<'EOF'
-AI-Ready Bootstrap installer
+agentlayer installer
 
 Usage:
   bash install.sh [options]
@@ -60,7 +60,7 @@ done
 
 mkdir -p "$BIN_DIR"
 
-TARGET_BIN="$BIN_DIR/ai-ready"
+TARGET_BIN="$BIN_DIR/agentlayer"
 if [ -e "$TARGET_BIN" ] || [ -L "$TARGET_BIN" ]; then
   [ "$FORCE" -eq 1 ] || die "Target already exists: $TARGET_BIN (use --force to replace it)"
   rm -f "$TARGET_BIN"
@@ -79,7 +79,7 @@ case "$LINK_MODE" in
     ;;
 esac
 
-printf 'Installed ai-ready at %s\n' "$TARGET_BIN"
+printf 'Installed agentlayer at %s\n' "$TARGET_BIN"
 case ":$PATH:" in
   *":$BIN_DIR:"*)
     printf 'PATH already includes %s\n' "$BIN_DIR"
@@ -91,4 +91,4 @@ case ":$PATH:" in
 esac
 
 printf 'Try:\n'
-printf '  ai-ready --help\n'
+printf '  agentlayer --help\n'

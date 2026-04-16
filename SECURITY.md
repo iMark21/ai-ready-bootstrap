@@ -2,7 +2,7 @@
 
 ## Scope
 
-AI-Ready Bootstrap is a local CLI tool. It reads the target repository and writes Markdown files and optional Git hooks. It does not transmit data, require network access, or execute code from the repositories it processes.
+agentlayer is a local CLI tool. It reads the target repository and writes Markdown files and optional Git hooks. It does not transmit data, require network access, or execute code from the repositories it processes.
 
 The primary security surface is:
 
@@ -16,7 +16,7 @@ If you discover a security issue, please do **not** open a public GitHub issue.
 
 Instead, report it by:
 
-1. Opening a [GitHub Security Advisory](https://github.com/iMark21/ai-ready-bootstrap/security/advisories/new) (preferred)
+1. Opening a [GitHub Security Advisory](https://github.com/iMark21/agentlayer/security/advisories/new) (preferred)
 2. Or emailing the maintainer directly — contact information is on the GitHub profile
 
 Please include:

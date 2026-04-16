@@ -16,7 +16,7 @@ labels: bug
 
 ```bash
 # The command you ran
-ai-ready ...
+agentlayer ...
 ```
 
 1.
@@ -28,7 +28,7 @@ ai-ready ...
 - OS:
 - Shell:
 - bash version (`bash --version`):
-- ai-ready version (`ai-ready --version`):
+- agentlayer version (`agentlayer --version`):
 - Project type (`--project-type`):
 - Runtimes selected (`--runtimes`):
 

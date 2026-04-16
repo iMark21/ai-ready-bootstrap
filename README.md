@@ -1,8 +1,8 @@
-# AI-Ready Bootstrap
+# agentlayer
 
 Your AI assistant writes better code when it actually knows your project.
 
-AI-Ready Bootstrap adds a structured context layer to any existing repository so that Codex, Claude Code, Copilot, Cursor — or any AI — stops guessing and starts following your real architecture, conventions, and decisions from the first prompt.
+agentlayer adds a structured context layer to any existing repository so that Codex, Claude Code, Copilot, Cursor — or any AI — stops guessing and starts following your real architecture, conventions, and decisions from the first prompt.
 
 No dependencies. Any AI runtime. Any tech stack.
 
@@ -14,11 +14,11 @@ No dependencies. Any AI runtime. Any tech stack.
 - A new teammate joins and has to figure out the codebase from scratch because there is no structured context
 - A legacy project has no AI setup at all and you do not know where to start
 
-AI-Ready Bootstrap solves all of these. It gives your repository a canonical `.ai/` layer that any AI reads before acting — so it understands the product, follows your conventions, and remembers what was already built.
+agentlayer solves all of these. It gives your repository a canonical `.ai/` layer that any AI reads before acting — so it understands the product, follows your conventions, and remembers what was already built.
 
 ## What you get: a team of agents
 
-When you install AI-Ready, your repo gets a team of specialized agents that follow a structured workflow:
+When you install agentlayer, your repo gets a team of specialized agents that follow a structured workflow:
 
 ```
 ┌──────────────────┐   ┌──────────────────┐   ┌──────────────────┐   ┌──────────────────┐
@@ -38,9 +38,9 @@ All generated automatically. Agents are Markdown playbooks — they work with an
 
 ## The structure is always the same. The content is yours.
 
-Without ai-ready-bootstrap, asking an AI to "set up an AI layer" produces something different every time — whatever the model decides that session.
+Without agentlayer, asking an AI to "set up an AI layer" produces something different every time — whatever the model decides that session.
 
-With ai-ready-bootstrap, every installation produces the same skeleton:
+With agentlayer, every installation produces the same skeleton:
 
 - 8 agents with defined responsibilities
 - 4 reusable skills
@@ -59,15 +59,15 @@ There are two ways. Pick the one that fits your setup.
 Paste this into your AI assistant — Codex, Claude Code, Copilot, Cursor, or any other:
 
 ```
-Fetch https://raw.githubusercontent.com/iMark21/ai-ready-bootstrap/main/assistant-installer/PROMPT.md
+Fetch https://raw.githubusercontent.com/iMark21/agentlayer/main/assistant-installer/PROMPT.md
 and follow the complete installation workflow defined there for this repository.
 ```
 
-The AI fetches the ai-ready-bootstrap spec, **asks you which AI runtime(s) you want**, audits the repo, and generates a grounded `.ai/` layer with real project knowledge — not generic placeholders.
+The AI fetches the agentlayer spec, **asks you which AI runtime(s) you want**, audits the repo, and generates a grounded `.ai/` layer with real project knowledge — not generic placeholders.
 
 > If your AI cannot fetch URLs directly, download the file first:
 > ```bash
-> curl -sO https://raw.githubusercontent.com/iMark21/ai-ready-bootstrap/main/assistant-installer/PROMPT.md
+> curl -sO https://raw.githubusercontent.com/iMark21/agentlayer/main/assistant-installer/PROMPT.md
 > ```
 > Then tell your AI: `Read PROMPT.md in this directory and follow the installation workflow.` Delete it when done.
 
@@ -75,11 +75,11 @@ The AI fetches the ai-ready-bootstrap spec, **asks you which AI runtime(s) you w
 
 ```bash
 # Install the CLI
-git clone https://github.com/iMark21/ai-ready-bootstrap.git /tmp/ai-ready-bootstrap
-cd /tmp/ai-ready-bootstrap && bash install.sh
+git clone https://github.com/iMark21/agentlayer.git /tmp/agentlayer
+cd /tmp/agentlayer && bash install.sh
 
 # Bootstrap your project
-ai-ready install /path/to/your-repo \
+agentlayer install /path/to/your-repo \
   --runtimes claude,generic \
   --project-type ios
 ```
@@ -95,7 +95,7 @@ and summarize what you found.
 Batch or CI installs:
 
 ```bash
-ai-ready install /path/to/your-repo \
+agentlayer install /path/to/your-repo \
   --runtimes codex,claude,copilot,cursor,generic \
   --project-type android \
   --non-interactive --yes
@@ -172,7 +172,7 @@ You get a structured analysis: pros, cons, estimated effort, risks, and a recomm
 └── archive/                     # past plans and fixes
 ```
 
-Plus a thin adapter at the root for your AI runtime (`AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`, `.cursor/rules/ai-ready.mdc`, or `AI-READY.md`).
+Plus a thin adapter at the root for your AI runtime (`AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`, `.cursor/rules/agentlayer.mdc`, or `AGENTLAYER.md`).
 
 ## Supported runtimes
 
@@ -181,8 +181,8 @@ Plus a thin adapter at the root for your AI runtime (`AGENTS.md`, `CLAUDE.md`, `
 | Codex | `AGENTS.md` | `--runtimes codex` |
 | Claude Code | `CLAUDE.md` | `--runtimes claude` |
 | GitHub Copilot | `.github/copilot-instructions.md` | `--runtimes copilot` |
-| Cursor | `.cursor/rules/ai-ready.mdc` | `--runtimes cursor` |
-| Any other AI | `AI-READY.md` | `--runtimes generic` |
+| Cursor | `.cursor/rules/agentlayer.mdc` | `--runtimes cursor` |
+| Any other AI | `AGENTLAYER.md` | `--runtimes generic` |
 
 Use `--runtimes all` to generate every adapter. Use `generic` when you want a tool-agnostic setup.
 
@@ -200,7 +200,7 @@ The CLI auto-detects the project type from the repo structure. Override with `--
 
 ## The core idea
 
-The system is runtime-agnostic. AI-Ready works on any tech project if you define these five things well:
+The system is runtime-agnostic. agentlayer works on any tech project if you define these five things well:
 
 1. Product context and architecture
 2. Precise rules by file type or module

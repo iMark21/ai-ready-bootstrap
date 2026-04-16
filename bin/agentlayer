@@ -20,13 +20,13 @@ INSTALL_GIT_HOOK=1
 
 usage() {
   cat <<'EOF'
-AI-Ready Bootstrap
+agentlayer
 
 Usage:
-  ai-ready <command> [repo-path] [options]
+  agentlayer <command> [repo-path] [options]
 
 Commands:
-  audit         Inspect a repo and emit an AI-Ready audit report
+  audit         Inspect a repo and emit an agentlayer audit report
   install       Install a canonical .ai/ layer plus selected runtime adapters
   standardize   Audit + back up existing AI files + rewrite to the canonical layout
 
@@ -46,9 +46,9 @@ Options:
   --help                   Show this help
 
 Examples:
-  ai-ready audit /path/to/repo
-  ai-ready install /path/to/repo --runtimes codex,claude --project-type android
-  ai-ready standardize /path/to/repo --runtimes all --yes
+  agentlayer audit /path/to/repo
+  agentlayer install /path/to/repo --runtimes codex,claude --project-type android
+  agentlayer standardize /path/to/repo --runtimes all --yes
 EOF
 }
 
@@ -480,11 +480,11 @@ run \`.ai/agents/agent-context-bootstrap.md\` before planning features or editin
     fi
     if has_runtime cursor; then
       if has_runtime codex || has_runtime claude || has_runtime copilot; then printf '%s' ', '; fi
-      printf '%s' '\`Cursor\` via \`.cursor/rules/ai-ready.mdc\`'
+      printf '%s' '\`Cursor\` via \`.cursor/rules/agentlayer.mdc\`'
     fi
     if has_runtime generic; then
       if has_runtime codex || has_runtime claude || has_runtime copilot || has_runtime cursor; then printf '%s' ', '; fi
-      printf '%s' '\`Generic AI\` via \`AI-READY.md\`'
+      printf '%s' '\`Generic AI\` via \`AGENTLAYER.md\`'
     fi
   )
 
@@ -749,7 +749,7 @@ render_recent_changes_md() {
 
 | Date | Change | Notes |
 | --- | --- | --- |
-| $(date '+%Y-%m-%d') | AI-Ready bootstrap initialized | Replace with real repository changes |
+| $(date '+%Y-%m-%d') | agentlayer initialized | Replace with real repository changes |
 
 ## Known Gotchas
 
@@ -1106,7 +1106,7 @@ render_skill_context_bootstrap_md() {
   cat <<EOF
 # Skill: Context Bootstrap
 
-Use this immediately after a fresh AI-Ready install or standardize pass.
+Use this immediately after a fresh agentlayer install or standardize pass.
 
 ## Checklist
 
@@ -1219,7 +1219,7 @@ EOF
 render_cursor_adapter() {
   cat <<EOF
 ---
-description: AI-Ready adapter for Cursor
+description: agentlayer adapter for Cursor
 globs:
 alwaysApply: true
 ---
@@ -1235,7 +1235,7 @@ Read order:
 6. \`.ai/decision-framework.md\`
 7. The relevant files under \`.ai/rules/\`, \`.ai/agents/\`, and \`.ai/skills/\`
 
-If \`AI-READY.md\` exists, use it as the universal adapter layer for non-native runtimes.
+If \`AGENTLAYER.md\` exists, use it as the universal adapter layer for non-native runtimes.
 If \`.ai/context.md\` still shows \`Pending first-pass grounding\`, run \`.ai/agents/agent-context-bootstrap.md\` first.
 Do not duplicate workflow logic inside Cursor-specific files.
 EOF
@@ -1380,11 +1380,11 @@ write_runtime_adapters() {
   fi
 
   if has_runtime cursor; then
-    write_file "$TARGET_REPO/.cursor/rules/ai-ready.mdc" "$(render_cursor_adapter)" "$overwrite"
+    write_file "$TARGET_REPO/.cursor/rules/agentlayer.mdc" "$(render_cursor_adapter)" "$overwrite"
   fi
 
   if has_runtime generic; then
-    write_file "$TARGET_REPO/AI-READY.md" "$(render_generic_adapter)" "$overwrite"
+    write_file "$TARGET_REPO/AGENTLAYER.md" "$(render_generic_adapter)" "$overwrite"
   fi
 }
 
@@ -1396,15 +1396,15 @@ build_audit_report() {
     git_repo_value="yes"
   fi
 
-  if [ -d "$TARGET_REPO/.ai" ] || [ -f "$TARGET_REPO/AGENTS.md" ] || [ -f "$TARGET_REPO/CLAUDE.md" ] || [ -f "$TARGET_REPO/.github/copilot-instructions.md" ] || [ -f "$TARGET_REPO/.cursor/rules/ai-ready.mdc" ] || [ -f "$TARGET_REPO/AI-READY.md" ]; then
+  if [ -d "$TARGET_REPO/.ai" ] || [ -f "$TARGET_REPO/AGENTS.md" ] || [ -f "$TARGET_REPO/CLAUDE.md" ] || [ -f "$TARGET_REPO/.github/copilot-instructions.md" ] || [ -f "$TARGET_REPO/.cursor/rules/agentlayer.mdc" ] || [ -f "$TARGET_REPO/AGENTLAYER.md" ]; then
     recommendation="- Repository already has some AI-related files. Prefer \`standardize\` if you want a canonical \`.ai/\` layer plus aligned runtime adapters.
 - Review existing docs before overwriting them."
   else
-    recommendation="- Repository does not appear to have an AI-Ready layer yet. \`install\` is the right starting command."
+    recommendation="- Repository does not appear to have an agentlayer control plane yet. \`install\` is the right starting command."
   fi
 
   cat <<EOF
-# AI-Ready Audit Report
+# agentlayer Audit Report
 
 | Field | Value |
 | --- | --- |
@@ -1424,8 +1424,8 @@ build_audit_report() {
 | \`CLAUDE.md\` | $( [ -f "$TARGET_REPO/CLAUDE.md" ] && printf 'present' || printf 'missing' ) |
 | \`.github/copilot-instructions.md\` | $( [ -f "$TARGET_REPO/.github/copilot-instructions.md" ] && printf 'present' || printf 'missing' ) |
 | \`.github/instructions/\` | $( [ -d "$TARGET_REPO/.github/instructions" ] && printf 'present' || printf 'missing' ) |
-| \`.cursor/rules/ai-ready.mdc\` | $( [ -f "$TARGET_REPO/.cursor/rules/ai-ready.mdc" ] && printf 'present' || printf 'missing' ) |
-| \`AI-READY.md\` | $( [ -f "$TARGET_REPO/AI-READY.md" ] && printf 'present' || printf 'missing' ) |
+| \`.cursor/rules/agentlayer.mdc\` | $( [ -f "$TARGET_REPO/.cursor/rules/agentlayer.mdc" ] && printf 'present' || printf 'missing' ) |
+| \`AGENTLAYER.md\` | $( [ -f "$TARGET_REPO/AGENTLAYER.md" ] && printf 'present' || printf 'missing' ) |
 | \`.githooks/pre-commit\` | $( [ -f "$TARGET_REPO/.githooks/pre-commit" ] && printf 'present' || printf 'missing' ) |
 
 ## Recommendation
@@ -1451,11 +1451,11 @@ print_first_pass_guidance() {
   fi
 
   if has_runtime cursor; then
-    log "- Cursor: let .cursor/rules/ai-ready.mdc route into .ai/, then execute .ai/agents/agent-context-bootstrap.md first."
+    log "- Cursor: let .cursor/rules/agentlayer.mdc route into .ai/, then execute .ai/agents/agent-context-bootstrap.md first."
   fi
 
   if has_runtime generic; then
-    log "- Generic AI: start from AI-READY.md and execute .ai/agents/agent-context-bootstrap.md before implementation work."
+    log "- Generic AI: start from AGENTLAYER.md and execute .ai/agents/agent-context-bootstrap.md before implementation work."
   fi
 }
 
@@ -1473,7 +1473,7 @@ run_audit() {
 run_install() {
   ensure_runtimes_selected
 
-  if [ -d "$TARGET_REPO/.ai" ] || [ -f "$TARGET_REPO/AGENTS.md" ] || [ -f "$TARGET_REPO/CLAUDE.md" ] || [ -f "$TARGET_REPO/.github/copilot-instructions.md" ] || [ -f "$TARGET_REPO/.cursor/rules/ai-ready.mdc" ] || [ -f "$TARGET_REPO/AI-READY.md" ]; then
+  if [ -d "$TARGET_REPO/.ai" ] || [ -f "$TARGET_REPO/AGENTS.md" ] || [ -f "$TARGET_REPO/CLAUDE.md" ] || [ -f "$TARGET_REPO/.github/copilot-instructions.md" ] || [ -f "$TARGET_REPO/.cursor/rules/agentlayer.mdc" ] || [ -f "$TARGET_REPO/AGENTLAYER.md" ]; then
     warn "AI-related files already exist in the target repo"
     prompt_yes_no "Continue with install mode anyway? Consider using standardize instead." "n" || exit 1
   fi
@@ -1483,7 +1483,7 @@ run_install() {
   install_git_hook_if_needed
   apply_git_identity_if_needed
 
-  log "AI-Ready install complete for $TARGET_REPO"
+  log "agentlayer install complete for $TARGET_REPO"
   print_first_pass_guidance
 }
 
@@ -1498,13 +1498,13 @@ run_standardize() {
   backup_path_if_exists "$TARGET_REPO/CLAUDE.md" "$backup_root"
   backup_path_if_exists "$TARGET_REPO/.github/copilot-instructions.md" "$backup_root"
   backup_path_if_exists "$TARGET_REPO/.github/instructions" "$backup_root"
-  backup_path_if_exists "$TARGET_REPO/.cursor/rules/ai-ready.mdc" "$backup_root"
-  backup_path_if_exists "$TARGET_REPO/AI-READY.md" "$backup_root"
+  backup_path_if_exists "$TARGET_REPO/.cursor/rules/agentlayer.mdc" "$backup_root"
+  backup_path_if_exists "$TARGET_REPO/AGENTLAYER.md" "$backup_root"
   backup_path_if_exists "$TARGET_REPO/.githooks/pre-commit" "$backup_root"
 
   remove_path_if_exists "$TARGET_REPO/.github/copilot-instructions.md"
   remove_path_if_exists "$TARGET_REPO/.github/instructions"
-  remove_path_if_exists "$TARGET_REPO/.cursor/rules/ai-ready.mdc"
+  remove_path_if_exists "$TARGET_REPO/.cursor/rules/agentlayer.mdc"
 
   if ! has_runtime codex; then
     remove_path_if_exists "$TARGET_REPO/AGENTS.md"
@@ -1515,7 +1515,7 @@ run_standardize() {
   fi
 
   if ! has_runtime generic; then
-    remove_path_if_exists "$TARGET_REPO/AI-READY.md"
+    remove_path_if_exists "$TARGET_REPO/AGENTLAYER.md"
   fi
 
   write_canonical_files 1
@@ -1523,7 +1523,7 @@ run_standardize() {
   install_git_hook_if_needed
   apply_git_identity_if_needed
 
-  log "AI-Ready standardization complete for $TARGET_REPO"
+  log "agentlayer standardization complete for $TARGET_REPO"
   print_first_pass_guidance
 }
 
