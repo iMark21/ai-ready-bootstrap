@@ -1,5 +1,7 @@
 # agentlayer
 
+![AgentLayer](docs/cover.png)
+
 Your AI assistant writes better code when it actually knows your project.
 
 agentlayer adds a structured context layer to any existing repository so that Codex, Claude Code, Copilot, Cursor — or any AI — stops guessing and starts following your real architecture, conventions, and decisions from the first prompt.
