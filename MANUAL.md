@@ -206,7 +206,34 @@ This is the safest default when you need the setup to survive tool churn.
 
 ## Commands
 
-### 1. Audit
+`init` is the recommended entrypoint; `install`, `standardize`, and `audit` remain available for advanced or scripted usage.
+
+### 1. Init (recommended)
+
+Single entrypoint that detects the repository state and routes to the right underlying command.
+
+```bash
+# Inside a repo
+cd /path/to/repo
+agentlayer init
+
+# Or with an explicit path
+agentlayer init /path/to/repo --runtimes claude,generic
+```
+
+What it does:
+
+- resolves the target path (`.` if omitted) and detects the project type
+- scans for pre-existing AI files (`.ai/`, `AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`, `.github/instructions/`, `.cursor/rules/agentlayer.mdc`, `AGENTLAYER.md`)
+- asks once which runtime(s) to generate, if not passed via `--runtimes`
+- prints a preflight summary (target repo, project name, project type, detected AI files, chosen action, runtimes)
+- asks for confirmation before running — skipped under `--yes`
+- calls `install` if the repo is fresh, or `standardize` if AI files are already present
+- under `--non-interactive`, requires `--runtimes` explicitly; otherwise it exits with an error
+
+`init` never modifies the install/standardize logic — it only decides which one to invoke.
+
+### 2. Audit
 
 Read-only mode.
 
@@ -229,7 +256,7 @@ bin/agentlayer audit /path/to/repo \
   --report-path /tmp/agentlayer-audit.md
 ```
 
-### 2. Install
+### 3. Install
 
 Use it when the repo does not yet have a canonical AI layer.
 
@@ -251,7 +278,7 @@ What it does:
 - optionally applies local git user name and email
 - prints the recommended first-pass context-bootstrap step for the selected runtimes
 
-### 3. Standardize
+### 4. Standardize
 
 Use it when the repo already has AI-related files and you want to normalize it.
 

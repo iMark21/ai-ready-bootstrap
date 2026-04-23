@@ -26,6 +26,7 @@ Usage:
   agentlayer <command> [repo-path] [options]
 
 Commands:
+  init          (Recommended) Detect repo state and route to install or standardize
   audit         Inspect a repo and emit an agentlayer audit report
   install       Install a canonical .ai/ layer plus selected runtime adapters
   standardize   Audit + back up existing AI files + rewrite to the canonical layout
@@ -46,6 +47,8 @@ Options:
   --help                   Show this help
 
 Examples:
+  agentlayer init                                           # inside the repo
+  agentlayer init /path/to/repo --runtimes claude,generic
   agentlayer audit /path/to/repo
   agentlayer install /path/to/repo --runtimes codex,claude --project-type android
   agentlayer standardize /path/to/repo --runtimes all --yes
@@ -1402,6 +1405,23 @@ has_existing_ai_files() {
     || [ -f "$TARGET_REPO/AGENTLAYER.md" ]
 }
 
+collect_existing_ai_files() {
+  local items=""
+  local sep=""
+  add_item() {
+    if [ -n "$items" ]; then sep=", "; fi
+    items="${items}${sep}$1"
+  }
+  [ -d "$TARGET_REPO/.ai" ] && add_item ".ai/"
+  [ -f "$TARGET_REPO/AGENTS.md" ] && add_item "AGENTS.md"
+  [ -f "$TARGET_REPO/CLAUDE.md" ] && add_item "CLAUDE.md"
+  [ -f "$TARGET_REPO/.github/copilot-instructions.md" ] && add_item ".github/copilot-instructions.md"
+  [ -d "$TARGET_REPO/.github/instructions" ] && add_item ".github/instructions/"
+  [ -f "$TARGET_REPO/.cursor/rules/agentlayer.mdc" ] && add_item ".cursor/rules/agentlayer.mdc"
+  [ -f "$TARGET_REPO/AGENTLAYER.md" ] && add_item "AGENTLAYER.md"
+  printf '%s' "$items"
+}
+
 build_audit_report() {
   local project_type_value git_repo_value recommendation
   project_type_value="$PROJECT_TYPE"
@@ -1513,6 +1533,61 @@ print_first_pass_guidance() {
   if has_runtime generic; then
     print_paste_block "Generic AI" "$(first_pass_prompt_generic)"
   fi
+}
+
+print_init_runtime_hint() {
+  log ""
+  log "Which AI assistant(s) will use this repo?"
+  log "  codex    Codex CLI"
+  log "  claude   Claude Code"
+  log "  copilot  GitHub Copilot"
+  log "  cursor   Cursor"
+  log "  generic  any other AI / tool-agnostic"
+  log "  all      generate adapters for every runtime"
+  log "(combine with commas, e.g. 'claude,generic')"
+}
+
+run_init() {
+  local action ai_list preflight_rule
+  preflight_rule="────────────────────────────────────────────────────────────"
+
+  if has_existing_ai_files; then
+    action="standardize"
+    ai_list="$(collect_existing_ai_files)"
+  else
+    action="install"
+    ai_list=""
+  fi
+
+  if [ -z "$RUNTIMES" ] && [ "$NON_INTERACTIVE" -ne 1 ]; then
+    print_init_runtime_hint
+  fi
+  ensure_runtimes_selected
+
+  log ""
+  log "$preflight_rule"
+  log "agentlayer init — preflight"
+  log "$preflight_rule"
+  log "Target repo:       $TARGET_REPO"
+  log "Project name:      $PROJECT_NAME"
+  log "Detected type:     $PROJECT_TYPE"
+  if [ -n "$ai_list" ]; then
+    log "Existing AI files: yes ($ai_list)"
+  else
+    log "Existing AI files: no"
+  fi
+  log "Action:            $action"
+  log "Runtimes:          $RUNTIMES"
+  log "$preflight_rule"
+
+  if [ "$YES" -ne 1 ] && [ "$NON_INTERACTIVE" -ne 1 ]; then
+    prompt_yes_no "Proceed with $action?" "y" || die "Aborted by user"
+  fi
+
+  case "$action" in
+    install)     run_install ;;
+    standardize) run_standardize ;;
+  esac
 }
 
 run_audit() {
@@ -1655,7 +1730,7 @@ main() {
   ensure_command
 
   case "$COMMAND" in
-    audit|install|standardize)
+    init|audit|install|standardize)
       ;;
     --help|-h|help)
       usage
@@ -1668,6 +1743,11 @@ main() {
   esac
 
   parse_args "$@"
+
+  if [ "$COMMAND" = "init" ] && [ -z "$TARGET_REPO" ]; then
+    TARGET_REPO="."
+  fi
+
   require_target_repo
   TARGET_REPO="$(cd "$TARGET_REPO" && pwd -P)"
 
@@ -1681,6 +1761,9 @@ main() {
   GIT_EMAIL="$(detect_git_email)"
 
   case "$COMMAND" in
+    init)
+      run_init
+      ;;
     audit)
       run_audit
       ;;

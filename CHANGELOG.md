@@ -4,6 +4,11 @@ All notable changes to agentlayer are documented here.
 
 ## [Unreleased]
 
+### Added
+- `agentlayer init` — recommended single-entrypoint command. Detects repository state (fresh vs. already has AI files), asks once which runtime(s) to use, prints a preflight summary (target repo, project type, existing AI files, chosen action, runtimes), confirms, and routes to `install` or `standardize`. Path argument is optional; defaults to the current directory. `audit`, `install`, and `standardize` remain available for advanced/scripted use.
+- README recut around the first-use path (`agentlayer init`). Internal structural detail moved to MANUAL.md.
+- README "Alternative — let your AI install it" section now states the prerequisites explicitly: the assistant must have local read/write access to the repository; cloud-only chat tools do not work.
+
 ### Changed (UX, breaking in edge cases)
 - `agentlayer install` now refuses to run on a repository that already has any AI-related file (`.ai/`, `AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`, `.github/instructions/`, `.cursor/rules/agentlayer.mdc`, or `AGENTLAYER.md`). The CLI exits non-zero and points at `agentlayer standardize`. The previous behavior (warn + optional prompt to continue) could leave a repo in a mixed state.
 - `agentlayer install --non-interactive` without `--runtimes` now exits non-zero with an explicit error. Previously it silently fell back to a detected default (e.g. `codex,claude,generic`) and generated adapters the user had not asked for.
