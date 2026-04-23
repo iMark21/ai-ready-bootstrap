@@ -4,6 +4,8 @@ All notable changes to agentlayer are documented here.
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-04-23
+
 ### Added
 - `agentlayer init` — recommended single-entrypoint command. Detects repository state (fresh vs. already has AI files), asks once which runtime(s) to use, prints a preflight summary (target repo, project type, existing AI files, chosen action, runtimes), confirms, and routes to `install` or `standardize`. Path argument is optional; defaults to the current directory. `audit`, `install`, and `standardize` remain available for advanced/scripted use.
 - README recut around the first-use path (`agentlayer init`). Internal structural detail moved to MANUAL.md.
@@ -18,6 +20,13 @@ All notable changes to agentlayer are documented here.
 - `agentlayer install .` no longer renders `Project Name | .` in generated docs. The target path is normalized with `cd && pwd -P` before any path operation.
 - `install.sh` now emits a non-fatal warning when run from a volatile path (`/tmp`, `/var/folders`, `/var/tmp`). Clones into those locations produced a symlink that broke on next OS cleanup.
 - README CLI-install example now clones into `~/.agentlayer` instead of `/tmp/agentlayer` to avoid the same footgun.
+
+## [0.5.0] - 2026-04-17
+
+### Changed
+- Project renamed from **AI-Ready Bootstrap** to **agentlayer**.
+- GitHub repository moved to `iMark21/agentlayer`.
+- CLI command renamed from `ai-ready` to `agentlayer`.
 
 ## [0.4.0] - 2026-04-17
 
