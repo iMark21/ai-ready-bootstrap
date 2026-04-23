@@ -206,7 +206,34 @@ This is the safest default when you need the setup to survive tool churn.
 
 ## Commands
 
-### 1. Audit
+`init` is the recommended entrypoint; `install`, `standardize`, and `audit` remain available for advanced or scripted usage.
+
+### 1. Init (recommended)
+
+Single entrypoint that detects the repository state and routes to the right underlying command.
+
+```bash
+# Inside a repo
+cd /path/to/repo
+agentlayer init
+
+# Or with an explicit path
+agentlayer init /path/to/repo --runtimes claude,generic
+```
+
+What it does:
+
+- resolves the target path (`.` if omitted) and detects the project type
+- scans for pre-existing AI files (`.ai/`, `AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`, `.github/instructions/`, `.cursor/rules/agentlayer.mdc`, `AGENTLAYER.md`)
+- asks once which runtime(s) to generate, if not passed via `--runtimes`
+- prints a preflight summary (target repo, project name, project type, detected AI files, chosen action, runtimes)
+- asks for confirmation before running — skipped under `--yes`
+- calls `install` if the repo is fresh, or `standardize` if AI files are already present
+- under `--non-interactive`, requires `--runtimes` explicitly; otherwise it exits with an error
+
+`init` never modifies the install/standardize logic — it only decides which one to invoke.
+
+### 2. Audit
 
 Read-only mode.
 
@@ -229,7 +256,7 @@ bin/agentlayer audit /path/to/repo \
   --report-path /tmp/agentlayer-audit.md
 ```
 
-### 2. Install
+### 3. Install
 
 Use it when the repo does not yet have a canonical AI layer.
 
@@ -251,7 +278,7 @@ What it does:
 - optionally applies local git user name and email
 - prints the recommended first-pass context-bootstrap step for the selected runtimes
 
-### 3. Standardize
+### 4. Standardize
 
 Use it when the repo already has AI-related files and you want to normalize it.
 
@@ -452,16 +479,30 @@ That gives the repository:
 
 If the repository still has placeholder text under `.ai/context/`, that is expected. The next step is to make the AI read the repo and replace placeholders with real project knowledge.
 
+`agentlayer install` and `agentlayer standardize` print these same prompts as copy-paste blocks at the end of the run — one block per selected runtime. The prompts below are the canonical wording; the CLI output mirrors this section.
+
 ### Codex Prompt
 
 ```text
-Read AGENTS.md and the canonical .ai layer. Audit the repository, map the real architecture and dependencies, replace the placeholder AI context with repo-specific information, and only then propose the smallest safe implementation plan.
+Read AGENTS.md and the canonical .ai/ layer. Audit the repository, map the real architecture and dependencies, replace the placeholder AI context with repo-specific information, and only then propose the smallest safe implementation plan.
 ```
 
 ### Claude Code Prompt
 
 ```text
-Read CLAUDE.md and the canonical .ai layer. Summarize the real module layout, identify missing context, update the agentlayer docs so they match the repository, and then suggest the next safe changes.
+Read CLAUDE.md and the canonical .ai/ layer. Summarize the real module layout, identify missing context, update the agentlayer docs so they match the repository, and then suggest the next safe changes.
+```
+
+### GitHub Copilot Prompt
+
+```text
+Read .github/copilot-instructions.md and the canonical .ai/ layer. Audit the repository, replace the placeholder AI context with repo-specific information, and propose the smallest safe next change before editing code.
+```
+
+### Cursor Prompt
+
+```text
+Follow .cursor/rules/agentlayer.mdc into the canonical .ai/ layer. Audit the repository, replace the placeholder AI context with repo-specific information, and propose the smallest safe next change before editing code.
 ```
 
 ### Generic AI Prompt
