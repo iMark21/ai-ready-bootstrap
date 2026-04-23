@@ -94,6 +94,60 @@ jobs:
           test -f "$repo/.ai/skills/context-bootstrap.md"
           grep -q 'Pending first-pass grounding' "$repo/.ai/context.md"
 
+      - name: Install conflict fail-fast — .github/instructions/ without copilot-instructions.md
+        shell: bash
+        run: |
+          set -euo pipefail
+          repo="$(mktemp -d)"
+          mkdir -p "$repo/.github/instructions"
+          echo "# legacy" > "$repo/.github/instructions/legacy.md"
+          git -C "$repo" init
+
+          status=0
+          bin/agentlayer install "$repo" \
+            --runtimes generic \
+            --project-type generic \
+            --yes \
+            --non-interactive || status=$?
+          test "$status" -ne 0
+
+          test ! -d "$repo/.ai"
+          test ! -d "$repo/.githooks"
+          test ! -f "$repo/AGENTLAYER.md"
+          test -f "$repo/.github/instructions/legacy.md"
+
+      - name: Install conflict fail-fast — CLAUDE.md present
+        shell: bash
+        run: |
+          set -euo pipefail
+          repo="$(mktemp -d)"
+          touch "$repo/CLAUDE.md"
+          git -C "$repo" init
+
+          status=0
+          bin/agentlayer install "$repo" \
+            --runtimes generic \
+            --project-type generic \
+            --yes \
+            --non-interactive || status=$?
+          test "$status" -ne 0
+          test ! -d "$repo/.ai"
+
+      - name: Non-interactive without --runtimes fails
+        shell: bash
+        run: |
+          set -euo pipefail
+          repo="$(mktemp -d)"
+          git -C "$repo" init
+
+          status=0
+          bin/agentlayer install "$repo" \
+            --project-type generic \
+            --yes \
+            --non-interactive || status=$?
+          test "$status" -ne 0
+          test ! -d "$repo/.ai"
+
       - name: Standardize smoke test
         shell: bash
         run: |

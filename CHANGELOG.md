@@ -2,6 +2,18 @@
 
 All notable changes to agentlayer are documented here.
 
+## [Unreleased]
+
+### Changed (UX, breaking in edge cases)
+- `agentlayer install` now refuses to run on a repository that already has any AI-related file (`.ai/`, `AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`, `.github/instructions/`, `.cursor/rules/agentlayer.mdc`, or `AGENTLAYER.md`). The CLI exits non-zero and points at `agentlayer standardize`. The previous behavior (warn + optional prompt to continue) could leave a repo in a mixed state.
+- `agentlayer install --non-interactive` without `--runtimes` now exits non-zero with an explicit error. Previously it silently fell back to a detected default (e.g. `codex,claude,generic`) and generated adapters the user had not asked for.
+- `install` and `standardize` post-run output replaced the prose guidance with visually delimited, copy-paste-ready prompt blocks — one per selected runtime, with wording aligned to MANUAL.md "What To Ask The AI After Install".
+
+### Fixed
+- `agentlayer install .` no longer renders `Project Name | .` in generated docs. The target path is normalized with `cd && pwd -P` before any path operation.
+- `install.sh` now emits a non-fatal warning when run from a volatile path (`/tmp`, `/var/folders`, `/var/tmp`). Clones into those locations produced a symlink that broke on next OS cleanup.
+- README CLI-install example now clones into `~/.agentlayer` instead of `/tmp/agentlayer` to avoid the same footgun.
+
 ## [0.4.0] - 2026-04-17
 
 ### Changed

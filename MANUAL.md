@@ -452,16 +452,30 @@ That gives the repository:
 
 If the repository still has placeholder text under `.ai/context/`, that is expected. The next step is to make the AI read the repo and replace placeholders with real project knowledge.
 
+`agentlayer install` and `agentlayer standardize` print these same prompts as copy-paste blocks at the end of the run — one block per selected runtime. The prompts below are the canonical wording; the CLI output mirrors this section.
+
 ### Codex Prompt
 
 ```text
-Read AGENTS.md and the canonical .ai layer. Audit the repository, map the real architecture and dependencies, replace the placeholder AI context with repo-specific information, and only then propose the smallest safe implementation plan.
+Read AGENTS.md and the canonical .ai/ layer. Audit the repository, map the real architecture and dependencies, replace the placeholder AI context with repo-specific information, and only then propose the smallest safe implementation plan.
 ```
 
 ### Claude Code Prompt
 
 ```text
-Read CLAUDE.md and the canonical .ai layer. Summarize the real module layout, identify missing context, update the agentlayer docs so they match the repository, and then suggest the next safe changes.
+Read CLAUDE.md and the canonical .ai/ layer. Summarize the real module layout, identify missing context, update the agentlayer docs so they match the repository, and then suggest the next safe changes.
+```
+
+### GitHub Copilot Prompt
+
+```text
+Read .github/copilot-instructions.md and the canonical .ai/ layer. Audit the repository, replace the placeholder AI context with repo-specific information, and propose the smallest safe next change before editing code.
+```
+
+### Cursor Prompt
+
+```text
+Follow .cursor/rules/agentlayer.mdc into the canonical .ai/ layer. Audit the repository, replace the placeholder AI context with repo-specific information, and propose the smallest safe next change before editing code.
 ```
 
 ### Generic AI Prompt

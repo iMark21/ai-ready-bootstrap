@@ -238,6 +238,10 @@ ensure_runtimes_selected() {
     return 0
   fi
 
+  if [ "$NON_INTERACTIVE" -eq 1 ]; then
+    die "Missing --runtimes under --non-interactive. Pass --runtimes codex,claude,copilot,cursor,generic,all explicitly; no silent default is applied."
+  fi
+
   RUNTIMES="$(prompt_value "Choose runtimes (codex, claude, copilot, cursor, generic, all)" "$(default_runtime_suggestion)")"
   RUNTIMES="$(normalize_runtimes "$RUNTIMES")"
   validate_runtimes "$RUNTIMES"
@@ -1388,6 +1392,16 @@ write_runtime_adapters() {
   fi
 }
 
+has_existing_ai_files() {
+  [ -d "$TARGET_REPO/.ai" ] \
+    || [ -f "$TARGET_REPO/AGENTS.md" ] \
+    || [ -f "$TARGET_REPO/CLAUDE.md" ] \
+    || [ -f "$TARGET_REPO/.github/copilot-instructions.md" ] \
+    || [ -d "$TARGET_REPO/.github/instructions" ] \
+    || [ -f "$TARGET_REPO/.cursor/rules/agentlayer.mdc" ] \
+    || [ -f "$TARGET_REPO/AGENTLAYER.md" ]
+}
+
 build_audit_report() {
   local project_type_value git_repo_value recommendation
   project_type_value="$PROJECT_TYPE"
@@ -1396,7 +1410,7 @@ build_audit_report() {
     git_repo_value="yes"
   fi
 
-  if [ -d "$TARGET_REPO/.ai" ] || [ -f "$TARGET_REPO/AGENTS.md" ] || [ -f "$TARGET_REPO/CLAUDE.md" ] || [ -f "$TARGET_REPO/.github/copilot-instructions.md" ] || [ -f "$TARGET_REPO/.cursor/rules/agentlayer.mdc" ] || [ -f "$TARGET_REPO/AGENTLAYER.md" ]; then
+  if has_existing_ai_files; then
     recommendation="- Repository already has some AI-related files. Prefer \`standardize\` if you want a canonical \`.ai/\` layer plus aligned runtime adapters.
 - Review existing docs before overwriting them."
   else
@@ -1434,28 +1448,70 @@ $recommendation
 EOF
 }
 
+first_pass_prompt_codex() {
+  cat <<'EOF'
+Read AGENTS.md and the canonical .ai/ layer. Audit the repository, map the real architecture and dependencies, replace the placeholder AI context with repo-specific information, and only then propose the smallest safe implementation plan.
+EOF
+}
+
+first_pass_prompt_claude() {
+  cat <<'EOF'
+Read CLAUDE.md and the canonical .ai/ layer. Summarize the real module layout, identify missing context, update the agentlayer docs so they match the repository, and then suggest the next safe changes.
+EOF
+}
+
+first_pass_prompt_copilot() {
+  cat <<'EOF'
+Read .github/copilot-instructions.md and the canonical .ai/ layer. Audit the repository, replace the placeholder AI context with repo-specific information, and propose the smallest safe next change before editing code.
+EOF
+}
+
+first_pass_prompt_cursor() {
+  cat <<'EOF'
+Follow .cursor/rules/agentlayer.mdc into the canonical .ai/ layer. Audit the repository, replace the placeholder AI context with repo-specific information, and propose the smallest safe next change before editing code.
+EOF
+}
+
+first_pass_prompt_generic() {
+  cat <<'EOF'
+Read AGENTLAYER.md and .ai/README.md. Use the repository itself to infer the true architecture, dependencies, and workflows, update the placeholder AI context files, and propose a minimal-risk plan before making code changes.
+EOF
+}
+
+print_paste_block() {
+  local label="$1"
+  local body="$2"
+  local rule="────────────────────────────────────────────────────────────"
+  log ""
+  log "$rule"
+  log "Paste this into $label"
+  log "$rule"
+  log "$body"
+  log "$rule"
+}
+
 print_first_pass_guidance() {
   log ""
-  log "Next recommended first pass:"
+  log "Next recommended first pass — copy one of the prompts below into your AI."
 
   if has_runtime codex; then
-    log "- Codex: open the repo and ask it to read AGENTS.md, then execute .ai/agents/agent-context-bootstrap.md before implementation work."
+    print_paste_block "Codex" "$(first_pass_prompt_codex)"
   fi
 
   if has_runtime claude; then
-    log "- Claude Code: open the repo and ask it to read CLAUDE.md, then execute .ai/agents/agent-context-bootstrap.md before implementation work."
+    print_paste_block "Claude Code" "$(first_pass_prompt_claude)"
   fi
 
   if has_runtime copilot; then
-    log "- Copilot: start from .github/copilot-instructions.md and run the context bootstrap flow before code changes."
+    print_paste_block "GitHub Copilot" "$(first_pass_prompt_copilot)"
   fi
 
   if has_runtime cursor; then
-    log "- Cursor: let .cursor/rules/agentlayer.mdc route into .ai/, then execute .ai/agents/agent-context-bootstrap.md first."
+    print_paste_block "Cursor" "$(first_pass_prompt_cursor)"
   fi
 
   if has_runtime generic; then
-    log "- Generic AI: start from AGENTLAYER.md and execute .ai/agents/agent-context-bootstrap.md before implementation work."
+    print_paste_block "Generic AI" "$(first_pass_prompt_generic)"
   fi
 }
 
@@ -1471,12 +1527,11 @@ run_audit() {
 }
 
 run_install() {
-  ensure_runtimes_selected
-
-  if [ -d "$TARGET_REPO/.ai" ] || [ -f "$TARGET_REPO/AGENTS.md" ] || [ -f "$TARGET_REPO/CLAUDE.md" ] || [ -f "$TARGET_REPO/.github/copilot-instructions.md" ] || [ -f "$TARGET_REPO/.cursor/rules/agentlayer.mdc" ] || [ -f "$TARGET_REPO/AGENTLAYER.md" ]; then
-    warn "AI-related files already exist in the target repo"
-    prompt_yes_no "Continue with install mode anyway? Consider using standardize instead." "n" || exit 1
+  if has_existing_ai_files; then
+    die "AI-related files already exist in $TARGET_REPO. 'install' refuses to run against a repo with prior AI setup. Run 'agentlayer standardize' to migrate the existing layout to the canonical layer, or remove the existing files manually first."
   fi
+
+  ensure_runtimes_selected
 
   write_canonical_files 0
   write_runtime_adapters 0
@@ -1614,6 +1669,7 @@ main() {
 
   parse_args "$@"
   require_target_repo
+  TARGET_REPO="$(cd "$TARGET_REPO" && pwd -P)"
 
   PROJECT_TYPE="$(detect_project_type)"
 

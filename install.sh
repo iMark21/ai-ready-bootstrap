@@ -58,6 +58,13 @@ done
 
 [ -f "$SOURCE_BIN" ] || die "Missing CLI at $SOURCE_BIN"
 
+case "$SCRIPT_DIR" in
+  /tmp/*|/private/tmp/*|/var/folders/*|/var/tmp/*)
+    printf 'WARN: installing from a volatile path (%s). The symlink will break when the OS cleans this directory.\n' "$SCRIPT_DIR" >&2
+    printf '      Clone into a persistent location (for example ~/.agentlayer) and re-run install.sh.\n' >&2
+    ;;
+esac
+
 mkdir -p "$BIN_DIR"
 
 TARGET_BIN="$BIN_DIR/agentlayer"

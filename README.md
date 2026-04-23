@@ -76,9 +76,9 @@ The AI fetches the agentlayer spec, **asks you which AI runtime(s) you want**, a
 ### Option 2 — Use the CLI (deterministic, no AI at install time)
 
 ```bash
-# Install the CLI
-git clone https://github.com/iMark21/agentlayer.git /tmp/agentlayer
-cd /tmp/agentlayer && bash install.sh
+# Install the CLI (clone somewhere persistent — /tmp gets cleaned and breaks the symlink)
+git clone https://github.com/iMark21/agentlayer.git ~/.agentlayer
+cd ~/.agentlayer && bash install.sh
 
 # Bootstrap your project
 agentlayer install /path/to/your-repo \
