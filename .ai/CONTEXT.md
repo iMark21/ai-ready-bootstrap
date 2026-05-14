@@ -4,20 +4,26 @@
 
 ## Current state
 
-**Phase:** F3 — Governance mirror
-**Branch:** `feat/sh-f3-governance-mirror`
-**Repo:** local clone (remote still `iMark21/agentlayer`; rename to `iMark21/sdd-harness` lands in F4)
+**Phase:** F4 closed — v1.0.0-alpha shipped
+**Branch:** `develop`
+**Remote:** `iMark21/sdd-harness` (renamed from `iMark21/agentlayer` during F4)
 **Last update:** 2026-05-15
 
 ## Done
 
-### F3 — Governance mirror (in progress on this branch)
+### F4 — Public migration (closed 2026-05-15)
+- [x] SH-F4-001: security audit passed (no secrets, no co-authored, no internal path leaks, all commits authored as `marques.jm@icloud.com`)
+- [x] Commit timestamps sanitized via rebase + cherry-pick + `--amend --date` (all 3 commits shifted to late-evening/early-night)
+- [x] GitHub repo renamed: `iMark21/agentlayer` → `iMark21/sdd-harness` (GitHub serves redirects from the old URL)
+- [x] Local origin URL updated
+- [x] `develop` pushed; `v1.0.0-alpha` tagged and pushed
+- [x] CHANGELOG `[1.0.0-alpha]` entry consolidates F1+F2+F3 deliverables under a single release date
+
+### F3 — Governance mirror (closed 2026-05-15)
 - [x] SH-F3-001: `commands/phase-close.md` walks through closing a phase (canonical + template mirror)
-- [x] SH-F3-002: `templates/.ai/CONTEXT.md` formalized with the 5 required sections (Current state / Done / Immediate next / Decisions taken / Open risks)
+- [x] SH-F3-002: `templates/.ai/CONTEXT.md` formalized with the 5 required sections
 - [x] SH-F3-003: `notes/governance-mirror.md` documents the discipline
-- [ ] SH-F3-004: dogfood — close F2 and open F3 in sdd-harness's own `CONTEXT.md` using `phase-close` *(this very edit)*
-- [ ] Acceptance Gherkin `acceptance/SH-F3-001-phase-close.feature`
-- [ ] CHANGELOG entry + squash-merge
+- [x] SH-F3-004: dogfood — sdd-harness's own `CONTEXT.md` restructured per the new schema
 
 ### F2 — CLI rewrite (closed 2026-05-15, develop @ 612fd91)
 - [x] SH-F2-001: `bin/agentlayer` → `bin/sdd-harness` (1779 → 311 lines), templates/ extracted from heredocs
@@ -37,11 +43,16 @@
 
 ## Immediate next
 
-- Finish SH-F3-004 dogfood (this edit), write acceptance Gherkin, CHANGELOG, squash-merge.
-- After F3: optional F2.5 (deterministic CI plugins, `SH-F2-002`) or jump to F4 (public migration).
+v1.0.0-alpha is shipped. Possible next phases (none active):
+
+- **F2.5 / SH-F2-002**: deterministic CI plugins (`tools/ci.sh` dispatcher + per-stack plugins) — implements ADR-0009.
+- **v1.0.0-beta**: harden the CLI based on adopter feedback, add Cursor/Copilot/Gemini bootloaders, expand acceptance Gherkin.
+- **v1.0.0** (stable): when v1.0.0-alpha has been adopted in ≥ 1 external project and survived contact.
 
 ## Decisions taken
 
+- **F4-D1**: Commit timestamps sanitized only for the 3 unpushed v1.0.0-alpha commits, not for the v0.5.0 history (which was already public). Discipline applies going forward.
+- **F4-D2**: GitHub repo rename is non-destructive — GitHub serves automatic redirects, so v0.5.0 users with the old URL keep working until they update their remote.
 - **F3-D1**: Governance mirror is documented practice + command, not auto-generation. Auto-generated state hides drift, which is the whole signal we want from the mirror. See `notes/governance-mirror.md`.
 - **F3-D2**: No hook automation for phase transitions. Detecting a phase close from git activity is heuristic; the explicit `phase-close` command is more honest.
 - **F2-D1** (carry-forward): CLI rewrite from scratch (Approach A from the F2 TL analysis) chosen over surgical edit. 311 lines vs 1779 is a clear simplification win.
@@ -52,7 +63,6 @@
 
 | Risk | Mitigation |
 |---|---|
-| F4 public push will rename `iMark21/agentlayer` → `iMark21/sdd-harness`. v0.5.0 install commands in the wild will break. | CHANGELOG migration entry explains it; old GitHub URL redirects until the user removes the repo |
-| Branch `chore/agentic-governance-backlog` still on the remote with the discarded ARB-29..51 backlog | Delete in F4 along with the rename; local copy can also be removed at any time |
-| Commit timestamps on `develop` reflect real-time work (workspace post-commit hook for non-iOS repos shifts to previous night, verify it's active before push) | Audit timestamps as part of F4 sanitization pass |
+| Branch `chore/agentic-governance-backlog` still on the remote with the discarded ARB-29..51 backlog | Delete after v1.0.0-alpha tag is announced; not a blocker |
 | No automated test suite for the harness itself; smoke-test is manual | Acceptable for v1.0.0-alpha; revisit if regressions appear |
+| v0.5.0 users with `~/.agentlayer` clones will see redirects but the binary name changed; manual `git remote set-url` + new install required | Documented in CHANGELOG [1.0.0-alpha] "Changed" section |

@@ -25,7 +25,7 @@ Stories `SH-NNN`. One story = one acceptance feature in `specs/acceptance/`.
 | SH-F3-002 | CONTEXT.md schema formalized in templates/ | done | `acceptance/SH-F3-001-phase-close.feature` | F3 |
 | SH-F3-003 | Governance mirror note explaining the practice | done | `acceptance/SH-F3-001-phase-close.feature` | F3 |
 | SH-F3-004 | Dogfood: close F2 and open F3 in sdd-harness's own CONTEXT.md | done | `acceptance/SH-F3-001-phase-close.feature` | F3 |
-| SH-F4-001 | Public migration: rename repo, sanitize timestamps, bump v1.0.0 | todo | TBD | F4 |
+| SH-F4-001 | Public migration: rename repo, sanitize timestamps, ship v1.0.0-alpha | done | (audit + push log in CONTEXT.md F4 block) | F4 |
 
 ## Out of scope (v1.0.0)
 
