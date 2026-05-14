@@ -1,8 +1,46 @@
 # Changelog
 
-All notable changes to agentlayer are documented here.
+All notable changes are documented here.
 
 ## [Unreleased]
+
+## [1.0.0-alpha] - 2026-05-15
+
+> **Project rename and rupture.** `agentlayer` is renamed to **`sdd-harness`**. v1.0.0 is a documented break from v0.5.0 — no migration shim. The `agent-explore → plan → code → verify` flow is removed entirely; the new flow is `spec → story → implement → verify → review → release`. This release ships the framework core; the CLI that distributes it into other repos is still wired to v0.5.0 templates and will be rewritten in v1.0.0-beta.
+
+### Changed (breaking)
+- **Project renamed**: `agentlayer` → `sdd-harness`. Local folder renamed `ai-ready-bootstrap` → `sdd-harness`. Remote rename to `iMark21/sdd-harness` lands at v1.0.0.
+- **`.ai/` layer replaced** with the disciplined Spec-Driven Development scaffold iterated through 6 phases in a real production codebase. Domain-specific artifacts (BLE/NFC/Keychain/Vapor) are scrubbed; only the generic discipline is kept.
+- **Old flow removed**: `agent-explore`, `agent-plan`, `agent-code`, `agent-verify` and their related skills are deleted. New flow: `spec`, `story`, `implement`, `verify`, `review`, `release` (one Markdown command file per step).
+- **Story prefix changed** from `ARB-NNN` to `SH-NNN`. Old backlog (ARB-29..51 Agentic Governance Pack roadmap) discarded as no longer applicable.
+- **Bootloaders are now 5-line pointers.** `CLAUDE.md` and `AGENTS.md` at the repo root contain no instructions — they redirect to `.ai/ROUTING.md`. See ADR 0008.
+- **Hook env var renamed**: `DOORKIT_SDD_SKIP` → `SH_SDD_SKIP` (inherited from upstream lineage and renamed for sdd-harness).
+- **Hook code-globs are now per-project configurable** in `.ai/hooks/config.sh` instead of hardcoded.
+- **`assistant-installer/`** directory removed. The PROMPT.md installer was tied to v0.5.0 and is incompatible with the new layout.
+
+### Added
+- `.ai/notes/spec-driven-development.md` — the SDD primer.
+- `.ai/adrs/0008-runtime-agnostic-ai-layer.md` — the foundational architecture decision.
+- `.ai/agents/spec-writer.md` — first reusable reviewer agent.
+- Meta acceptance Gherkin at `.ai/specs/acceptance/SH-F1-001-dogfood.feature` — validates that the harness governs itself.
+
+### Migration from v0.5.0
+There is no automatic migration. If you have v0.5.0 installed:
+
+```bash
+# Remove the old install
+rm -rf ~/.agentlayer
+rm -f ~/.local/bin/agentlayer
+
+# Wait for v1.0.0-beta for the new CLI, or copy .ai/ manually (see README.md)
+```
+
+Existing repos that were initialized with `agentlayer init` v0.5.0 will keep working — their `.ai/` is now legacy content from your perspective; the new sdd-harness `.ai/` is a different structure entirely.
+
+### Known limitations (v1.0.0-alpha)
+- The CLI (`bin/agentlayer` on disk, soon `bin/sdd-harness`) still installs v0.5.0 templates. Rewrite scheduled for v1.0.0-beta.
+- No automated test suite for the harness itself yet. Validation is via the meta acceptance Gherkin read manually.
+- No `GEMINI.md`, `.cursorrules`, or `.github/copilot-instructions.md` bootloaders yet — `CLAUDE.md` and `AGENTS.md` ship in v1.0.0-alpha and prove the pattern.
 
 ## [0.6.0] - 2026-04-23
 

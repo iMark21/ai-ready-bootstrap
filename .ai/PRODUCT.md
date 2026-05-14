@@ -1,55 +1,46 @@
-# agentlayer — Product Brief
+# sdd-harness — Product Vision
 
-## Product Vision
+## Tagline
 
-agentlayer gives any existing repository a canonical AI context layer so coding
-agents stop guessing and start from project-specific architecture, conventions,
-decisions, and workflows. It is intentionally local-first, dependency-free, and
-usable from any AI runtime.
+A runtime-agnostic **Spec-Driven Development harness** that any AI can operate. Drop it into a repo and the team — humans and AIs alike — follow the same disciplined loop: spec first, code second, verify against spec.
 
-## Target Users
+## North Star
 
-| Persona | Description | Key Need |
-| --- | --- | --- |
-| Solo developer | Uses Codex, Claude Code, Copilot, Cursor, or mixed tools | One repo-native source of truth for AI behavior |
-| Maintainer | Has contributors and partial AI docs already | Standardize drifting adapter files safely |
-| Team lead | Wants AI work to follow team conventions | Reproducible rules, context, agents, and skills |
-| AI tool evaluator | Tests multiple runtimes on the same repo | Thin adapters pointing at one canonical layer |
+Any engineer or AI assistant should be able to:
 
-## Core Product Surface
+1. Clone or `init` sdd-harness into a fresh repo.
+2. Read `.ai/PRODUCT.md` and understand the project's vision in 5 minutes.
+3. Follow the `spec → story → implement → verify → review → release` loop without coaching.
+4. Trust that pre-commit hooks block drift between code and specs.
+5. Swap the AI runtime (Claude Code → Codex → Cursor → Copilot → whatever's next) without rewriting anything under `.ai/`.
 
-- `agentlayer init` as the recommended first-use command.
-- `audit`, `install`, and `standardize` commands for inspect-first workflows,
-  fresh installs, and cleanup of existing AI files.
-- Universal AI-assisted installer prompt for users who prefer to bootstrap
-  through their current AI tool.
-- Runtime adapters for Codex, Claude Code, Copilot, Cursor, and generic AI
-  tools.
-- Canonical `.ai/` structure with context, rules, agents, skills, and recent
-  changes.
+## Non-Goals
 
-## Product Principles
+- **Not a code generator.** sdd-harness does not write your features; it disciplines the process around them.
+- **Not stack-specific.** No Swift, Python, JS, Go opinions baked in. Stack-specific tooling (test runners, build commands, release pipelines) lives in the consuming project, not the harness.
+- **Not a single-AI tool.** No `.claude/`-only artifacts. Adapters at the repo root are 5-line pointers to `.ai/`.
+- **Not a project management tool.** `BACKLOG.md` tracks stories tied to specs; it is not Jira.
+- **Not a documentation generator.** It scaffolds the *kinds* of docs that matter (PRD, ADRs, threat model) and enforces their presence — content is owned by the project.
 
-- The `.ai/` layer is the canonical source of truth.
-- Runtime-specific files stay thin and route back to `.ai/`.
-- No cloud account or dependency install is required for the core flow.
-- Generated context must be grounded against the real repository before serious
-  implementation work.
-- Public documentation must avoid private org assumptions.
+## Audience
 
-## Monetization Model
+1. **Engineers starting a new repo** (primary): want SDD discipline without rolling their own templates.
+2. **Engineers retrofitting an existing repo** (secondary): want to add `.ai/` to a project that already has code, without disrupting it.
+3. **AI agents operating on the repo** (tertiary): need a stable, runtime-agnostic contract to read and update.
 
-- None. The project is MIT-licensed open source.
-- Strategic value comes from public adoption, reusable conventions, and
-  improving AI-assisted engineering quality.
+## Philosophy
 
-## Story Ownership
+- **Specs are the contract.** If code contradicts the spec, we don't patch the code: we update the spec first, then change the code. The pre-commit hook enforces this.
+- **Runtime-agnostic AI.** The entire AI layer (`commands`, `agents`, `hooks`) lives under `.ai/`. Any AI can operate the project by reading `.ai/`. Adapter files at the repo root (`CLAUDE.md`, `AGENTS.md`, etc.) are 5-line pointers.
+- **Harness, not framework.** sdd-harness provides discipline and gates, not opinions on architecture. Your ADRs declare your architecture; the harness ensures you follow your own ADRs.
+- **Deterministic gates.** Every step (spec, story, implement, verify, review, release) has a `Done criteria` section. Either it's done or it isn't — no ambiguity.
 
-Stories are stored in `stories/` when detailed specs are needed and tracked in
-`BACKLOG.md`. Product changes should keep the first-use path short and
-inspectable.
+## Lineage
 
-## References
+sdd-harness extracts the disciplined `.ai/` layer iterated through 6 phases in a real production codebase (a smart-lock iOS prototype with BLE/NFC/hardware constraints). The discipline survived contact with hardware, mocks, simulators, and CI — which is the bar for shipping a framework rather than a template.
 
-- **CONTEXT.md**: `.ai/CONTEXT.md` — current state, architecture, release history, and roadmap
-- **BACKLOG.md**: `.ai/BACKLOG.md` — task tracker and release backlog
+## Success metrics (subjective, not product KPIs)
+
+- A new contributor (human or AI) reads `.ai/ROUTING.md` and can open a PR within an hour, knowing exactly which files to touch.
+- An AI assistant given a story ID can produce a spec, plan, implementation, and verification report without asking the human "where do I put X?".
+- `pre-commit-spec-check.sh` blocks ≥ 1 drift attempt per week in active projects — proving the discipline is real, not theatrical.

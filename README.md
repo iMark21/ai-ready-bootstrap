@@ -1,88 +1,83 @@
-# agentlayer
+# sdd-harness
 
-![AgentLayer](docs/cover.png)
+> **v1.0.0-alpha** — Framework pivot from `agentlayer` v0.5.0. CLI distribution under reconstruction; the core `.ai/` layer is complete and dogfooded in this repo.
 
-Your AI assistant writes better code when it actually knows your project.
+A runtime-agnostic **Spec-Driven Development harness** that any AI can operate. Drop it into a repo and the team — humans and AIs alike — follow the same disciplined loop: **spec first, code second, verify against spec**.
 
-agentlayer adds a structured `.ai/` layer to any existing repository so that Codex, Claude Code, Copilot, Cursor — or any AI — stops guessing and starts following your real architecture, conventions, and decisions from the first prompt.
+## Status
 
-No dependencies. Any AI runtime. Any tech stack.
+This repository is in transition. The `.ai/` layer (the *brain* of the harness) has been ported from a battle-tested production lineage and is ready to read, adapt, and adopt. The CLI that distributes it into other repos (`bin/sdd-harness` once renamed, currently `bin/agentlayer` on disk) is still wired to the v0.5.0 templates and will be rewritten in **v1.0.0-beta**.
 
-## Install
+If you arrived from `iMark21/agentlayer` looking for the v0.5.0 `agent-explore → plan → code → verify` flow: that has been replaced. See [CHANGELOG.md](CHANGELOG.md) for the rupture rationale and migration guidance.
 
-One command. It detects the repo state, asks which AI you use, and sets everything up.
+## What sdd-harness gives you
+
+A `.ai/` directory that is the single source of truth for any AI runtime:
+
+```
+.ai/
+├── ROUTING.md      — how any AI operates the project
+├── PRODUCT.md      — vision and non-goals
+├── CONTEXT.md      — living state
+├── BACKLOG.md      — stories (SH-NNN format)
+├── README.md       — entrypoint map
+├── adrs/           — architecture decisions, MADR format
+├── agents/         — reusable AI roles (spec-writer to start)
+├── commands/       — repeatable workflows (spec, story, implement, verify, review, release)
+├── hooks/          — runtime-agnostic shell scripts; config.sh per-project tunable
+├── notes/          — distilled mini-tutorials
+└── specs/          — PRD, glossary, acceptance Gherkin, your protocol contracts
+```
+
+Plus 5-line bootloaders at the repo root: [`CLAUDE.md`](CLAUDE.md), [`AGENTS.md`](AGENTS.md), and the same pattern for any future AI runtime.
+
+## The discipline
+
+```
+spec  →  human + agent review  →  implement (TDD-light)  →  verify-against-spec  →  merge
+```
+
+Enforced by `.ai/hooks/pre-commit-spec-check.sh`: feature branches that touch code must also touch a spec or ADR. The path globs are project-configurable in [`.ai/hooks/config.sh`](.ai/hooks/config.sh).
+
+See [`.ai/notes/spec-driven-development.md`](.ai/notes/spec-driven-development.md) for the full primer.
+
+## Lineage
+
+sdd-harness extracts the disciplined `.ai/` layer iterated through 6 phases in a real production codebase (a smart-lock iOS prototype with BLE/NFC/hardware constraints). The discipline survived contact with hardware, mocks, simulators, and CI — which is the bar for shipping a framework rather than a template. Domain-specific artifacts (BLE, NFC, Keychain, Vapor) are excluded; only the generic SDD discipline is kept.
+
+## Adopting it (manual path, v1.0.0-alpha)
+
+While the CLI is being rewritten:
 
 ```bash
-# 1. Get the CLI (clone somewhere persistent — /tmp gets cleaned and breaks the symlink)
-git clone https://github.com/iMark21/agentlayer.git ~/.agentlayer
-cd ~/.agentlayer && bash install.sh
+# Copy the .ai/ structure into your repo
+cp -R .ai/ /path/to/your-repo/.ai/
+cp CLAUDE.md AGENTS.md /path/to/your-repo/
 
-# 2. Inside your repo
-cd /path/to/your-repo
-agentlayer init
+# Tune the code globs to your stack
+$EDITOR /path/to/your-repo/.ai/hooks/config.sh
+
+# Install the SDD pre-commit hook
+cd /path/to/your-repo && ./.ai/hooks/install.sh
 ```
 
-`init` auto-routes to the right action:
+Then rewrite `.ai/PRODUCT.md`, `.ai/BACKLOG.md`, `.ai/CONTEXT.md` for your project. ADR 0008 (runtime-agnostic AI layer) stays as-is; add your own ADRs starting at 0009 or higher.
 
-- **Repo has no AI files yet** → installs a fresh canonical `.ai/` layer plus the adapter for the runtime you pick
-- **Repo already has AI files** (`AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`, etc.) → runs `standardize` instead, backing up the old files and rewriting the layout
+## Roadmap
 
-At the end, `init` prints a copy-paste-ready prompt for your AI so you can ground the generated context in the real repo.
+- **v1.0.0-alpha** (current) — Framework core ported and dogfooded.
+- **v1.0.0-beta** — CLI rewrite: `sdd-harness init` lays down the new `.ai/` in a target repo. Plugin-based CI scaffolding per stack (Swift/Python/JS/Go).
+- **v1.0.0** — Public migration: repo renamed to `iMark21/sdd-harness`, commit timestamps sanitized, CHANGELOG migration guide for v0.5.0 users.
+- **v1.1.0+** — Governance mirror (auto-update `CONTEXT.md` on phase close), additional reviewer agents, optional integrations.
 
-### Alternative — let your AI install it
+## License
 
-If you prefer, paste this into any AI assistant with local read/write access to the repo:
-
-```
-Fetch https://raw.githubusercontent.com/iMark21/agentlayer/main/assistant-installer/PROMPT.md
-and follow the complete installation workflow defined there for this repository.
-```
-
-**Prerequisites for the AI-assisted path:** the assistant must be able to read files in and write files to this repository from your local machine (Codex, Claude Code, Cursor, Copilot CLI, or any other with local filesystem access). Cloud-only chat tools without repo access will not work — use the CLI path above.
-
-If your AI cannot fetch URLs directly:
-
-```bash
-curl -sO https://raw.githubusercontent.com/iMark21/agentlayer/main/assistant-installer/PROMPT.md
-```
-
-Then ask it: `Read PROMPT.md in this directory and follow the installation workflow.` Delete the file when done.
-
-## What you get
-
-A team of agents that follow a structured workflow:
-
-```
-agent-explore → agent-plan → agent-code → agent-verify
-```
-
-Plus specialized agents for bug fixes (`agent-fix`), refactors (`agent-tech`), and investigations (`agent-spike`), and four reusable skills (context refresh, feature scaffold, migration audit, context bootstrap).
-
-Every installation produces the same deterministic skeleton: 8 agents, 4 skills, 5 context files, scoped rules by file type, and thin adapters for each AI runtime. The **structure** is fixed. The **content** is filled with real knowledge from your repository.
-
-## Using it — example
-
-Adding a login screen:
-
-1. **Explore:** *"Use agent-explore. I need to add a login screen with email and password."* — the AI reads `.ai/context/architecture.md`, maps your existing auth code, and reports back before writing anything.
-2. **Plan:** *"Use agent-plan. Plan the login screen feature."* — file-level plan: which files to create, which to modify, which tests to add.
-3. **Implement:** *"Use agent-code. Implement the approved plan."* — task by task. Stops and reports if a step fails.
-4. **Verify:** *"Use agent-verify. Verify the login feature."* — runs tests, checks acceptance criteria, documents residual risk.
-
-The feature is recorded under `.ai/features/login.md` so the next session already has context.
-
-For bug fixes: *"Use agent-fix. The total is not updating when I remove an item from the cart."*
-For refactor decisions: *"Use agent-spike. Is it worth extracting the payment logic into its own module?"* — returns a decision document, no code.
-
-## Supported runtimes and project types
-
-- Runtimes: Codex, Claude Code, GitHub Copilot, Cursor, or a tool-agnostic `AGENTLAYER.md` for any other AI.
-- Project types (auto-detected): Android, iOS, web, backend, or generic fallback.
-
-See [MANUAL.md](MANUAL.md) for the full reference — every command, every flag, every adapter format, every rule generated.
+MIT. See [LICENSE](LICENSE).
 
 ## Read more
 
-- [MANUAL.md](MANUAL.md) — full reference: commands, flags, workflows, generated structure
+- [`.ai/ROUTING.md`](.ai/ROUTING.md) — start here for any AI
+- [`.ai/PRODUCT.md`](.ai/PRODUCT.md) — vision and non-goals
+- [`.ai/notes/spec-driven-development.md`](.ai/notes/spec-driven-development.md) — SDD primer
+- [`.ai/adrs/0008-runtime-agnostic-ai-layer.md`](.ai/adrs/0008-runtime-agnostic-ai-layer.md) — why `.ai/` and not `.claude/`
 - [CHANGELOG.md](CHANGELOG.md) — version history
-- [CONTRIBUTING.md](CONTRIBUTING.md) — how to contribute
