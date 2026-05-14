@@ -1,6 +1,6 @@
 # {{PROJECT_NAME}} — Context (living state)
 
-> Updated as the plan phases progress. Keep short and current.
+> The **mirror**: this file reflects the live state of the project. Update it on every phase close via [`commands/phase-close.md`](commands/phase-close.md). See [`notes/governance-mirror.md`](notes/governance-mirror.md) for the discipline.
 
 ## Current state
 
@@ -14,17 +14,13 @@
 
 ## Immediate next
 
-- Write `.ai/PRODUCT.md` for this project
-- Add your first story to `.ai/BACKLOG.md`
-- Customize `.ai/hooks/config.sh` to match your stack's code paths
-
-## Active constraints
-
-- (List the active constraints of this project here.)
+- Write `.ai/PRODUCT.md` for this project.
+- Add your first story to `.ai/BACKLOG.md`.
+- Customize `.ai/hooks/config.sh` to match your stack's code paths.
 
 ## Decisions taken
 
-- (List ADRs and short notes here. New ADRs go in `.ai/adrs/`.)
+- (Add bullets here as the project takes decisions. Anything longer than two lines becomes an ADR under `adrs/` and is referenced here by number.)
 
 ## Open risks
 

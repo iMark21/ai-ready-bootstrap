@@ -19,9 +19,12 @@ Stories `SH-NNN`. One story = one acceptance feature in `specs/acceptance/`.
 | SH-F1-003 | Hooks ported with per-project `config.sh` for code globs | done | `acceptance/SH-F1-001-dogfood.feature` | F1 |
 | SH-F1-004 | Governance templates (CONTEXT/PRODUCT/ROUTING/BACKLOG/README) rewritten for sdd-harness | done | `acceptance/SH-F1-001-dogfood.feature` | F1 |
 | SH-F1-005 | Runtime bootloaders (CLAUDE.md, AGENTS.md) | done | `acceptance/SH-F1-001-dogfood.feature` | F1 |
-| SH-F2-001 | CLI rewrite: rename `bin/agentlayer` → `bin/sdd-harness`, replace embedded v0.5.0 templates with new `.ai/` layout, update `install.sh` paths | todo | TBD | F2 |
-| SH-F2-002 | Deterministic CI scaffolding (stack-plugin pattern: swift/python/js/go) | todo | TBD | F2 |
-| SH-F3-001 | Governance mirror — CONTEXT.md update on phase close | todo | TBD | F3 |
+| SH-F2-001 | CLI rewrite: `bin/agentlayer` → `bin/sdd-harness` + templates/ pattern | done | `acceptance/SH-F2-001-cli-init.feature` | F2 |
+| SH-F2-002 | Deterministic CI scaffolding (stack-plugin pattern: swift/python/js/go) | todo | TBD | F2.5 |
+| SH-F3-001 | `phase-close` command (canonical + template) | done | `acceptance/SH-F3-001-phase-close.feature` | F3 |
+| SH-F3-002 | CONTEXT.md schema formalized in templates/ | done | `acceptance/SH-F3-001-phase-close.feature` | F3 |
+| SH-F3-003 | Governance mirror note explaining the practice | done | `acceptance/SH-F3-001-phase-close.feature` | F3 |
+| SH-F3-004 | Dogfood: close F2 and open F3 in sdd-harness's own CONTEXT.md | done | `acceptance/SH-F3-001-phase-close.feature` | F3 |
 | SH-F4-001 | Public migration: rename repo, sanitize timestamps, bump v1.0.0 | todo | TBD | F4 |
 
 ## Out of scope (v1.0.0)

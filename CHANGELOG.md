@@ -5,6 +5,10 @@ All notable changes are documented here.
 ## [Unreleased]
 
 ### Added — toward v1.0.0-beta
+- **F3 — Governance mirror.** `.ai/commands/phase-close.md` codifies the procedure for closing a phase: verify all stories terminal, bump `CONTEXT.md` header, append done items, refresh decisions and risks, update `BACKLOG.md`. Mirrored under `templates/.ai/commands/`.
+- `.ai/notes/governance-mirror.md` explains the discipline: `CONTEXT.md` is the project's mirror, updated only at phase close, never auto-generated.
+- `templates/.ai/CONTEXT.md` formalized with the 5 required sections (Current state / Done / Immediate next / Decisions taken / Open risks).
+- `.ai/specs/acceptance/SH-F3-001-phase-close.feature` (8 scenarios) — including "an AI assistant reading CONTEXT.md after phase-close has full context".
 - `bin/sdd-harness` rewritten from scratch (311 lines, down from 1779 in the v0.5.0 `bin/agentlayer`). Commands: `init` (auto-routes), `install`, `standardize`, `audit`.
 - `templates/` directory at the repo root: canonical `.ai/` (with framework-canonical files like commands/hooks/ROUTING/ADR-0008 and project-specific placeholders for PRODUCT/CONTEXT/BACKLOG/PRD/glossary) plus root bootloaders. The CLI does `cp -R` from here, no embedded heredocs.
 - Placeholder substitution: `{{PROJECT_NAME}}`, `{{STORY_PREFIX}}` (3-letter uppercase), `{{TODAY}}` (YYYY-MM-DD) are rewritten on `install`.
