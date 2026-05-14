@@ -4,6 +4,11 @@
 # Symlinks the hooks in this folder into .git/hooks/ so they fire from Git.
 # Idempotent: running twice does not duplicate links.
 #
+# If core.hooksPath is configured to a directory other than the repo's
+# .git/hooks/ (commonly a globally-installed shared hooks dir), Git will
+# IGNORE the symlinks created here. The script warns about that case and
+# offers the one-line fix.
+#
 # Usage:
 #   ./.ai/hooks/install.sh
 
@@ -33,5 +38,25 @@ link_hook() {
 
 link_hook "pre-commit-spec-check.sh" "pre-commit"
 link_hook "post-edit-trace.sh"      "post-commit"
+
+# Detect a redirected hooksPath that would silently disable the hooks we just linked.
+configured_path="$(git config --get core.hooksPath 2>/dev/null || true)"
+if [[ -n "$configured_path" ]]; then
+  # Normalize both sides for comparison.
+  if [[ "$configured_path" != ".git/hooks" && "$configured_path" != "$hooks_dst" ]]; then
+    cat >&2 <<EOF
+[install.sh] WARNING: git core.hooksPath is set to:
+    $configured_path
+That means Git will look there for hooks, not in $hooks_dst, and the
+sdd-harness SDD pre-commit hook installed just now WILL NOT fire.
+
+Fix (local to this repo only):
+    git config core.hooksPath .git/hooks
+
+Or, if you want sdd-harness to share the configured hooks directory,
+re-run installation against that directory instead.
+EOF
+  fi
+fi
 
 echo "[install.sh] done."

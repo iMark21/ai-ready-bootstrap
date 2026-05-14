@@ -1,21 +1,20 @@
-# sdd-harness demo: integrating into a real Android project
+# sdd-harness demo: install on a clean Android repo, then launch the first spec.
 #
-# Subject: marvel-android (Android Marvel client, last commit 2021)
-# Pre-condition: repo carries v0.5.0 agentlayer files (.ai/ + CLAUDE.md + AGENTS.md).
-# Demo: `sdd-harness init` auto-detects, routes to `standardize`, backs up old AI files,
-# installs the v1.0.0-alpha layout.
+# Subject: marvel-android (Android Marvel client, last commit 2021), AI files stripped.
+# Real content: the spec follows the sdd-harness PRD shape, the Kotlin stub follows
+# the architecture the spec describes, and the pre-commit hook actually fires.
 #
-# Render: vhs docs/demo/demo.tape -> docs/demo.gif
+# Render: cd ~/Developer/sdd-harness && vhs docs/demo/demo.tape  -> docs/demo.gif
 
 Output docs/demo.gif
 
 Set Shell "bash"
-Set FontSize 16
-Set Width 1100
-Set Height 640
-Set PlaybackSpeed 0.9
+Set FontSize 15
+Set Width 1240
+Set Height 760
+Set PlaybackSpeed 1.0
 Set Theme "Catppuccin Mocha"
-Set TypingSpeed 28ms
+Set TypingSpeed 22ms
 
 # ---- silent setup ----
 Hide
@@ -24,45 +23,77 @@ Type "clear" Enter
 Show
 Sleep 600ms
 
-# ---- step 1: where we are ----
-Type "# A real Android project, untouched since 2021, with old agentlayer v0.5.0 files." Enter
-Sleep 1200ms
+# ---- 1. clean state ----
+Type "# A real Android repo (Marvel client, last commit 2021). No AI layer." Enter
+Sleep 800ms
 Type "ls" Enter
-Sleep 1800ms
+Sleep 1500ms
 
-# ---- step 2: audit ----
+# ---- 2. install ----
 Type "" Enter
-Type "# Detect what AI layer the repo already has." Enter
+Type "# Install: lays down .ai/, root bootloaders, and the SDD pre-commit hook." Enter
 Sleep 700ms
-Type "sdd-harness audit ." Enter
-Sleep 3500ms
-
-# ---- step 3: init (auto-routes to standardize) ----
-Type "" Enter
-Type "# 'init' auto-routes: existing AI files -> standardize (backup + fresh install)." Enter
-Sleep 700ms
-Type "sdd-harness init . --yes --no-git-hook" Enter
+Type "sdd-harness init . --yes" Enter
 Sleep 4500ms
 
-# ---- step 4: result ----
 Type "clear" Enter
+Sleep 400ms
+Type "# What sdd-harness laid down:" Enter
 Sleep 500ms
-Type "# New v1.0.0-alpha layout:" Enter
-Sleep 600ms
 Type "ls .ai/" Enter
-Sleep 2500ms
-Type "" Enter
-Type "# Old v0.5.0 files preserved in the backup directory:" Enter
-Sleep 600ms
-Type "ls .ai-backup-*/" Enter
-Sleep 2500ms
-Type "" Enter
-Type "# Bootloaders are 5-line pointers, runtime-agnostic:" Enter
-Sleep 600ms
-Type "wc -l CLAUDE.md AGENTS.md" Enter
-Sleep 2500ms
+Sleep 2000ms
 
-# tail
+# ---- 3. start a feature ----
 Type "" Enter
-Type "# Done. Edit .ai/PRODUCT.md and start the SDD loop." Enter
+Type "git checkout -b feat/marvel-login" Enter
+Sleep 1500ms
+
+# ---- 4. write code first (no spec yet) — the hook should refuse ----
+Type "" Enter
+Type "# Drop a real Kotlin stub for the feature. No spec yet. Try to commit." Enter
+Sleep 700ms
+Type "mkdir -p src" Enter
+Sleep 300ms
+Type "cat > src/LoginViewModel.kt <<'KT'" Enter
+Type "package com.imark.marvel.auth" Enter
+Type "" Enter
+Type "class LoginViewModel(private val auth: AuthRepository) : ViewModel() {" Enter
+Type "  fun login(email: String, password: String): Result<Session> = auth.login(email, password)" Enter
+Type "}" Enter
+Type "KT" Enter
+Sleep 800ms
+Type "git add src/LoginViewModel.kt && git commit -m 'feat: login view-model'" Enter
+Sleep 5500ms
+
+# ---- 5. write the real spec via heredoc ----
+Type "" Enter
+Type "# The hook blocked it. Spec first, then code." Enter
+Sleep 800ms
+Type "cat > .ai/specs/SH-001-marvel-login.md <<'MD'" Enter
+Type "# SH-001 — Marvel login" Enter
+Type "" Enter
+Type "## 1. Problem" Enter
+Type "Users see anonymous content. Favorites and last-read comics need a session" Enter
+Type "tied to a Marvel API account." Enter
+Type "" Enter
+Type "## 2. Solution" Enter
+Type "Email + password screen against the Marvel public API. Session token" Enter
+Type "encrypted in EncryptedSharedPreferences, 24h expiry." Enter
+Type "" Enter
+Type "## 3. Acceptance" Enter
+Type "- Empty email or password disables the Login button." Enter
+Type "- HTTP 200 navigates to the comics list." Enter
+Type "- HTTP 401 shows a clear error." Enter
+Type "MD" Enter
+Sleep 1500ms
+
+# ---- 6. commit again, spec + code together ----
+Type "" Enter
+Type "git add .ai/specs/SH-001-marvel-login.md src/LoginViewModel.kt" Enter
+Sleep 500ms
+Type "git commit -m 'feat: login spec + view-model'" Enter
+Sleep 4500ms
+
+Type "" Enter
+Type "# Spec and code shipped together. The SDD loop is live." Enter
 Sleep 2500ms

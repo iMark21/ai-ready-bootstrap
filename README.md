@@ -12,9 +12,9 @@ If you arrived from `iMark21/agentlayer` looking for the v0.5.0 `agent-explore â
 
 ## Demo
 
-Integrating sdd-harness into a real Android project (untouched since 2021, carrying a previous AI layer). `sdd-harness init` auto-routes to `standardize`: it backs up the existing AI files under `.ai-backup-<timestamp>/`, lays down the new `.ai/` layout, and installs the 5-line bootloaders.
+Installing sdd-harness in a real Android repo (Marvel API client, last commit 2021, no prior AI layer) and launching the first spec. The pre-commit hook refuses the code-only commit; once the spec lands, the same code is accepted.
 
-![sdd-harness installing into an Android repo](docs/demo.gif)
+![sdd-harness installing in an Android repo and gating the first commit](docs/demo.gif)
 
 ## What sdd-harness gives you
 
