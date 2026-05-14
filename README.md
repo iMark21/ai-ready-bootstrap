@@ -10,6 +10,12 @@ v1.0.0-alpha ships the framework core (`.ai/` layer + 5-line bootloaders) and a 
 
 If you arrived from `iMark21/agentlayer` looking for the v0.5.0 `agent-explore → plan → code → verify` flow: that has been replaced. See [CHANGELOG.md](CHANGELOG.md) for the rupture rationale and migration guidance.
 
+## Demo
+
+Integrating sdd-harness into a real Android project (untouched since 2021, carrying a previous AI layer). `sdd-harness init` auto-routes to `standardize`: it backs up the existing AI files under `.ai-backup-<timestamp>/`, lays down the new `.ai/` layout, and installs the 5-line bootloaders.
+
+![sdd-harness installing into an Android repo](docs/demo.gif)
+
 ## What sdd-harness gives you
 
 A `.ai/` directory that is the single source of truth for any AI runtime:
