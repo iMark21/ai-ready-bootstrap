@@ -30,7 +30,7 @@ All notable changes are documented here.
 
 ### Changed (breaking)
 - **Project renamed**: `agentlayer` → `sdd-harness`. Local folder renamed `ai-ready-bootstrap` → `sdd-harness`. Remote rename to `iMark21/sdd-harness` lands at v1.0.0.
-- **`.ai/` layer replaced** with the disciplined Spec-Driven Development scaffold iterated through 6 phases in a real production codebase. Domain-specific artifacts (BLE/NFC/Keychain/Vapor) are scrubbed; only the generic discipline is kept.
+- **`.ai/` layer replaced** with the disciplined Spec-Driven Development scaffold iterated through multiple phases in a real production codebase. Domain-specific artifacts are excluded; only the generic discipline is kept.
 - **Old flow removed**: `agent-explore`, `agent-plan`, `agent-code`, `agent-verify` and their related skills are deleted. New flow: `spec`, `story`, `implement`, `verify`, `review`, `release` (one Markdown command file per step).
 - **Story prefix changed** from `ARB-NNN` to `SH-NNN`. Old backlog (ARB-29..51 Agentic Governance Pack roadmap) discarded as no longer applicable.
 - **Bootloaders are now 5-line pointers.** `CLAUDE.md` and `AGENTS.md` at the repo root contain no instructions — they redirect to `.ai/ROUTING.md`. See ADR 0008.

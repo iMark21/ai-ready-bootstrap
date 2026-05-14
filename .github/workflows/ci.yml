@@ -5,6 +5,7 @@ on:
     branches:
       - develop
       - main
+      - "feat/**"
       - "feature/**"
       - "fix/**"
       - "chore/**"
@@ -22,11 +23,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Bash syntax
-        run: bash -n bin/agentlayer
+      - name: Bash syntax — bin/sdd-harness
+        run: bash -n bin/sdd-harness
 
-      - name: Installer syntax
+      - name: Bash syntax — install.sh
         run: bash -n install.sh
+
+      - name: Bash syntax — hooks
+        run: |
+          set -euo pipefail
+          for f in templates/.ai/hooks/*.sh; do
+            bash -n "$f"
+          done
 
       - name: Installer smoke test
         shell: bash
@@ -34,198 +42,128 @@ jobs:
           set -euo pipefail
           bin_dir="$(mktemp -d)"
           bash install.sh --bin-dir "$bin_dir"
-          test -x "$bin_dir/agentlayer" -o -L "$bin_dir/agentlayer"
-          "$bin_dir/agentlayer" --help >/dev/null
+          test -x "$bin_dir/sdd-harness" -o -L "$bin_dir/sdd-harness"
+          "$bin_dir/sdd-harness" --help >/dev/null
+          "$bin_dir/sdd-harness" --version
 
       - name: Fresh install smoke test
         shell: bash
         run: |
           set -euo pipefail
           repo="$(mktemp -d)"
-          mkdir -p "$repo/app/src/main"
-          touch "$repo/settings.gradle.kts" "$repo/app/src/main/AndroidManifest.xml"
-          git -C "$repo" init
+          git -C "$repo" init -q
+          bin/sdd-harness init "$repo" --non-interactive --yes --no-git-hook
 
-          bin/agentlayer install "$repo" \
-            --runtimes codex,claude,generic \
-            --project-type android \
-            --git-name "CI Bot" \
-            --git-email "ci@example.com" \
-            --apply-git-config \
-            --non-interactive
-
+          # Canonical files
+          test -f "$repo/.ai/ROUTING.md"
+          test -f "$repo/.ai/PRODUCT.md"
+          test -f "$repo/.ai/CONTEXT.md"
+          test -f "$repo/.ai/BACKLOG.md"
           test -f "$repo/.ai/README.md"
-          test -f "$repo/.ai/rules/kotlin.md"
-          test -f "$repo/.ai/rules/compose.md"
-          test -f "$repo/.ai/agents/agent-context-bootstrap.md"
-          test -f "$repo/AGENTS.md"
+          test -f "$repo/.ai/adrs/0008-runtime-agnostic-ai-layer.md"
+          test -f "$repo/.ai/agents/spec-writer.md"
+          test -f "$repo/.ai/commands/spec.md"
+          test -f "$repo/.ai/commands/story.md"
+          test -f "$repo/.ai/commands/implement.md"
+          test -f "$repo/.ai/commands/verify.md"
+          test -f "$repo/.ai/commands/review.md"
+          test -f "$repo/.ai/commands/release.md"
+          test -f "$repo/.ai/commands/phase-close.md"
+          test -f "$repo/.ai/hooks/config.sh"
+          test -f "$repo/.ai/hooks/install.sh"
+          test -f "$repo/.ai/hooks/pre-commit-spec-check.sh"
+          test -f "$repo/.ai/notes/spec-driven-development.md"
+          test -f "$repo/.ai/notes/governance-mirror.md"
+          test -f "$repo/.ai/specs/PRD.md"
+          test -f "$repo/.ai/specs/glossary.md"
           test -f "$repo/CLAUDE.md"
-          test -f "$repo/AGENTLAYER.md"
-          test -f "$repo/.ai/agents/agent-verify.md"
-          test -f "$repo/.ai/skills/context-bootstrap.md"
-          grep -q 'Pending first-pass grounding' "$repo/.ai/context.md"
-          test -f "$repo/.githooks/pre-commit"
-
-      - name: iOS install smoke test
-        shell: bash
-        run: |
-          set -euo pipefail
-          repo="$(mktemp -d)"
-          mkdir -p "$repo/MyApp.xcodeproj"
-          touch "$repo/Podfile"
-          git -C "$repo" init
-
-          bin/agentlayer install "$repo" \
-            --runtimes codex,claude,generic \
-            --project-type ios \
-            --git-name "CI Bot" \
-            --git-email "ci@example.com" \
-            --apply-git-config \
-            --non-interactive
-
-          test -f "$repo/.ai/README.md"
-          test -f "$repo/.ai/rules/swift.md"
-          test -f "$repo/.ai/rules/swiftui.md"
-          test -f "$repo/.ai/agents/agent-context-bootstrap.md"
           test -f "$repo/AGENTS.md"
-          test -f "$repo/CLAUDE.md"
-          test -f "$repo/AGENTLAYER.md"
-          test -f "$repo/.ai/agents/agent-verify.md"
-          test -f "$repo/.ai/skills/context-bootstrap.md"
-          grep -q 'Pending first-pass grounding' "$repo/.ai/context.md"
 
-      - name: Install conflict fail-fast — .github/instructions/ without copilot-instructions.md
-        shell: bash
-        run: |
-          set -euo pipefail
-          repo="$(mktemp -d)"
-          mkdir -p "$repo/.github/instructions"
-          echo "# legacy" > "$repo/.github/instructions/legacy.md"
-          git -C "$repo" init
+          # Placeholder substitution worked
+          ! grep -q '{{PROJECT_NAME}}' "$repo/.ai/PRODUCT.md"
+          ! grep -q '{{STORY_PREFIX}}' "$repo/.ai/BACKLOG.md"
+          ! grep -q '{{TODAY}}' "$repo/.ai/CONTEXT.md"
 
-          status=0
-          bin/agentlayer install "$repo" \
-            --runtimes generic \
-            --project-type generic \
-            --yes \
-            --non-interactive || status=$?
-          test "$status" -ne 0
-
-          test ! -d "$repo/.ai"
-          test ! -d "$repo/.githooks"
-          test ! -f "$repo/AGENTLAYER.md"
-          test -f "$repo/.github/instructions/legacy.md"
-
-      - name: Install conflict fail-fast — CLAUDE.md present
+      - name: Install refuses to overwrite existing AI files
         shell: bash
         run: |
           set -euo pipefail
           repo="$(mktemp -d)"
           touch "$repo/CLAUDE.md"
-          git -C "$repo" init
+          git -C "$repo" init -q
 
           status=0
-          bin/agentlayer install "$repo" \
-            --runtimes generic \
-            --project-type generic \
-            --yes \
-            --non-interactive || status=$?
+          bin/sdd-harness install "$repo" --non-interactive || status=$?
           test "$status" -ne 0
           test ! -d "$repo/.ai"
 
-      - name: Non-interactive without --runtimes fails
+      - name: Standardize backs up existing AI files and installs fresh
         shell: bash
         run: |
           set -euo pipefail
           repo="$(mktemp -d)"
-          git -C "$repo" init
+          mkdir -p "$repo/.ai"
+          echo "stale" > "$repo/.ai/old.md"
+          echo "stale" > "$repo/CLAUDE.md"
+          git -C "$repo" init -q
 
-          status=0
-          bin/agentlayer install "$repo" \
-            --project-type generic \
-            --yes \
-            --non-interactive || status=$?
-          test "$status" -ne 0
-          test ! -d "$repo/.ai"
+          bin/sdd-harness standardize "$repo" --yes --no-git-hook
 
-      - name: init auto-routes to install on fresh repo
-        shell: bash
-        run: |
-          set -euo pipefail
-          repo="$(mktemp -d)"
-          git -C "$repo" init
+          # Backup created
+          backup="$(find "$repo" -maxdepth 1 -type d -name '.ai-backup-*' | head -n 1)"
+          test -n "$backup"
+          test -d "$backup/.ai"
+          test -f "$backup/CLAUDE.md"
 
-          bin/agentlayer init "$repo" \
-            --runtimes generic \
-            --project-type generic \
-            --yes \
-            --non-interactive > "$repo/init.log"
+          # Fresh .ai/ installed
+          test -f "$repo/.ai/ROUTING.md"
 
-          grep -q "Action:            install" "$repo/init.log"
-          test -f "$repo/.ai/README.md"
-          test -f "$repo/AGENTLAYER.md"
-
-      - name: init auto-routes to standardize when AI files exist
+      - name: --non-interactive fails fast on conflicts without --yes
         shell: bash
         run: |
           set -euo pipefail
           repo="$(mktemp -d)"
           touch "$repo/CLAUDE.md"
-          git -C "$repo" init
+          git -C "$repo" init -q
 
-          bin/agentlayer init "$repo" \
-            --runtimes claude,generic \
-            --project-type generic \
-            --yes \
-            --non-interactive > "$repo/init.log"
+          status=0
+          bin/sdd-harness standardize "$repo" --non-interactive || status=$?
+          test "$status" -ne 0
 
-          grep -q "Action:            standardize" "$repo/init.log"
-          grep -q "Existing AI files: yes" "$repo/init.log"
-          test -f "$repo/.ai/README.md"
-          test -d "$repo/.ai/archive"
-
-      - name: init with no path defaults to cwd
+      - name: Unsupported runtime is rejected
         shell: bash
         run: |
           set -euo pipefail
           repo="$(mktemp -d)"
-          git -C "$repo" init
-          cli="$(pwd)/bin/agentlayer"
+          git -C "$repo" init -q
 
-          cd "$repo"
-          "$cli" init \
-            --runtimes generic \
-            --project-type generic \
-            --yes \
-            --non-interactive > init.log
+          status=0
+          bin/sdd-harness init "$repo" --runtimes cursor --non-interactive --yes --no-git-hook || status=$?
+          test "$status" -ne 0
+          test ! -d "$repo/.ai"
 
-          grep -q "Target repo:       $repo" init.log
-          test -f .ai/README.md
-
-      - name: Standardize smoke test
+      - name: init auto-routes between install and standardize
         shell: bash
         run: |
           set -euo pipefail
           repo="$(mktemp -d)"
-          mkdir -p "$repo/.github/instructions" "$repo/.cursor/rules"
-          touch "$repo/AGENTS.md" "$repo/CLAUDE.md" "$repo/AGENTLAYER.md" "$repo/.github/copilot-instructions.md" "$repo/.github/instructions/old.instructions.md" "$repo/.cursor/rules/agentlayer.mdc"
-          git -C "$repo" init
+          git -C "$repo" init -q
 
-          bin/agentlayer standardize "$repo" \
-            --runtimes copilot,generic \
-            --project-type generic \
-            --yes \
-            --non-interactive
+          # Fresh repo -> install
+          bin/sdd-harness init "$repo" --non-interactive --yes --no-git-hook > "$repo/log1"
+          grep -q "Routing to 'install'" "$repo/log1"
 
-          test -f "$repo/.ai/README.md"
-          test -f "$repo/.github/copilot-instructions.md"
-          test -f "$repo/.github/instructions/code.instructions.md"
-          test -f "$repo/AGENTLAYER.md"
-          test -f "$repo/.ai/agents/agent-context-bootstrap.md"
-          test -f "$repo/.ai/agents/agent-verify.md"
-          test -f "$repo/.ai/skills/context-bootstrap.md"
-          grep -q 'Pending first-pass grounding' "$repo/.ai/context.md"
-          test ! -f "$repo/AGENTS.md"
+          # Now repo has AI files -> standardize
+          bin/sdd-harness init "$repo" --yes --no-git-hook > "$repo/log2"
+          grep -q "Routing to 'standardize'" "$repo/log2"
+
+      - name: Dry-run never writes files
+        shell: bash
+        run: |
+          set -euo pipefail
+          repo="$(mktemp -d)"
+          git -C "$repo" init -q
+          bin/sdd-harness init "$repo" --dry-run --non-interactive --yes --no-git-hook
+          test ! -d "$repo/.ai"
           test ! -f "$repo/CLAUDE.md"
-          test ! -f "$repo/.cursor/rules/agentlayer.mdc"
-          find "$repo/.ai/archive" -type f | grep -q .
+          test ! -f "$repo/AGENTS.md"

@@ -33,13 +33,13 @@
 - [x] ADR-0009 documents the future plugin pattern for deterministic CI (implementation deferred to F2.5)
 
 ### F1 — Core SDD harness port (closed 2026-05-15, develop @ bf88d31)
-- [x] `.ai/` replaced with the runtime-agnostic SDD scaffold ported from the DoorKit lineage; domain (BLE/NFC/Keychain/Vapor) scrubbed
+- [x] `.ai/` replaced with the runtime-agnostic SDD scaffold ported from the upstream lineage; domain artifacts scrubbed
 - [x] 6 SDD commands stack-agnostic; hooks with per-project `config.sh`
 - [x] ADR-0008 (runtime-agnostic AI layer) kept; root bootloaders CLAUDE.md + AGENTS.md ship as 5-line pointers
 - [x] Dogfood acceptance Gherkin `SH-F1-001-dogfood.feature` — all 9 scenarios verified manually
 
 ### F0 — Gap-analysis (closed 2026-05-15)
-- [x] Audited DoorKit `.ai/`, classified artifacts into Generic / Domain / Hybrid; ~70% genuinely portable.
+- [x] Audited the upstream lineage's `.ai/`, classified artifacts into Generic / Domain / Hybrid; ~70% genuinely portable.
 
 ## Immediate next
 

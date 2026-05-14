@@ -14,7 +14,7 @@ Stories `SH-NNN`. One story = one acceptance feature in `specs/acceptance/`.
 
 | ID | Title | Status | Spec | Phase |
 |---|---|---|---|---|
-| SH-F1-001 | `.ai/` core port from DoorKit lineage (clean slate, no domain) | done | `acceptance/SH-F1-001-dogfood.feature` | F1 |
+| SH-F1-001 | `.ai/` core port from upstream lineage (clean slate, no domain) | done | `acceptance/SH-F1-001-dogfood.feature` | F1 |
 | SH-F1-002 | SDD commands ported as stack-agnostic | done | `acceptance/SH-F1-001-dogfood.feature` | F1 |
 | SH-F1-003 | Hooks ported with per-project `config.sh` for code globs | done | `acceptance/SH-F1-001-dogfood.feature` | F1 |
 | SH-F1-004 | Governance templates (CONTEXT/PRODUCT/ROUTING/BACKLOG/README) rewritten for sdd-harness | done | `acceptance/SH-F1-001-dogfood.feature` | F1 |
@@ -30,7 +30,7 @@ Stories `SH-NNN`. One story = one acceptance feature in `specs/acceptance/`.
 ## Out of scope (v1.0.0)
 
 - Multi-AI testing harness (decision deferred)
-- MCP server scaffold (DoorKit's was incomplete; revisit if user demand emerges)
+- MCP server scaffold (the upstream lineage shipped an incomplete one; revisit if user demand emerges)
 - LangGraph / MAS / RAG agentic patterns (those belong in a separate "governance pack" repo, not the harness core)
 - Auto-generation of stack-specific test runners (consumer project owns this)
 

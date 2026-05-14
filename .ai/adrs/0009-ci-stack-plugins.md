@@ -6,9 +6,9 @@
 
 ## Context
 
-The DoorKit lineage shipped a `tools/ci.sh` that orchestrates deterministic CI on a Swift/iOS codebase: XcodeGen drift checks, SwiftPM package tests, iOS simulator tests, macOS simulator tests, secret scanning. The script was *deterministic* (same inputs → same outputs, no flakiness) and *single-entrypoint* (one command, both local and GitHub Actions).
+The lineage that produced sdd-harness shipped a `tools/ci.sh` that orchestrates deterministic CI on a single stack: project-generation drift checks, package tests, simulator tests, secret scanning. The script was *deterministic* (same inputs → same outputs, no flakiness) and *single-entrypoint* (one command, both local and remote CI).
 
-sdd-harness needs to offer the same discipline — deterministic CI behind a single entrypoint — without baking in any particular stack's tooling. A Python project should not need to read `xcodebuild` references; a JS project should not need to know what XcodeGen is.
+sdd-harness needs to offer the same discipline — deterministic CI behind a single entrypoint — without baking in any particular stack's tooling. A Python project should not need to read iOS toolchain references; a JS project should not need to know what a simulator drift check is.
 
 ## Decision
 
@@ -71,5 +71,5 @@ When a consumer project asks for CI scaffolding:
 
 ## References
 
-- DoorKit `tools/ci.sh`, `tools/spec-check.sh`, `tools/portfolio-check.sh` — the lineage source for the deterministic-CI philosophy.
+- The lineage `tools/ci.sh`, `tools/spec-check.sh`, `tools/portfolio-check.sh` scripts that demonstrated the deterministic-CI philosophy on a single stack before it was generalized here.
 - `.ai/adrs/0008-runtime-agnostic-ai-layer.md` — same "single source of truth, runtime-agnostic" pattern applied to the AI layer.

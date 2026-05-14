@@ -37,7 +37,7 @@ Any engineer or AI assistant should be able to:
 
 ## Lineage
 
-sdd-harness extracts the disciplined `.ai/` layer iterated through 6 phases in a real production codebase (a smart-lock iOS prototype with BLE/NFC/hardware constraints). The discipline survived contact with hardware, mocks, simulators, and CI — which is the bar for shipping a framework rather than a template.
+sdd-harness extracts the disciplined `.ai/` layer iterated through multiple phases in a real production codebase under non-trivial constraints (multiple transports, hardware integration, end-to-end test harness, deterministic CI). The discipline survived contact with reality — which is the bar for shipping a framework rather than a template.
 
 ## Success metrics (subjective, not product KPIs)
 

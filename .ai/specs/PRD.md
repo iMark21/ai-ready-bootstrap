@@ -1,6 +1,6 @@
 # sdd-harness — Product Requirements Document
 
-> Version: 1.0.0-alpha (F1 core port from DoorKit lineage).
+> Version: 1.0.0-alpha (initial release).
 
 ## 1. Problem
 

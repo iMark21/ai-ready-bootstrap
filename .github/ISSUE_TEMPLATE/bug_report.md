@@ -16,7 +16,7 @@ labels: bug
 
 ```bash
 # The command you ran
-agentlayer ...
+sdd-harness ...
 ```
 
 1.
@@ -28,8 +28,7 @@ agentlayer ...
 - OS:
 - Shell:
 - bash version (`bash --version`):
-- agentlayer version (`agentlayer --version`):
-- Project type (`--project-type`):
+- sdd-harness version (`sdd-harness --version`):
 - Runtimes selected (`--runtimes`):
 
 ## Relevant output or error message

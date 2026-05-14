@@ -1,6 +1,6 @@
 # sdd-harness — Manual
 
-> **v1.0.0-alpha** — This manual is intentionally minimal. The detailed v0.5.0 manual (covering `agentlayer init`, runtime adapters, install/standardize flows) no longer matches reality: the CLI is being rewritten and the `.ai/` layer has been replaced. The full manual returns in v1.0.0-beta together with the CLI rewrite.
+> **v1.0.0-alpha** — This manual is intentionally minimal. The detailed v0.5.0 manual covered the previous CLI and a `.ai/` layout that no longer exists. A full manual returns in v1.0.0-beta.
 
 ## Where to read
 
@@ -42,9 +42,9 @@ $EDITOR .ai/hooks/config.sh
 
 The hook blocks `feat/*` commits that touch declared code globs without touching `.ai/specs/` or `.ai/adrs/`. Bypass for documented exceptions: `SH_SDD_SKIP=1 git commit ...`.
 
-## CLI status
+## CLI
 
-`bin/agentlayer` ships in this release but its templates still reflect v0.5.0. **Do not use it to initialize new repos** — it would lay down the old structure. Use the manual adoption path in [README.md](README.md) until v1.0.0-beta.
+`bin/sdd-harness` ships in this release. Install it via `bash install.sh`, then run `sdd-harness init` inside any target repo to lay down the canonical `.ai/` layer plus bootloaders.
 
 ## Roadmap to v1.0.0
 

@@ -8,8 +8,21 @@
 set -euo pipefail
 
 VERSION="1.0.0-alpha"
-SCRIPT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+
+# Resolve $0 through any symlink chain so we can find templates/ relative to
+# the real script location, not the symlink in ~/.local/bin/.
+_self="$0"
+while [ -h "$_self" ]; do
+  _dir="$(cd -P "$(dirname "$_self")" && pwd)"
+  _self="$(readlink "$_self")"
+  case "$_self" in
+    /*) ;;
+    *) _self="$_dir/$_self" ;;
+  esac
+done
+SCRIPT_DIR="$(cd -P "$(dirname "$_self")/.." && pwd)"
 TEMPLATES_DIR="$SCRIPT_DIR/templates"
+unset _self _dir
 
 # ---------- defaults ----------
 COMMAND=""

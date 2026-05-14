@@ -1,12 +1,12 @@
 # sdd-harness
 
-> **v1.0.0-alpha** — Framework pivot from `agentlayer` v0.5.0. CLI distribution under reconstruction; the core `.ai/` layer is complete and dogfooded in this repo.
+> **v1.0.0-alpha** — Framework rewrite. Repo renamed from `agentlayer` v0.5.0. Core `.ai/` layer ported and dogfooded; CLI rewritten end-to-end.
 
 A runtime-agnostic **Spec-Driven Development harness** that any AI can operate. Drop it into a repo and the team — humans and AIs alike — follow the same disciplined loop: **spec first, code second, verify against spec**.
 
 ## Status
 
-This repository is in transition. The `.ai/` layer (the *brain* of the harness) has been ported from a battle-tested production lineage and is ready to read, adapt, and adopt. The CLI that distributes it into other repos (`bin/sdd-harness` once renamed, currently `bin/agentlayer` on disk) is still wired to the v0.5.0 templates and will be rewritten in **v1.0.0-beta**.
+v1.0.0-alpha ships the framework core (`.ai/` layer + 5-line bootloaders) and a rewritten CLI that lays it down in any target repository. Templates live under `templates/` and are copied verbatim with placeholder substitution.
 
 If you arrived from `iMark21/agentlayer` looking for the v0.5.0 `agent-explore → plan → code → verify` flow: that has been replaced. See [CHANGELOG.md](CHANGELOG.md) for the rupture rationale and migration guidance.
 
@@ -43,25 +43,26 @@ See [`.ai/notes/spec-driven-development.md`](.ai/notes/spec-driven-development.m
 
 ## Lineage
 
-sdd-harness extracts the disciplined `.ai/` layer iterated through 6 phases in a real production codebase (a smart-lock iOS prototype with BLE/NFC/hardware constraints). The discipline survived contact with hardware, mocks, simulators, and CI — which is the bar for shipping a framework rather than a template. Domain-specific artifacts (BLE, NFC, Keychain, Vapor) are excluded; only the generic SDD discipline is kept.
+sdd-harness extracts the disciplined `.ai/` layer iterated through multiple phases in a real production codebase under non-trivial constraints (multiple transports, hardware integration, end-to-end test harness, deterministic CI). The discipline survived contact with reality — which is the bar for shipping a framework rather than a template. Domain-specific artifacts are excluded; only the generic SDD discipline is kept.
 
-## Adopting it (manual path, v1.0.0-alpha)
-
-While the CLI is being rewritten:
+## Adopting it
 
 ```bash
-# Copy the .ai/ structure into your repo
-cp -R .ai/ /path/to/your-repo/.ai/
-cp CLAUDE.md AGENTS.md /path/to/your-repo/
+# 1. Get the CLI (clone somewhere persistent)
+git clone https://github.com/iMark21/sdd-harness.git ~/.sdd-harness
+cd ~/.sdd-harness && bash install.sh
 
-# Tune the code globs to your stack
-$EDITOR /path/to/your-repo/.ai/hooks/config.sh
-
-# Install the SDD pre-commit hook
-cd /path/to/your-repo && ./.ai/hooks/install.sh
+# 2. In your target repo
+cd /path/to/your-repo
+sdd-harness init
 ```
 
-Then rewrite `.ai/PRODUCT.md`, `.ai/BACKLOG.md`, `.ai/CONTEXT.md` for your project. ADR 0008 (runtime-agnostic AI layer) stays as-is; add your own ADRs starting at 0009 or higher.
+`sdd-harness init` auto-routes:
+
+- **Fresh repo** → lays down `.ai/` plus root bootloaders (`CLAUDE.md`, `AGENTS.md`).
+- **Repo already has AI files** → routes to `standardize`, which backs them up under `.ai-backup-<timestamp>/` and installs the new layout.
+
+Then customize `.ai/PRODUCT.md`, `.ai/BACKLOG.md`, `.ai/CONTEXT.md` for your project. ADR 0008 (runtime-agnostic AI layer) stays as-is; add your own ADRs starting at 0009 or higher. Tune `.ai/hooks/config.sh` to match your stack's code paths.
 
 ## Roadmap
 

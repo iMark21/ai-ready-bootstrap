@@ -10,7 +10,7 @@
 
 Specs (`PRD.md`, `BACKLOG.md`, `adrs/`) describe what *should* be. Code is what *is*. **`CONTEXT.md` is the bridge between them** — what has actually shipped, what's mid-flight, what blocked. Without it, every new contributor (human or AI) has to reconstruct the state by grepping git history, which is slow and unreliable.
 
-The DoorKit lineage shipped through 7 phases (F0 → F7) over several weeks. The discipline that kept the project legible end-to-end was *not* the test suite or the ADRs — those exist in many projects that still feel chaotic. It was the habit of closing every phase by updating `CONTEXT.md` so a fresh reader could land on it and know where they were.
+The lineage that produced sdd-harness shipped through multiple phases over several weeks. The discipline that kept the project legible end-to-end was *not* the test suite or the ADRs — those exist in many projects that still feel chaotic. It was the habit of closing every phase by updating `CONTEXT.md` so a fresh reader could land on it and know where they were.
 
 ## The five required sections
 
@@ -38,7 +38,7 @@ The DoorKit lineage shipped through 7 phases (F0 → F7) over several weeks. The
 
 We considered auto-generating `CONTEXT.md` from git history + backlog status. Rejected for two reasons:
 
-1. **Auto-generated state has no intent.** A bullet that says "merged commit a3f2b1" is information, but a bullet that says "DK-001 done; pairing flow verified end-to-end against the BLE simulator" is *context*. Humans write context; machines write information.
+1. **Auto-generated state has no intent.** A bullet that says "merged commit a3f2b1" is information, but a bullet that says "SH-001 done; the critical flow is verified end-to-end against the test harness" is *context*. Humans write context; machines write information.
 2. **Drift detection is the whole point.** If a human has to update the mirror at phase close, they notice when reality and intent diverged. Auto-generation hides the divergence.
 
 ## How an AI assistant should use the mirror

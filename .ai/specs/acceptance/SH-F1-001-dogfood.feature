@@ -57,11 +57,11 @@ Feature: SH-F1-001 — Dogfood: sdd-harness governs itself via its own .ai/
     And no file under .ai/ references the old `explore→plan→code→verify` flow
     And the assistant-installer/ directory does not exist
 
-  Scenario: No domain-specific references leak from the DoorKit lineage
+  Scenario: No domain-specific references leak from the upstream lineage
     Given the .ai/ layer
-    When grepped for: BLE, NFC, Keychain, Vapor, CoreBluetooth, smart lock
-    Then no matches are found in commands/, hooks/, agents/, ADRs (except provenance notes in BACKLOG/CONTEXT/PRD)
-    And references to "DoorKit" only appear as historical provenance, never as live dependencies
+    When grepped for any hardware-protocol or stack-specific term (BLE, NFC, Keychain, Vapor, CoreBluetooth, xcodebuild, etc.)
+    Then no matches are found in commands/, hooks/, agents/, ADRs, notes, or specs templates
+    And the only lineage references that remain are generic phrasings like "iterated through multiple phases in a real production codebase"
 
   Scenario: The SDD flow is documented end-to-end
     Given .ai/notes/spec-driven-development.md exists
