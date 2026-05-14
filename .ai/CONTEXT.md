@@ -4,9 +4,9 @@
 
 ## Current state
 
-**Phase:** F1 — Core SDD harness port from DoorKit lineage
-**Branch:** `feat/sh-f1-core-port`
-**Repo:** `~/Developer/sdd-harness/` (formerly `~/Developer/ai-ready-bootstrap`; remote still `iMark21/agentlayer`, renamed to `iMark21/sdd-harness` in F4)
+**Phase:** F2 — CLI rewrite (`bin/sdd-harness`) + templates extraction
+**Branch:** `feat/sh-f2-cli-rewrite`
+**Repo:** `~/Developer/sdd-harness/` (remote still `iMark21/agentlayer`, renamed to `iMark21/sdd-harness` in F4)
 **Last update:** 2026-05-15
 
 ## Done
@@ -22,15 +22,24 @@
 
 ## Immediate next
 
-**Scope-cut (2026-05-15, TL judgment)**: T7 CLI rewrite moves from F1 to F2 (SH-F2-001). Reason: `bin/agentlayer` is 1779 lines of bash with v0.5.0 `.ai/` templates embedded as heredocs; rewriting is ~3-5h work, exceeds F1 scope. F2 (originally "CI determinista") expands to include CLI distribution rewrite.
+F1 closed 2026-05-15 (squash-merged `develop` at `bf88d31`).
 
-F1 remaining tasks:
+F2 in progress on `feat/sh-f2-cli-rewrite`. Scope further trimmed (TL judgment): SH-F2-002 (deterministic CI plugins) deferred to F2.5 or v1.1.0; F2 ships only the CLI rewrite plus ADR-0009 documenting the future plugin pattern.
 
-- T8: write meta acceptance Gherkin (`acceptance/SH-F1-001-dogfood.feature`) — validates that an AI runtime reading `.ai/` can execute the SDD flow on this repo
-- T9: rewrite `README.md` honest about v1.0.0-alpha state (CLI in reconstruction), `CHANGELOG.md` documents rupture, simplify `MANUAL.md`
-- T10: manual smoke-test = read `.ai/` end-to-end as a first contributor would; verify internal consistency
+F2 done so far:
 
-After T10: F1 closes, squash-merge `feat/sh-f1-core-port` → `develop` (per workspace GitFlow). NO push to remote until F4.
+- [x] T1: `templates/` directory created with canonical and placeholder files
+- [x] T2: `bin/sdd-harness` rewritten from scratch (311 lines vs 1779)
+- [x] T3: `install.sh` updated (paths, binary name)
+- [x] T6: `acceptance/SH-F2-001-cli-init.feature` with 9 scenarios
+- [x] T7: e2e smoke-test passed (init/install/audit verified in `/tmp/`)
+- [x] T8: ADR-0009 plugin pattern for CI documented (implementation deferred)
+- [x] T9: CHANGELOG entry under [Unreleased]
+
+Remaining for F2 close:
+
+- Verify `sdd-harness standardize` end-to-end (smoke-test only covered install/audit)
+- Squash-merge `feat/sh-f2-cli-rewrite` → `develop` (local, no push)
 
 ## Active constraints
 

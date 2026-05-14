@@ -4,6 +4,19 @@ All notable changes are documented here.
 
 ## [Unreleased]
 
+### Added — toward v1.0.0-beta
+- `bin/sdd-harness` rewritten from scratch (311 lines, down from 1779 in the v0.5.0 `bin/agentlayer`). Commands: `init` (auto-routes), `install`, `standardize`, `audit`.
+- `templates/` directory at the repo root: canonical `.ai/` (with framework-canonical files like commands/hooks/ROUTING/ADR-0008 and project-specific placeholders for PRODUCT/CONTEXT/BACKLOG/PRD/glossary) plus root bootloaders. The CLI does `cp -R` from here, no embedded heredocs.
+- Placeholder substitution: `{{PROJECT_NAME}}`, `{{STORY_PREFIX}}` (3-letter uppercase), `{{TODAY}}` (YYYY-MM-DD) are rewritten on `install`.
+- `install.sh` updated for the new binary name (`sdd-harness`) and install path (`~/.sdd-harness`).
+- `.ai/adrs/0009-ci-stack-plugins.md` documents the planned plugin pattern for deterministic CI (`tools/ci.sh` dispatcher + per-stack plugins under `tools/ci/`). Implementation deferred to `SH-F2-002`.
+- `.ai/specs/acceptance/SH-F2-001-cli-init.feature` validates the rewritten CLI end-to-end.
+
+### Changed
+- **CLI renamed**: `bin/agentlayer` → `bin/sdd-harness`. Install path: `~/.local/bin/sdd-harness`. The old name no longer ships.
+- **Runtime support narrowed to claude + codex in v1.0.0-alpha**. Future runtimes (cursor, copilot, gemini) reintroduced as their bootloaders ship.
+- **Drop CLI flags that no longer apply**: `--project-type`, `--project-name`, `--git-name`, `--git-email`, `--apply-git-config`, `--report-path`. The harness layout is universal; project metadata is derived from the directory name and customized post-install.
+
 ## [1.0.0-alpha] - 2026-05-15
 
 > **Project rename and rupture.** `agentlayer` is renamed to **`sdd-harness`**. v1.0.0 is a documented break from v0.5.0 — no migration shim. The `agent-explore → plan → code → verify` flow is removed entirely; the new flow is `spec → story → implement → verify → review → release`. This release ships the framework core; the CLI that distributes it into other repos is still wired to v0.5.0 templates and will be rewritten in v1.0.0-beta.

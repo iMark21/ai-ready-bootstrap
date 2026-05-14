@@ -1,0 +1,311 @@
+#!/bin/bash
+# sdd-harness — runtime-agnostic Spec-Driven Development harness CLI
+#
+# Lays down a canonical .ai/ layer plus root-level bootloaders for any AI runtime.
+# Templates live in $REPO_ROOT/templates/ and are copied verbatim (with placeholder
+# substitution) into the target repository.
+
+set -euo pipefail
+
+VERSION="1.0.0-alpha"
+SCRIPT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+TEMPLATES_DIR="$SCRIPT_DIR/templates"
+
+# ---------- defaults ----------
+COMMAND=""
+TARGET_REPO=""
+RUNTIMES="claude,codex"
+FORCE=0
+DRY_RUN=0
+YES=0
+NON_INTERACTIVE=0
+INSTALL_HOOK=1
+
+# ---------- output helpers ----------
+log()  { printf '%s\n' "$*"; }
+warn() { printf 'WARN: %s\n' "$*" >&2; }
+die()  { printf 'ERROR: %s\n' "$*" >&2; exit 1; }
+say()  { [ "$DRY_RUN" -eq 1 ] && printf '[dry-run] %s\n' "$*" || printf '%s\n' "$*"; }
+
+usage() {
+  cat <<EOF
+sdd-harness $VERSION
+
+Usage:
+  sdd-harness <command> [repo-path] [options]
+
+Commands:
+  init            (Recommended) Detect repo state, route to install or standardize.
+  audit           Inspect a repo and report the AI-layer state.
+  install         Lay down a fresh .ai/ layer plus runtime bootloaders.
+  standardize     Audit + back up existing AI files + install fresh.
+
+Options:
+  --repo PATH           Target repository path (defaults to current directory).
+  --runtimes LIST       Comma-separated runtimes: claude, codex (default: both).
+  --force               Overwrite existing files where applicable.
+  --dry-run             Print actions without writing files.
+  --yes                 Do not ask for confirmation.
+  --non-interactive     Fail instead of prompting for missing choices.
+  --no-git-hook         Skip pre-commit-spec-check.sh installation.
+  --version             Print version and exit.
+  --help                Show this help.
+
+Examples:
+  sdd-harness init                              # inside the target repo
+  sdd-harness init /path/to/repo
+  sdd-harness audit /path/to/repo
+  sdd-harness standardize /path/to/repo --yes
+
+For the full manual, see .ai/ inside the target repo after install, or the
+sdd-harness README at https://github.com/iMark21/sdd-harness.
+EOF
+}
+
+# ---------- arg parsing ----------
+if [ $# -eq 0 ]; then usage; exit 1; fi
+
+COMMAND="$1"; shift || true
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --repo)            TARGET_REPO="${2:-}"; shift 2 ;;
+    --runtimes)        RUNTIMES="${2:-}"; shift 2 ;;
+    --force)           FORCE=1; shift ;;
+    --dry-run)         DRY_RUN=1; shift ;;
+    --yes)             YES=1; shift ;;
+    --non-interactive) NON_INTERACTIVE=1; shift ;;
+    --no-git-hook)     INSTALL_HOOK=0; shift ;;
+    --version)         echo "$VERSION"; exit 0 ;;
+    --help|-h)         usage; exit 0 ;;
+    --*)               die "Unknown option: $1" ;;
+    *)
+      [ -z "$TARGET_REPO" ] && TARGET_REPO="$1" || die "Unexpected argument: $1"
+      shift
+      ;;
+  esac
+done
+
+# Default target repo = pwd
+[ -z "$TARGET_REPO" ] && TARGET_REPO="$(pwd)"
+TARGET_REPO="$(cd "$TARGET_REPO" 2>/dev/null && pwd -P || die "Target does not exist: $TARGET_REPO")"
+
+# Validate templates dir exists
+[ -d "$TEMPLATES_DIR/.ai" ] || die "Templates directory missing: $TEMPLATES_DIR/.ai"
+
+# ---------- runtime list normalization ----------
+normalize_runtimes() {
+  local input="$1"
+  printf '%s' "$input" | tr '[:upper:]' '[:lower:]' | tr ',' '\n' \
+    | awk 'NF' | sort -u | paste -sd, -
+}
+
+RUNTIMES="$(normalize_runtimes "$RUNTIMES")"
+
+valid_runtime() {
+  case "$1" in
+    claude|codex) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+for r in $(echo "$RUNTIMES" | tr ',' ' '); do
+  valid_runtime "$r" || die "Unsupported runtime in v$VERSION: $r (supported: claude, codex)"
+done
+
+# ---------- detection ----------
+AI_MARKERS=(
+  ".ai"
+  "CLAUDE.md"
+  "AGENTS.md"
+  "AGENTLAYER.md"
+  ".github/copilot-instructions.md"
+  ".github/instructions"
+  ".cursor/rules"
+)
+
+detect_existing_ai() {
+  local repo="$1"
+  for m in "${AI_MARKERS[@]}"; do
+    if [ -e "$repo/$m" ]; then
+      printf '%s\n' "$m"
+    fi
+  done
+}
+
+# ---------- file operations ----------
+copy_file() {
+  local src="$1" dst="$2"
+  if [ "$DRY_RUN" -eq 1 ]; then
+    say "copy $src -> $dst"
+    return
+  fi
+  mkdir -p "$(dirname "$dst")"
+  if [ -e "$dst" ] && [ "$FORCE" -ne 1 ]; then
+    die "Destination exists: $dst (use --force or run 'sdd-harness standardize')"
+  fi
+  cp "$src" "$dst"
+}
+
+copy_tree() {
+  local src="$1" dst="$2"
+  if [ "$DRY_RUN" -eq 1 ]; then
+    say "copy -R $src -> $dst"
+    return
+  fi
+  mkdir -p "$dst"
+  cp -R "$src/." "$dst/"
+}
+
+# ---------- install ----------
+project_name() {
+  basename "$1"
+}
+
+substitute_placeholders() {
+  local file="$1" project="$2"
+  [ "$DRY_RUN" -eq 1 ] && return
+  local prefix today
+  prefix="$(printf '%s' "$project" | tr 'a-z' 'A-Z' | tr -cd 'A-Z' | cut -c1-3)"
+  [ -z "$prefix" ] && prefix="X"
+  today="$(date +%Y-%m-%d)"
+  sed -i.bak \
+    -e "s/{{PROJECT_NAME}}/$project/g" \
+    -e "s/{{STORY_PREFIX}}/$prefix/g" \
+    -e "s/{{TODAY}}/$today/g" \
+    "$file"
+  rm -f "${file}.bak"
+}
+
+run_install() {
+  local repo="$1"
+  local existing
+  existing="$(detect_existing_ai "$repo" | tr '\n' ' ' | sed 's/ *$//')"
+  if [ -n "$existing" ] && [ "$FORCE" -ne 1 ]; then
+    die "Repo already has AI files: $existing
+Use 'sdd-harness standardize' to back them up and install fresh, or --force."
+  fi
+
+  local project
+  project="$(project_name "$repo")"
+  log "Installing sdd-harness $VERSION into $repo"
+  log "  Project name: $project"
+  log "  Runtimes: $RUNTIMES"
+  [ "$DRY_RUN" -eq 1 ] && log "  Mode: DRY RUN (no files will be written)"
+
+  copy_tree "$TEMPLATES_DIR/.ai" "$repo/.ai"
+
+  for r in $(echo "$RUNTIMES" | tr ',' ' '); do
+    case "$r" in
+      claude) copy_file "$TEMPLATES_DIR/CLAUDE.md" "$repo/CLAUDE.md" ;;
+      codex)  copy_file "$TEMPLATES_DIR/AGENTS.md" "$repo/AGENTS.md" ;;
+    esac
+  done
+
+  if [ "$DRY_RUN" -ne 1 ]; then
+    for f in "$repo/.ai/PRODUCT.md" "$repo/.ai/CONTEXT.md" "$repo/.ai/BACKLOG.md" \
+             "$repo/.ai/specs/PRD.md" "$repo/.ai/specs/glossary.md"; do
+      [ -f "$f" ] && substitute_placeholders "$f" "$project"
+    done
+  fi
+
+  if [ "$INSTALL_HOOK" -eq 1 ]; then
+    if [ "$DRY_RUN" -eq 1 ]; then
+      say "would run $repo/.ai/hooks/install.sh"
+    else
+      ( cd "$repo" && ./.ai/hooks/install.sh ) || warn "Hook installer exited non-zero; check $repo/.ai/hooks/install.sh"
+    fi
+  fi
+
+  log ""
+  log "Done. Next steps:"
+  log "  1. Edit $repo/.ai/PRODUCT.md and $repo/.ai/BACKLOG.md for your project."
+  log "  2. Customize $repo/.ai/hooks/config.sh to match your stack's code paths."
+  log "  3. Read $repo/.ai/ROUTING.md (it tells any AI how to operate the project)."
+}
+
+# ---------- standardize ----------
+backup_existing() {
+  local repo="$1"
+  local stamp; stamp="$(date +%Y%m%d-%H%M%S)"
+  local backup_dir="$repo/.ai-backup-$stamp"
+  log "Backing up existing AI files to $backup_dir/"
+  [ "$DRY_RUN" -eq 1 ] && { say "mkdir $backup_dir && move existing AI files"; return; }
+  mkdir -p "$backup_dir"
+  for m in "${AI_MARKERS[@]}"; do
+    if [ -e "$repo/$m" ]; then
+      mv "$repo/$m" "$backup_dir/$(basename "$m")" 2>/dev/null || true
+    fi
+  done
+}
+
+run_standardize() {
+  local repo="$1"
+  local existing
+  existing="$(detect_existing_ai "$repo" | tr '\n' ' ' | sed 's/ *$//')"
+  if [ -z "$existing" ]; then
+    log "No existing AI files detected. Routing to 'install'."
+    run_install "$repo"
+    return
+  fi
+  log "Existing AI files: $existing"
+  if [ "$YES" -ne 1 ]; then
+    if [ "$NON_INTERACTIVE" -eq 1 ]; then
+      die "--non-interactive set and existing AI files present; pass --yes to proceed with backup + install."
+    fi
+    printf 'Proceed with backup + fresh install? [y/N] '
+    read -r answer
+    [ "$answer" = "y" ] || [ "$answer" = "Y" ] || die "Aborted by user."
+  fi
+  backup_existing "$repo"
+  FORCE=1
+  run_install "$repo"
+}
+
+# ---------- audit ----------
+run_audit() {
+  local repo="$1"
+  local existing
+  existing="$(detect_existing_ai "$repo")"
+  log "sdd-harness audit — $repo"
+  log "  version: $VERSION"
+  log ""
+  if [ -z "$existing" ]; then
+    log "  No AI-layer files detected. Repo is ready for 'sdd-harness init'."
+  else
+    log "  Detected AI-layer files:"
+    printf '%s\n' "$existing" | sed 's/^/    - /'
+    log ""
+    if [ -d "$repo/.ai" ]; then
+      log "  .ai/ contents:"
+      ( cd "$repo" && find .ai -maxdepth 2 -type f -not -name '.gitkeep' 2>/dev/null | sort | sed 's/^/    /' )
+    fi
+    log ""
+    log "  To re-layer this repo, run: sdd-harness standardize $repo"
+  fi
+}
+
+# ---------- init (auto-route) ----------
+run_init() {
+  local repo="$1"
+  local existing
+  existing="$(detect_existing_ai "$repo" | tr '\n' ' ' | sed 's/ *$//')"
+  if [ -z "$existing" ]; then
+    log "Fresh repo detected. Routing to 'install'."
+    run_install "$repo"
+  else
+    log "Existing AI files detected. Routing to 'standardize'."
+    run_standardize "$repo"
+  fi
+}
+
+# ---------- dispatch ----------
+case "$COMMAND" in
+  init)         run_init "$TARGET_REPO" ;;
+  install)      run_install "$TARGET_REPO" ;;
+  standardize)  run_standardize "$TARGET_REPO" ;;
+  audit)        run_audit "$TARGET_REPO" ;;
+  --help|-h)    usage ;;
+  --version)    echo "$VERSION" ;;
+  *)            die "Unknown command: $COMMAND (try: sdd-harness --help)" ;;
+esac
