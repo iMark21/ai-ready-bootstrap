@@ -125,24 +125,82 @@ A short GIF of the same flow is available at [`docs/demo.gif`](docs/demo.gif) fo
 
 ## What sdd-harness gives you
 
-A `.ai/` directory that is the single source of truth for any AI runtime:
+A `.ai/` directory that is the single source of truth for any AI runtime. Files marked **canonical** ship ready and you usually leave them alone; files marked **you fill** are templates waiting for your project's content:
 
 ```
 .ai/
-├── ROUTING.md      — how any AI operates the project
-├── PRODUCT.md      — vision and non-goals
-├── CONTEXT.md      — living state
-├── BACKLOG.md      — stories (SH-NNN format)
-├── README.md       — entrypoint map
-├── adrs/           — architecture decisions, MADR format
-├── agents/         — reusable AI roles (spec-writer to start)
-├── commands/       — repeatable workflows (spec, story, implement, verify, review, release)
-├── hooks/          — runtime-agnostic shell scripts; config.sh per-project tunable
-├── notes/          — distilled mini-tutorials
-└── specs/          — PRD, glossary, acceptance Gherkin, your protocol contracts
+├── ROUTING.md      — canonical: how any AI operates the project
+├── PRODUCT.md      — you fill: vision and non-goals
+├── CONTEXT.md      — you fill: phase, branch, decisions, risks
+├── BACKLOG.md      — you fill: your stories (SH-NNN by default)
+├── README.md       — canonical: entrypoint map
+├── adrs/           — ships ADR 0008; you add 0009+ as decisions land
+├── agents/         — ships spec-writer; you add stack-specific reviewers
+├── commands/       — canonical: spec, story, implement, verify, review, release, phase-close
+├── hooks/          — canonical scripts; you customize config.sh code globs
+├── notes/          — canonical: SDD primer, governance mirror; you add your own
+└── specs/          — you fill: PRD, glossary, acceptance Gherkin, protocol contracts
 ```
 
 Plus 5-line bootloaders at the repo root: [`CLAUDE.md`](CLAUDE.md), [`AGENTS.md`](AGENTS.md), and the same pattern for any future AI runtime.
+
+### Concrete example after install
+
+For an Android client like the one in the demo, the files you fill in might look like:
+
+**`.ai/PRODUCT.md`**
+
+```markdown
+# marvel-android — Product Vision
+
+## Tagline
+Native Android client for browsing Marvel comics, characters, and stories
+against the public Marvel API.
+
+## Non-Goals
+- No in-app comic reader in v1 (link out to marvel.com).
+- No offline mode beyond image-thumbnail cache.
+- No social features (favorites stay device-local).
+
+## Audience
+Marvel fans, primary; Android developers reviewing the codebase, secondary.
+```
+
+**`.ai/BACKLOG.md`**
+
+```markdown
+| ID     | Title                                            | Status | Spec                                    | Phase |
+|--------|--------------------------------------------------|--------|-----------------------------------------|-------|
+| MA-001 | Marvel API login (email + password)              | done   | acceptance/MA-001-login.feature         | F0    |
+| MA-002 | List characters from /v1/public/characters       | todo   | TBD                                     | F0    |
+| MA-003 | Character detail with comics list                | todo   | TBD                                     | F1    |
+```
+
+**`.ai/CONTEXT.md`** (after the first phase closes)
+
+```markdown
+**Phase:** F1 — character browsing
+**Branch:** develop
+**Last update:** 2026-06-02
+
+## Done
+- [x] MA-001: login flow against Marvel public API (see acceptance/MA-001-login.feature)
+
+## Immediate next
+- MA-002: characters list. Pagination = 20 per page, cache thumbnails 7 days.
+```
+
+**`.ai/specs/glossary.md`**
+
+```markdown
+| Term      | Definition                                                                  |
+|-----------|-----------------------------------------------------------------------------|
+| Hero      | A character with at least one comic appearance.                             |
+| Creator   | Writer or artist credited on a comic. Disjoint from Hero in this domain.    |
+| Storyline | A multi-issue narrative arc grouping Comics.                                |
+```
+
+Don't write all of this on day one — start with `PRODUCT.md` and the first row of `BACKLOG.md`, then let the SDD loop drive the rest.
 
 ## The discipline
 
