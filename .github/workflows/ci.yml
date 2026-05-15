@@ -138,7 +138,7 @@ jobs:
           git -C "$repo" init -q
 
           status=0
-          bin/sdd-harness init "$repo" --runtimes cursor --non-interactive --yes --no-git-hook || status=$?
+          bin/sdd-harness init "$repo" --runtimes lolwat --non-interactive --yes --no-git-hook || status=$?
           test "$status" -ne 0
           test ! -d "$repo/.ai"
 
