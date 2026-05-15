@@ -10,11 +10,108 @@ v1.0.0-alpha ships the framework core (`.ai/` layer + 5-line bootloaders) and a 
 
 If you arrived from `iMark21/agentlayer` looking for the v0.5.0 `agent-explore → plan → code → verify` flow: that has been replaced. See [CHANGELOG.md](CHANGELOG.md) for the rupture rationale and migration guidance.
 
-## Demo
+## Demo — installing into a real Android repo
 
-Installing sdd-harness in a real Android repo (Marvel API client, last commit 2021, no prior AI layer) and launching the first spec. The pre-commit hook refuses the code-only commit; once the spec lands, the same code is accepted.
+The result of this walkthrough lives on a public branch of a real Android project (Marvel API client, last commit 2021, no prior AI layer):
 
-![sdd-harness installing in an Android repo and gating the first commit](docs/demo.gif)
+> [`iMark21/marvel-android` — `feat/marvel-login`](https://github.com/iMark21/marvel-android/tree/feat/marvel-login) — [commit](https://github.com/iMark21/marvel-android/commit/95d194c)
+
+### 1. Install in a clean repo
+
+```bash
+$ cd marvel-android        # last commit Oct 2021, no AI files
+$ sdd-harness init . --yes
+
+Fresh repo detected. Routing to 'install'.
+Installing sdd-harness 1.0.0-alpha into /Users/.../marvel-android
+  Project name: marvel-android
+  Runtimes: claude,codex
+[install.sh] linked pre-commit -> .../.ai/hooks/pre-commit-spec-check.sh
+[install.sh] linked post-commit -> .../.ai/hooks/post-edit-trace.sh
+[install.sh] done.
+
+Done. Next steps:
+  1. Edit .ai/PRODUCT.md and .ai/BACKLOG.md for your project.
+  2. Customize .ai/hooks/config.sh to match your stack's code paths.
+  3. Read .ai/ROUTING.md (it tells any AI how to operate the project).
+```
+
+`sdd-harness init` lays down `.ai/` (commands, hooks, ADRs, agents, notes, specs), root bootloaders (`CLAUDE.md`, `AGENTS.md`), and the SDD pre-commit hook.
+
+### 2. Start a feature
+
+```bash
+$ git checkout -b feat/marvel-login
+```
+
+### 3. Try to commit code without a spec — the hook refuses
+
+```bash
+$ cat > src/LoginViewModel.kt <<'KT'
+package com.imark.marvel.auth
+
+class LoginViewModel(private val auth: AuthRepository) : ViewModel() {
+  fun login(email: String, password: String): Result<Session> = auth.login(email, password)
+}
+KT
+
+$ git add src/LoginViewModel.kt && git commit -m 'feat: login view-model'
+```
+
+The pre-commit hook fires and exits non-zero:
+
+```
+[sdd-check] Spec-Driven Development violation.
+
+This feature commit changes code under one of: src/* lib/* app/* apps/* packages/* services/*
+but does not touch any file under .ai/specs/ or .ai/adrs/.
+
+sdd-harness requires every feature change to be accompanied by a spec or
+ADR update. Either:
+
+  1. Update the relevant spec in .ai/specs/ and re-stage it, or
+  2. Add a new ADR under .ai/adrs/ that justifies the change, or
+  3. If this is a one-off documented exception (e.g. typo fix), retry with:
+        SH_SDD_SKIP=1 git commit ...
+
+See .ai/ROUTING.md and .ai/adrs/0008-runtime-agnostic-ai-layer.md.
+```
+
+### 4. Write the spec first
+
+```bash
+$ cat > .ai/specs/SH-001-marvel-login.md <<'MD'
+# SH-001 — Marvel login
+
+## 1. Problem
+Users see anonymous content. Favorites and last-read comics need a session
+tied to a Marvel API account.
+
+## 2. Solution
+Email + password screen against the Marvel public API. Session token
+encrypted in EncryptedSharedPreferences, 24h expiry.
+
+## 3. Acceptance
+- Empty email or password disables the Login button.
+- HTTP 200 navigates to the comics list.
+- HTTP 401 shows a clear error.
+MD
+```
+
+### 5. Commit spec and code together — passes
+
+```bash
+$ git add .ai/specs/SH-001-marvel-login.md src/LoginViewModel.kt
+$ git commit -m 'feat: login spec + view-model'
+[feat/marvel-login 95d194c] feat: login spec + view-model
+ 2 files changed, 19 insertions(+)
+ create mode 100644 .ai/specs/SH-001-marvel-login.md
+ create mode 100644 src/LoginViewModel.kt
+```
+
+The spec lands with the code in the same commit. From this point on, every subsequent feature on `feat/*` branches will go through the same gate. The result is at the link at the top of this section — open the spec, open the code, and verify the discipline yourself.
+
+A short GIF of the same flow is available at [`docs/demo.gif`](docs/demo.gif) for those who prefer to watch.
 
 ## What sdd-harness gives you
 
