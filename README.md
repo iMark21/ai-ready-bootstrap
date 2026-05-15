@@ -79,6 +79,10 @@ See .ai/ROUTING.md and .ai/adrs/0008-runtime-agnostic-ai-layer.md.
 
 ### 4. Write the spec first
 
+Two paths — pick whichever fits your flow.
+
+**a) By hand.** Open the file in your editor:
+
 ```bash
 $ cat > .ai/specs/SH-001-marvel-login.md <<'MD'
 # SH-001 — Marvel login
@@ -97,6 +101,12 @@ encrypted in EncryptedSharedPreferences, 24h expiry.
 - HTTP 401 shows a clear error.
 MD
 ```
+
+**b) Ask your AI to draft it.** sdd-harness was designed so any AI (Claude Code, Codex, Cursor, Copilot, …) can operate the project by reading `.ai/`. Paste a prompt like this into your AI:
+
+> Read `.ai/commands/spec.md`, then draft a spec for **SH-001 — Marvel login**: an Android login screen that authenticates against the Marvel public API, stores the session token in `EncryptedSharedPreferences` with a 24-hour expiry, navigates to the comics list on HTTP 200, and shows a clear error on HTTP 401. Save it to `.ai/specs/SH-001-marvel-login.md` and follow the section structure that `spec.md` documents (Problem, Solution, Roles, Functional requirements, Non-functional, Out of scope, Acceptance criteria). The product context lives in `.ai/PRODUCT.md` and the glossary in `.ai/specs/glossary.md` — read those first to align vocabulary.
+
+Whichever path you choose, the spec file is what unblocks the next commit.
 
 ### 5. Commit spec and code together — passes
 
