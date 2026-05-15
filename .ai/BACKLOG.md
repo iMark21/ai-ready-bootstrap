@@ -26,6 +26,13 @@ Stories `SH-NNN`. One story = one acceptance feature in `specs/acceptance/`.
 | SH-F3-002 | CONTEXT.md schema formalized in templates/ | done | `acceptance/SH-F3-001-phase-close.feature` | F3 |
 | SH-F3-003 | Governance mirror note explaining the practice | done | `acceptance/SH-F3-001-phase-close.feature` | F3 |
 | SH-F3-004 | Dogfood: close F2 and open F3 in sdd-harness's own CONTEXT.md | done | `acceptance/SH-F3-001-phase-close.feature` | F3 |
+| SH-F4-101 | External adoption proof: real cold-start on a legacy unmaintained repo | done | `iMark21/marvel-android@develop` (MAR-002 pager via SDD loop) | beta-gate-2 |
+| SH-F4-102 | Install: dry-run the SDD hook against tracked files, warn if `SH_CODE_GLOBS` matches nothing (caught only by manual config tuning on marvel-android) | todo | TBD | beta |
+| SH-F4-103 | Install: deterministic CONTEXT.md seed — current git branch + first/last commit dates | todo | TBD | beta |
+| SH-F4-104 | Install: stack detection from manifest (`build.gradle`/`package.json`/`Cargo.toml`/`go.mod`/`Package.swift`) → PRODUCT.md stack stub | todo | TBD | beta |
+| SH-F4-105 | Install: migrate a README `## TODO`/`## Roadmap` checklist into BACKLOG.md rows | todo | TBD | beta |
+| SH-F4-106 | Install: write the bootstrap prompt to `.ai/BOOTSTRAP.md` + post-install pointer (judgment-layer handoff, not lost in scrollback) | todo | TBD | beta |
+| SH-F4-107 | README rebalance: lead with value (SDD discipline + cold-start onboarding), CLI as delivery mechanism not protagonist | todo | TBD | beta |
 | SH-F4-001 | Public migration: rename repo, sanitize timestamps, ship v1.0.0-alpha | done | (audit + push log in CONTEXT.md F4 block) | F4 |
 
 ## Out of scope (v1.0.0)

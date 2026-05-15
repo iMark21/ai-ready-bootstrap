@@ -19,6 +19,11 @@
 - [x] `develop` pushed; `v1.0.0-alpha` tagged and pushed
 - [x] CHANGELOG `[1.0.0-alpha]` entry consolidates F1+F2+F3 deliverables under a single release date
 
+### Beta gate #2 — external adoption (proven 2026-05-16)
+- [x] SH-F4-101: real cold-start adoption on `iMark21/marvel-android` (legacy, unmaintained since 2021). Context bootstrapped from source; README TODO → backlog; `MAR-002` pager shipped through the full SDD loop; hook verified (code-only blocked, spec+code passed).
+- **Finding**: default `SH_CODE_GLOBS` did not match the repo's `Marvel/app/*` nesting — the hook would have silently passed code-only commits. Filed SH-F4-102..107 for beta (install should pre-fill the deterministic ~60% and dry-run the hook to catch this).
+- **Analysis (TL)**: install is template-drop only; the valuable bootstrap (the AI reading the repo) is out-of-band. Beta should make install fill what is deterministic (branch, stack, README→backlog, glob sanity) and hand off judgment via `.ai/BOOTSTRAP.md`, without breaking zero-dep / runtime-agnostic (no shelling to an AI).
+
 ### F3 — Governance mirror (closed 2026-05-15)
 - [x] SH-F3-001: `commands/phase-close.md` walks through closing a phase (canonical + template mirror)
 - [x] SH-F3-002: `templates/.ai/CONTEXT.md` formalized with the 5 required sections

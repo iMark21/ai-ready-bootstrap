@@ -20,6 +20,8 @@ The resulting branch:
 
 > [`iMark21/marvel-android` — `feat/marvel-login`](https://github.com/iMark21/marvel-android/tree/feat/marvel-login) — [commit](https://github.com/iMark21/marvel-android/commit/95d194c)
 
+> **Proven on a real adoption — not a staged demo.** Beyond this login walkthrough, sdd-harness was cold-started on the same legacy repo for real: context bootstrapped from the source, the README TODO list migrated into a backlog, and a genuine feature (infinite-scroll pagination, `MAR-002`) shipped through the full `spec → implement → verify` loop with the pre-commit hook enforcing spec-first. See [`develop`](https://github.com/iMark21/marvel-android/tree/develop): [`.ai/specs/MAR-002-pager.md`](https://github.com/iMark21/marvel-android/blob/develop/.ai/specs/MAR-002-pager.md), [`.ai/CONTEXT.md`](https://github.com/iMark21/marvel-android/blob/develop/.ai/CONTEXT.md). That adoption surfaced a real product gap (default hook globs didn't match the repo's nested Gradle module) — now tracked for the beta milestone.
+
 ### 1. Install in a clean repo
 
 ```bash
