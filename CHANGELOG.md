@@ -5,6 +5,10 @@ All notable changes are documented here.
 ## [Unreleased]
 
 ### Added — toward v1.0.0-beta
+- **Install completeness (SH-F4-110)**: `init` now finishes the deterministic work and hands off the judgment work instead of dropping empty templates.
+  - **Glob-sanity dry-run**: after installing the hook, the repo's `SH_CODE_GLOBS` are matched against `git ls-files`. If nothing matches, a prominent warning lists the repo's top-level dirs and names `.ai/hooks/config.sh` to edit — catching the silent mis-gate that the marvel-android adoption hit (nested `Marvel/app/*`). Uses the same case-pattern matcher as the hook, so the dry-run cannot disagree with it.
+  - **`{{GIT_BRANCH}}` seed**: `CONTEXT.md`'s Branch line is the repo's real current branch (`git symbolic-ref`, works pre-first-commit), not a hardcoded `develop`.
+  - **`.ai/BOOTSTRAP.md`**: the precise prompt that fills the judgment-layer files (PRODUCT/CONTEXT/BACKLOG/glossary) from the repo, written into the repo and referenced as post-install step 1 — no longer buried in the README/scrollback. Still zero-dep / runtime-agnostic (nothing shells out to an AI).
 - **Multi-runtime bootloaders**: Cursor (`.cursor/rules/sdd-harness.mdc`), Copilot (`.github/copilot-instructions.md`), Gemini (`GEMINI.md`). Each is the same 5-line pointer pattern as `CLAUDE.md` / `AGENTS.md`, just in the location each runtime expects.
 - CLI accepts `--runtimes all` as an alias that expands to `claude,codex,cursor,copilot,gemini`. Default remains `claude,codex` to avoid polluting repos that don't use the other runtimes.
 - `audit` now detects `GEMINI.md` as a known AI marker.

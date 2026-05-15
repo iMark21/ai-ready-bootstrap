@@ -5,7 +5,7 @@
 ## Current state
 
 **Phase:** F0 — initial setup
-**Branch:** `develop`
+**Branch:** `{{GIT_BRANCH}}`
 **Last update:** {{TODAY}}
 
 ## Done

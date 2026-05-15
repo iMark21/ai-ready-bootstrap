@@ -183,18 +183,56 @@ project_name() {
 }
 
 substitute_placeholders() {
-  local file="$1" project="$2"
+  local file="$1" project="$2" branch="$3"
   [ "$DRY_RUN" -eq 1 ] && return
   local prefix today
   prefix="$(printf '%s' "$project" | tr 'a-z' 'A-Z' | tr -cd 'A-Z' | cut -c1-3)"
   [ -z "$prefix" ] && prefix="X"
   today="$(date +%Y-%m-%d)"
+  [ -z "$branch" ] && branch="develop"
   sed -i.bak \
     -e "s/{{PROJECT_NAME}}/$project/g" \
     -e "s/{{STORY_PREFIX}}/$prefix/g" \
     -e "s/{{TODAY}}/$today/g" \
+    -e "s/{{GIT_BRANCH}}/$branch/g" \
     "$file"
   rm -f "${file}.bak"
+}
+
+# Dry-run the SDD hook's code-glob matching against tracked files. If the
+# repo's SH_CODE_GLOBS match nothing, the hook is mis-gated (it would pass
+# code-only commits silently). Warn — do not fail. See SH-F4-110.
+glob_sanity_check() {
+  local repo="$1"
+  local config="$repo/.ai/hooks/config.sh"
+  [ -f "$config" ] || { warn "no $config — skipping glob sanity check"; return; }
+
+  # shellcheck source=/dev/null
+  ( . "$config"
+    local matched=0 path pattern
+    while IFS= read -r path; do
+      for pattern in "${SH_CODE_GLOBS[@]}"; do
+        # shellcheck disable=SC2254
+        case "$path" in $pattern) matched=1; break ;; esac
+      done
+      [ "$matched" -eq 1 ] && break
+    done < <(git -C "$repo" ls-files 2>/dev/null)
+
+    if [ "$matched" -eq 0 ]; then
+      printf '\n'
+      printf 'WARNING: the SDD pre-commit hook is mis-gated.\n' >&2
+      printf '  None of the SH_CODE_GLOBS in .ai/hooks/config.sh match any\n' >&2
+      printf '  tracked file. Feature commits would NOT be checked for a spec.\n' >&2
+      printf '  Globs: %s\n' "${SH_CODE_GLOBS[*]}" >&2
+      printf '  This repo'\''s top-level entries:\n' >&2
+      git -C "$repo" ls-files \
+        | sed 's|/.*||' | sort -u \
+        | grep -vE '^(\.ai|\.github|\.cursor)$' \
+        | head -10 | sed 's/^/    /' >&2
+      printf '  Edit .ai/hooks/config.sh -> SH_CODE_GLOBS to include your code\n' >&2
+      printf '  path (e.g. "Marvel/app/*"), then re-run .ai/hooks/install.sh.\n\n' >&2
+    fi
+  )
 }
 
 run_install() {
@@ -206,10 +244,14 @@ run_install() {
 Use 'sdd-harness standardize' to back them up and install fresh, or --force."
   fi
 
-  local project
+  local project branch
   project="$(project_name "$repo")"
+  # symbolic-ref works even before the first commit; fails on detached HEAD.
+  branch="$(git -C "$repo" symbolic-ref --short -q HEAD 2>/dev/null || true)"
+  [ -z "$branch" ] && branch="develop"
   log "Installing sdd-harness $VERSION into $repo"
   log "  Project name: $project"
+  log "  Branch: $branch"
   log "  Runtimes: $RUNTIMES"
   [ "$DRY_RUN" -eq 1 ] && log "  Mode: DRY RUN (no files will be written)"
 
@@ -227,23 +269,30 @@ Use 'sdd-harness standardize' to back them up and install fresh, or --force."
 
   if [ "$DRY_RUN" -ne 1 ]; then
     for f in "$repo/.ai/PRODUCT.md" "$repo/.ai/CONTEXT.md" "$repo/.ai/BACKLOG.md" \
-             "$repo/.ai/specs/PRD.md" "$repo/.ai/specs/glossary.md"; do
-      [ -f "$f" ] && substitute_placeholders "$f" "$project"
+             "$repo/.ai/BOOTSTRAP.md" "$repo/.ai/specs/PRD.md" "$repo/.ai/specs/glossary.md"; do
+      [ -f "$f" ] && substitute_placeholders "$f" "$project" "$branch"
     done
   fi
 
   if [ "$INSTALL_HOOK" -eq 1 ]; then
     if [ "$DRY_RUN" -eq 1 ]; then
       say "would run $repo/.ai/hooks/install.sh"
+      say "would dry-run the SDD hook globs against tracked files"
     else
       ( cd "$repo" && ./.ai/hooks/install.sh ) || warn "Hook installer exited non-zero; check $repo/.ai/hooks/install.sh"
+      glob_sanity_check "$repo"
     fi
+  fi
+
+  if [ "$DRY_RUN" -eq 1 ]; then
+    say "would write $repo/.ai/BOOTSTRAP.md (judgment-layer handoff prompt)"
   fi
 
   log ""
   log "Done. Next steps:"
-  log "  1. Edit $repo/.ai/PRODUCT.md and $repo/.ai/BACKLOG.md for your project."
-  log "  2. Customize $repo/.ai/hooks/config.sh to match your stack's code paths."
+  log "  1. Open $repo/.ai/BOOTSTRAP.md — it tells you (or your AI) how to fill"
+  log "     PRODUCT/CONTEXT/BACKLOG/glossary from this repo. Delete it when done."
+  log "  2. If a glob warning appeared above, tune $repo/.ai/hooks/config.sh."
   log "  3. Read $repo/.ai/ROUTING.md (it tells any AI how to operate the project)."
 }
 

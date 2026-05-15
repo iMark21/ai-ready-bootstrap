@@ -181,6 +181,38 @@ jobs:
           test -f "$repo/.github/copilot-instructions.md"
           test -f "$repo/.cursor/rules/sdd-harness.mdc"
 
+      - name: Glob-sanity warns on a nested code layout
+        shell: bash
+        run: |
+          set -euo pipefail
+          repo="$(mktemp -d)"
+          mkdir -p "$repo/Marvel/app/src"
+          echo 'class X' > "$repo/Marvel/app/src/X.kt"
+          git -C "$repo" init -q
+          git -C "$repo" add -A
+          git -C "$repo" -c user.email=a@b.c -c user.name=t commit -qm init
+
+          out="$(bin/sdd-harness init "$repo" --yes 2>&1)"
+          echo "$out" | grep -q "the SDD pre-commit hook is mis-gated"
+          echo "$out" | grep -q "SH_CODE_GLOBS"
+          test -f "$repo/.ai/BOOTSTRAP.md"
+          grep -q '^\*\*Branch:\*\* `' "$repo/.ai/CONTEXT.md"
+          ! grep -rq '{{GIT_BRANCH}}' "$repo/.ai"
+
+      - name: Glob-sanity is silent on a conventional layout
+        shell: bash
+        run: |
+          set -euo pipefail
+          repo="$(mktemp -d)"
+          mkdir -p "$repo/src"
+          echo 'print()' > "$repo/src/main.py"
+          git -C "$repo" init -q
+          git -C "$repo" add -A
+          git -C "$repo" -c user.email=a@b.c -c user.name=t commit -qm init
+
+          out="$(bin/sdd-harness init "$repo" --yes 2>&1)"
+          ! echo "$out" | grep -q "the SDD pre-commit hook is mis-gated"
+
       - name: Selective --runtimes installs only the chosen bootloaders
         shell: bash
         run: |
