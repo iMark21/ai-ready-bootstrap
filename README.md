@@ -38,6 +38,16 @@ Done. Next steps:
 
 `sdd-harness init` lays down `.ai/` (commands, hooks, ADRs, agents, notes, specs), root bootloaders (`CLAUDE.md`, `AGENTS.md`), and the SDD pre-commit hook.
 
+A handful of files ship as **empty templates** waiting for your project's content: `.ai/PRODUCT.md`, `.ai/BACKLOG.md`, `.ai/CONTEXT.md`, `.ai/specs/PRD.md`, `.ai/specs/glossary.md`. You have the same two paths as for any other authoring step:
+
+**a) By hand.** Open them in your editor and fill them in — see the [concrete examples above](#concrete-example-after-install) for the shape.
+
+**b) Ask your AI to bootstrap them.** Paste this into your AI runtime:
+
+> Read `.ai/ROUTING.md` first, then bootstrap the project templates from what you can infer about this repository (README, source structure, dependencies, recent commits): fill `.ai/PRODUCT.md` (tagline, audience, non-goals), `.ai/BACKLOG.md` with 3–5 candidate stories using a short uppercase project prefix, and `.ai/CONTEXT.md` (current phase F0, active branch, any decisions already taken). Keep entries short — the SDD loop will refine them. Ask me before guessing anything the repo doesn't make obvious.
+
+Whichever path you choose, you're ready to start the first feature once `PRODUCT.md` and at least one row of `BACKLOG.md` are filled.
+
 ### 2. Start a feature
 
 ```bash
