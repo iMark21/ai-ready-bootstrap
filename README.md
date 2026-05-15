@@ -12,7 +12,11 @@ If you arrived from `iMark21/agentlayer` looking for the v0.5.0 `agent-explore �
 
 ## Demo — installing into a real Android repo
 
-The result of this walkthrough lives on a public branch of a real Android project (Marvel API client, last commit 2021, no prior AI layer):
+The repo used below is deliberately **legacy and unmaintained**: [`iMark21/marvel-android`](https://github.com/iMark21/marvel-android), an Android Marvel API client whose last commit was in October 2021. No one is actively keeping it up to date. Most readers landing on this page have never seen it before, and the demo runner doesn't have its design loaded in head either — the project is closer to "code you've been handed and need to start working on" than to "your current daily driver".
+
+That's the scenario sdd-harness is most useful in: a codebase nobody is currently the expert on, where bootstrapping context (vision, decisions, vocabulary) from the repo itself is the prerequisite to making any safe change. The walkthrough below works without any prior knowledge of the project.
+
+The resulting branch:
 
 > [`iMark21/marvel-android` — `feat/marvel-login`](https://github.com/iMark21/marvel-android/tree/feat/marvel-login) — [commit](https://github.com/iMark21/marvel-android/commit/95d194c)
 
