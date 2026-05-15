@@ -167,3 +167,29 @@ jobs:
           test ! -d "$repo/.ai"
           test ! -f "$repo/CLAUDE.md"
           test ! -f "$repo/AGENTS.md"
+
+      - name: --runtimes all installs every bootloader
+        shell: bash
+        run: |
+          set -euo pipefail
+          repo="$(mktemp -d)"
+          git -C "$repo" init -q
+          bin/sdd-harness init "$repo" --runtimes all --non-interactive --yes --no-git-hook
+          test -f "$repo/CLAUDE.md"
+          test -f "$repo/AGENTS.md"
+          test -f "$repo/GEMINI.md"
+          test -f "$repo/.github/copilot-instructions.md"
+          test -f "$repo/.cursor/rules/sdd-harness.mdc"
+
+      - name: Selective --runtimes installs only the chosen bootloaders
+        shell: bash
+        run: |
+          set -euo pipefail
+          repo="$(mktemp -d)"
+          git -C "$repo" init -q
+          bin/sdd-harness init "$repo" --runtimes cursor --non-interactive --yes --no-git-hook
+          test -f "$repo/.cursor/rules/sdd-harness.mdc"
+          test ! -f "$repo/CLAUDE.md"
+          test ! -f "$repo/AGENTS.md"
+          test ! -f "$repo/GEMINI.md"
+          test ! -f "$repo/.github/copilot-instructions.md"

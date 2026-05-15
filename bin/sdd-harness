@@ -55,7 +55,8 @@ Commands:
 
 Options:
   --repo PATH           Target repository path (defaults to current directory).
-  --runtimes LIST       Comma-separated runtimes: claude, codex (default: both).
+  --runtimes LIST       Comma-separated runtimes: claude, codex, cursor, copilot,
+                        gemini, or 'all' (default: claude,codex).
   --force               Overwrite existing files where applicable.
   --dry-run             Print actions without writing files.
   --yes                 Do not ask for confirmation.
@@ -109,21 +110,26 @@ TARGET_REPO="$(cd "$TARGET_REPO" 2>/dev/null && pwd -P || die "Target does not e
 # ---------- runtime list normalization ----------
 normalize_runtimes() {
   local input="$1"
-  printf '%s' "$input" | tr '[:upper:]' '[:lower:]' | tr ',' '\n' \
-    | awk 'NF' | sort -u | paste -sd, -
+  local lowered
+  lowered="$(printf '%s' "$input" | tr '[:upper:]' '[:lower:]')"
+  # Expand the 'all' alias before deduping.
+  if printf '%s' "$lowered" | tr ',' '\n' | grep -qx 'all'; then
+    lowered="claude,codex,cursor,copilot,gemini"
+  fi
+  printf '%s' "$lowered" | tr ',' '\n' | awk 'NF' | sort -u | paste -sd, -
 }
 
 RUNTIMES="$(normalize_runtimes "$RUNTIMES")"
 
 valid_runtime() {
   case "$1" in
-    claude|codex) return 0 ;;
+    claude|codex|cursor|copilot|gemini) return 0 ;;
     *) return 1 ;;
   esac
 }
 
 for r in $(echo "$RUNTIMES" | tr ',' ' '); do
-  valid_runtime "$r" || die "Unsupported runtime in v$VERSION: $r (supported: claude, codex)"
+  valid_runtime "$r" || die "Unsupported runtime in v$VERSION: $r (supported: claude, codex, cursor, copilot, gemini; or 'all')"
 done
 
 # ---------- detection ----------
@@ -131,6 +137,7 @@ AI_MARKERS=(
   ".ai"
   "CLAUDE.md"
   "AGENTS.md"
+  "GEMINI.md"
   "AGENTLAYER.md"
   ".github/copilot-instructions.md"
   ".github/instructions"
@@ -210,8 +217,11 @@ Use 'sdd-harness standardize' to back them up and install fresh, or --force."
 
   for r in $(echo "$RUNTIMES" | tr ',' ' '); do
     case "$r" in
-      claude) copy_file "$TEMPLATES_DIR/CLAUDE.md" "$repo/CLAUDE.md" ;;
-      codex)  copy_file "$TEMPLATES_DIR/AGENTS.md" "$repo/AGENTS.md" ;;
+      claude)  copy_file "$TEMPLATES_DIR/CLAUDE.md"  "$repo/CLAUDE.md" ;;
+      codex)   copy_file "$TEMPLATES_DIR/AGENTS.md"  "$repo/AGENTS.md" ;;
+      cursor)  copy_file "$TEMPLATES_DIR/.cursor/rules/sdd-harness.mdc" "$repo/.cursor/rules/sdd-harness.mdc" ;;
+      copilot) copy_file "$TEMPLATES_DIR/.github/copilot-instructions.md" "$repo/.github/copilot-instructions.md" ;;
+      gemini)  copy_file "$TEMPLATES_DIR/GEMINI.md" "$repo/GEMINI.md" ;;
     esac
   done
 

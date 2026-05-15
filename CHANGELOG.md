@@ -4,6 +4,12 @@ All notable changes are documented here.
 
 ## [Unreleased]
 
+### Added — toward v1.0.0-beta
+- **Multi-runtime bootloaders**: Cursor (`.cursor/rules/sdd-harness.mdc`), Copilot (`.github/copilot-instructions.md`), Gemini (`GEMINI.md`). Each is the same 5-line pointer pattern as `CLAUDE.md` / `AGENTS.md`, just in the location each runtime expects.
+- CLI accepts `--runtimes all` as an alias that expands to `claude,codex,cursor,copilot,gemini`. Default remains `claude,codex` to avoid polluting repos that don't use the other runtimes.
+- `audit` now detects `GEMINI.md` as a known AI marker.
+- CI workflow gains two new smoke steps: `--runtimes all` installs every bootloader; `--runtimes cursor` installs only Cursor (and no others).
+
 ## [1.0.0-alpha] - 2026-05-15
 
 > **Project rename and rupture.** `agentlayer` is renamed to **`sdd-harness`**. v1.0.0 is a documented break from v0.5.0 — no migration shim. The `agent-explore → plan → code → verify` flow is removed entirely; the new flow is `spec → story → implement → verify → review → release`. This release ships the framework core, the rewritten CLI, and the governance mirror discipline.
