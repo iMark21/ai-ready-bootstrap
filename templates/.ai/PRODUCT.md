@@ -18,6 +18,12 @@ What this project is **not**. Be explicit — most scope debates happen because 
 
 Who is this for, in order of priority? Be specific (roles, teams, scenarios) — "everyone" is not an audience.
 
+## Tech Stack
+
+**Primary stack:** {{STACK}}
+
+Detail your language(s), frameworks, platforms, and critical dependencies. Link to `ADR-NNN` if there was a choice between alternatives.
+
 ## Philosophy
 
 3-5 principles that govern technical decisions. Examples:

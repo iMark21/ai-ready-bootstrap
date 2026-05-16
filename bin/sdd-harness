@@ -33,6 +33,8 @@ DRY_RUN=0
 YES=0
 NON_INTERACTIVE=0
 INSTALL_HOOK=1
+STACK=""
+LIST_STACKS=0
 
 # ---------- output helpers ----------
 log()  { printf '%s\n' "$*"; }
@@ -57,6 +59,9 @@ Options:
   --repo PATH           Target repository path (defaults to current directory).
   --runtimes LIST       Comma-separated runtimes: claude, codex, cursor, copilot,
                         gemini, or 'all' (default: claude,codex).
+  --stack STACK         Explicitly set stack (swift, android, python, node, go, rust, generic).
+                        If omitted, defaults to 'generic'. Does not auto-detect.
+  --list-stacks         Print supported stacks and exit.
   --force               Overwrite existing files where applicable.
   --dry-run             Print actions without writing files.
   --yes                 Do not ask for confirmation.
@@ -85,6 +90,8 @@ while [ $# -gt 0 ]; do
   case "$1" in
     --repo)            TARGET_REPO="${2:-}"; shift 2 ;;
     --runtimes)        RUNTIMES="${2:-}"; shift 2 ;;
+    --stack)           STACK="${2:-}"; shift 2 ;;
+    --list-stacks)     LIST_STACKS=1; shift ;;
     --force)           FORCE=1; shift ;;
     --dry-run)         DRY_RUN=1; shift ;;
     --yes)             YES=1; shift ;;
@@ -131,6 +138,31 @@ valid_runtime() {
 for r in $(echo "$RUNTIMES" | tr ',' ' '); do
   valid_runtime "$r" || die "Unsupported runtime in v$VERSION: $r (supported: claude, codex, cursor, copilot, gemini; or 'all')"
 done
+
+# ---------- stack validation ----------
+valid_stack() {
+  case "$1" in
+    swift|android|python|node|go|rust|generic) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+list_stacks() {
+  log "Supported stacks:"
+  log "  swift      Swift iOS"
+  log "  android    Android"
+  log "  python     Python"
+  log "  node       Node.js"
+  log "  go         Go"
+  log "  rust       Rust"
+  log "  generic    Generic/unspecified"
+}
+
+# Validate --stack flag if provided
+if [ -n "$STACK" ]; then
+  valid_stack "$STACK" || die "Unsupported stack: $STACK
+Run 'sdd-harness init --list-stacks' to see available options."
+fi
 
 # ---------- detection ----------
 AI_MARKERS=(
@@ -183,7 +215,7 @@ project_name() {
 }
 
 substitute_placeholders() {
-  local file="$1" project="$2" branch="$3"
+  local file="$1" project="$2" branch="$3" stack="${4:-generic}"
   [ "$DRY_RUN" -eq 1 ] && return
   local prefix today
   prefix="$(printf '%s' "$project" | tr 'a-z' 'A-Z' | tr -cd 'A-Z' | cut -c1-3)"
@@ -195,6 +227,7 @@ substitute_placeholders() {
     -e "s/{{STORY_PREFIX}}/$prefix/g" \
     -e "s/{{TODAY}}/$today/g" \
     -e "s/{{GIT_BRANCH}}/$branch/g" \
+    -e "s/{{STACK}}/$stack/g" \
     "$file"
   rm -f "${file}.bak"
 }
@@ -259,6 +292,82 @@ glob_sanity_check() {
   )
 }
 
+# Extract README ## TODO and ## Roadmap sections into BACKLOG.md rows.
+# Returns count of items migrated (for reporting).
+migrate_readme_to_backlog() {
+  local repo="$1" backlog="$2"
+  [ -f "$repo/README.md" ] || { echo 0; return; }
+  [ "$DRY_RUN" -eq 1 ] && { echo 0; return; }
+
+  local todo_section roadmap_section item count=0
+  local in_todo=0 in_roadmap=0
+
+  # Parse README for ## TODO and ## Roadmap sections.
+  # This is a simple line-by-line parser; it does NOT handle nested markdown.
+  # Items are lines starting with "- " or "* ".
+  todo_section=""
+  roadmap_section=""
+
+  while IFS= read -r line; do
+    if [ "$line" = "## TODO" ] || [ "$line" = "## Todo" ]; then
+      in_todo=1
+      in_roadmap=0
+      continue
+    fi
+    if [ "$line" = "## Roadmap" ] || [ "$line" = "## ROADMAP" ]; then
+      in_roadmap=1
+      in_todo=0
+      continue
+    fi
+    if printf '%s' "$line" | grep -q '^## '; then
+      in_todo=0
+      in_roadmap=0
+      continue
+    fi
+    if [ "$in_todo" -eq 1 ] && printf '%s' "$line" | grep -qE '^[ \t]*[-*] '; then
+      todo_section="$todo_section$(printf '%s\n' "$line" | sed 's/^[ \t]*[-*] //')"$'\n'
+      count=$((count + 1))
+    fi
+    if [ "$in_roadmap" -eq 1 ] && printf '%s' "$line" | grep -qE '^[ \t]*[-*] '; then
+      roadmap_section="$roadmap_section$(printf '%s\n' "$line" | sed 's/^[ \t]*[-*] //')"$'\n'
+      count=$((count + 1))
+    fi
+  done <"$repo/README.md"
+
+  # Append items to BACKLOG.md if any were found.
+  if [ -n "$todo_section" ]; then
+    {
+      printf '\n## From README TODO\n\n'
+      printf '%s' "$todo_section" | while IFS= read -r item; do
+        [ -z "$item" ] && continue
+        printf '| TBD | %s | todo | N/A | backlog |\n' "$item"
+      done
+    } >>"$backlog"
+  fi
+
+  if [ -n "$roadmap_section" ]; then
+    {
+      printf '\n## From README Roadmap\n\n'
+      printf '%s' "$roadmap_section" | while IFS= read -r item; do
+        [ -z "$item" ] && continue
+        printf '| TBD | %s | todo | N/A | backlog |\n' "$item"
+      done
+    } >>"$backlog"
+  fi
+
+  if [ "$count" -eq 0 ]; then
+    {
+      printf '\n## From README\n\n'
+      printf '<!-- No README ## TODO or ## Roadmap section was found in the original repo.\n'
+      printf 'If you have roadmap items, add them to the BACKLOG.md table above, or run:\n'
+      printf '  specify clarify\n'
+      printf 'to scaffold content with AI assistance. -->\n'
+    } >>"$backlog"
+  fi
+
+  echo "$count"
+}
+
 run_install() {
   local repo="$1"
   local existing
@@ -268,14 +377,18 @@ run_install() {
 Use 'sdd-harness standardize' to back them up and install fresh, or --force."
   fi
 
-  local project branch
+  local project branch stack
   project="$(project_name "$repo")"
   # symbolic-ref works even before the first commit; fails on detached HEAD.
   branch="$(git -C "$repo" symbolic-ref --short -q HEAD 2>/dev/null || true)"
   [ -z "$branch" ] && branch="develop"
+  # Use provided --stack or default to 'generic'
+  stack="${STACK:-generic}"
+
   log "Installing sdd-harness $VERSION into $repo"
   log "  Project name: $project"
   log "  Branch: $branch"
+  log "  Stack: $stack"
   log "  Runtimes: $RUNTIMES"
   [ "$DRY_RUN" -eq 1 ] && log "  Mode: DRY RUN (no files will be written)"
 
@@ -294,7 +407,7 @@ Use 'sdd-harness standardize' to back them up and install fresh, or --force."
   if [ "$DRY_RUN" -ne 1 ]; then
     for f in "$repo/.ai/PRODUCT.md" "$repo/.ai/CONTEXT.md" "$repo/.ai/BACKLOG.md" \
              "$repo/.ai/BOOTSTRAP.md" "$repo/.ai/specs/PRD.md" "$repo/.ai/specs/glossary.md"; do
-      [ -f "$f" ] && substitute_placeholders "$f" "$project" "$branch"
+      [ -f "$f" ] && substitute_placeholders "$f" "$project" "$branch" "$stack"
     done
   fi
 
@@ -310,10 +423,20 @@ Use 'sdd-harness standardize' to back them up and install fresh, or --force."
 
   if [ "$DRY_RUN" -eq 1 ]; then
     say "would write $repo/.ai/BOOTSTRAP.md (judgment-layer handoff prompt)"
+    say "would migrate README TODO/Roadmap items to .ai/BACKLOG.md"
+  else
+    # Migrate README items to BACKLOG.md
+    local migrated_count
+    migrated_count="$(migrate_readme_to_backlog "$repo" "$repo/.ai/BACKLOG.md")"
   fi
 
   log ""
-  log "Done. Next steps:"
+  log "Installation complete. Results:"
+  log "  ✓ Stack: $stack"
+  [ "$DRY_RUN" -ne 1 ] && [ "$migrated_count" -gt 0 ] && log "  ✓ Migrated $migrated_count items from README to BACKLOG.md"
+  log "  ✓ BOOTSTRAP.md ready for AI handoff"
+  log ""
+  log "Next steps:"
   log "  1. Open $repo/.ai/BOOTSTRAP.md — it tells you (or your AI) how to fill"
   log "     PRODUCT/CONTEXT/BACKLOG/glossary from this repo. Delete it when done."
   log "  2. If a glob warning appeared above, review $repo/.ai/hooks/config.sh."
@@ -396,6 +519,12 @@ run_init() {
 }
 
 # ---------- dispatch ----------
+# Handle --list-stacks before command dispatch
+if [ "$LIST_STACKS" -eq 1 ]; then
+  list_stacks
+  exit 0
+fi
+
 case "$COMMAND" in
   init)         run_init "$TARGET_REPO" ;;
   install)      run_install "$TARGET_REPO" ;;

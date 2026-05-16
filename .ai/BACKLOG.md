@@ -27,8 +27,8 @@ Stories `SH-NNN`. One story = one acceptance feature in `specs/acceptance/`.
 | SH-F3-003 | Governance mirror note explaining the practice | done | `acceptance/SH-F3-001-phase-close.feature` | F3 |
 | SH-F3-004 | Dogfood: close F2 and open F3 in sdd-harness's own CONTEXT.md | done | `acceptance/SH-F3-001-phase-close.feature` | F3 |
 | SH-F4-101 | External adoption proof: real cold-start on a legacy unmaintained repo | done | `iMark21/marvel-android@develop` (MAR-002 pager via SDD loop) | beta-gate-2 |
-| SH-F4-104 | Install: stack detection from manifest (`build.gradle`/`package.json`/`Cargo.toml`/`go.mod`/`Package.swift`) → PRODUCT.md stack stub | todo | TBD | beta |
-| SH-F4-105 | Install: migrate a README `## TODO`/`## Roadmap` checklist into BACKLOG.md rows | todo | TBD | beta |
+| SH-F4-104 | Install: stack detection via `--stack` flag + stack-specific glob defaults | in-progress | `acceptance/SH-F4-104-105-install-helpers.feature` | beta |
+| SH-F4-105 | Install: migrate a README `## TODO`/`## Roadmap` checklist into BACKLOG.md rows | in-progress | `acceptance/SH-F4-104-105-install-helpers.feature` | beta |
 | SH-F4-110 | Install completeness: glob-sanity dry-run warning + `{{GIT_BRANCH}}` CONTEXT seed + `.ai/BOOTSTRAP.md` handoff (folds in -102/-103/-106) | done | `acceptance/SH-F4-110-install-completeness.feature` | beta |
 | SH-F4-111 | Universal code-surface default: protect arbitrary repo layouts without stack-specific glob tuning | done | `acceptance/SH-F4-111-universal-code-surface.feature` | beta |
 | SH-F4-107 | README rebalance: value-first, badges, TOC, synced, roadmap fixed | done | (review) | beta |

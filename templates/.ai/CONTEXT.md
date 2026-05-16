@@ -6,6 +6,7 @@
 
 **Phase:** F0 — initial setup
 **Branch:** `{{GIT_BRANCH}}`
+**Stack:** {{STACK}}
 **Last update:** {{TODAY}}
 
 ## Done
