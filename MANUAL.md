@@ -1,6 +1,6 @@
 # sdd-harness — Manual
 
-> **v1.0.0-alpha** — This manual is intentionally minimal. The detailed v0.5.0 manual covered the previous CLI and a `.ai/` layout that no longer exists. A full manual returns in v1.0.0-beta.
+> **v1.0.0-beta** — This manual is intentionally compact. The canonical operating docs live under `.ai/`; this file points humans and AIs to the current entry points.
 
 ## Where to read
 

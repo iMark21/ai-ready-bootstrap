@@ -23,7 +23,7 @@ SDD_HOME="${SDD_HOME:-$HOME/.sdd-harness}"
 # Ensure templates exist (for distributed installation)
 if [ ! -d "$SDD_HOME/templates/.ai" ]; then
   printf 'ERROR: sdd-harness templates not found\n' >&2
-  printf 'Run: bash %s/install-single-command.sh\n' "$SDD_HOME" >&2
+  printf 'Install first: curl -sSL https://github.com/iMark21/sdd-harness/raw/main/install-single-command.sh | bash\n' >&2
   exit 1
 fi
 

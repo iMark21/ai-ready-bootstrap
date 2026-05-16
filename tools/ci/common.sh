@@ -21,28 +21,38 @@ die() {
 }
 
 # ---------- timing ----------
-_STEP_START=""
+_STEP_START_MS=""
+
+now_ms() {
+  local ns
+  ns="$(date +%s%N 2>/dev/null || true)"
+  if [[ "$ns" =~ ^[0-9]+$ ]]; then
+    printf '%s\n' "$((ns / 1000000))"
+  else
+    printf '%s\n' "$(($(date +%s) * 1000))"
+  fi
+}
 
 step_start() {
   local label="$1"
   log "→ $label..."
-  _STEP_START="$(date +%s%N)"
+  _STEP_START_MS="$(now_ms)"
 }
 
 step_done() {
-  if [ -z "$_STEP_START" ]; then
+  if [ -z "$_STEP_START_MS" ]; then
     return
   fi
-  local elapsed_ns=$(($(date +%s%N) - _STEP_START))
-  local elapsed_ms=$((elapsed_ns / 1000000))
+  local elapsed_ms
+  elapsed_ms="$(($(now_ms) - _STEP_START_MS))"
   log "  ✓ completed in ${elapsed_ms}ms"
-  _STEP_START=""
+  _STEP_START_MS=""
 }
 
 step_fail() {
   local label="$1"
   log "  ✗ $label failed"
-  _STEP_START=""
+  _STEP_START_MS=""
   return 1
 }
 

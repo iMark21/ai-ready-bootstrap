@@ -6,7 +6,7 @@ repository, and fill the judgment-layer files** in a single instruction.
 
 Use it by pasting this into your AI, from inside your target repo:
 
-> Fetch `https://raw.githubusercontent.com/iMark21/sdd-harness/develop/assistant-installer/PROMPT.md`
+> Fetch `https://raw.githubusercontent.com/iMark21/sdd-harness/main/assistant-installer/PROMPT.md`
 > and follow the complete workflow it defines for this repository.
 
 If your AI cannot fetch URLs, download the file and tell it to read the local

@@ -36,6 +36,16 @@ jobs:
             bash -n "$f"
           done
 
+      - name: Bash syntax — CI scripts
+        run: |
+          set -euo pipefail
+          for f in tools/ci.sh tools/ci/*.sh templates/tools/ci.sh templates/tools/ci/*.sh; do
+            bash -n "$f"
+          done
+
+      - name: Generic CI smoke
+        run: bash tools/ci.sh --stack generic
+
       - name: Installer smoke test
         shell: bash
         run: |
@@ -61,6 +71,7 @@ jobs:
           test -f "$repo/.ai/BACKLOG.md"
           test -f "$repo/.ai/README.md"
           test -f "$repo/.ai/adrs/0008-runtime-agnostic-ai-layer.md"
+          test -f "$repo/.ai/adrs/0009-ci-stack-plugins.md"
           test -f "$repo/.ai/agents/spec-writer.md"
           test -f "$repo/.ai/commands/spec.md"
           test -f "$repo/.ai/commands/story.md"
@@ -76,6 +87,7 @@ jobs:
           test -f "$repo/.ai/notes/governance-mirror.md"
           test -f "$repo/.ai/specs/PRD.md"
           test -f "$repo/.ai/specs/glossary.md"
+          test -f "$repo/tools/ci/generic.sh"
           test -f "$repo/CLAUDE.md"
           test -f "$repo/AGENTS.md"
 

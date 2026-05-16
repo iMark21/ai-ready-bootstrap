@@ -354,7 +354,7 @@ That adoption surfaced a real product gap — the original default hook globs di
 ## Roadmap
 
 - **v1.0.0-alpha** *(shipped)* — framework core, CLI rewrite (`bin/sdd-harness`), multi-runtime bootloaders, governance mirror (`phase-close`), install completeness (glob dry-run, git seed, `BOOTSTRAP.md`), one proven external adoption.
-- **v1.0.0-beta** — heuristic install helpers (stack detection, README → backlog migration), a self-test suite for the harness itself, ≥ 3 external adopters across different stacks.
+- **v1.0.0-beta** *(shipped)* — stack-aware bootstrap, AI-assisted setup, README → backlog migration, universal hook surface, multi-runtime bootloaders, deterministic CI plugins, and the generic CI fallback.
 - **v1.0.0** — stability window with no breaking changes, full `MANUAL.md`, contributor playbook, explicit SemVer/deprecation policy.
 - **v1.1.0+** — deterministic CI stack-plugins ([ADR 0009](.ai/adrs/0009-ci-stack-plugins.md)), additional reviewer agents, optional integrations.
 
