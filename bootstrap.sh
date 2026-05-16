@@ -8,13 +8,15 @@
 set -euo pipefail
 
 STACK="generic"
+AI_SETUP=0
 GITHUB_RAW="https://raw.githubusercontent.com/iMark21/sdd-harness/main"
 REPO_DIR="$(pwd)"
 
-# Parse --stack flag
+# Parse flags
 while [ $# -gt 0 ]; do
   case "$1" in
     --stack) STACK="${2:-}"; shift 2 ;;
+    --ai-setup) AI_SETUP=1; shift ;;
     *) shift ;;
   esac
 done
@@ -116,8 +118,30 @@ printf '→ Installing hooks...\n'
 cd .ai/hooks && bash install.sh && cd ../..
 
 printf '\n=== Done ===\n'
-printf 'Next steps:\n'
-printf '  1. cat .ai/BOOTSTRAP.md\n'
-printf '  2. bash tools/ci.sh --list\n'
-printf '  3. Read .ai/ROUTING.md\n'
+
+if [ "$AI_SETUP" -eq 1 ]; then
+  printf '→ Downloading AI-assisted bootstrap prompt...\n'
+  curl -sSL "$GITHUB_RAW/assistant-installer/PROMPT.md" -o ".ai/BOOTSTRAP-AI.md"
+
+  printf '\n=== sdd-harness ready for AI-guided bootstrap ===\n'
+  printf '\nOpen .ai/BOOTSTRAP-AI.md with your AI:\n'
+  printf '  - Claude Code\n'
+  printf '  - Cursor\n'
+  printf '  - Copilot CLI\n'
+  printf '  - Any AI with repo access\n'
+  printf '\nThe AI will:\n'
+  printf '  1. Audit your repository\n'
+  printf '  2. Fill PRODUCT.md (vision & goals)\n'
+  printf '  3. Migrate README TODOs → BACKLOG.md\n'
+  printf '  4. Initialize CONTEXT.md\n'
+  printf '\nThen delete .ai/BOOTSTRAP-AI.md when done.\n'
+else
+  printf 'Next steps:\n'
+  printf '  1. cat .ai/BOOTSTRAP.md (manual bootstrap)\n'
+  printf '  2. bash tools/ci.sh --list (verify CI)\n'
+  printf '  3. Read .ai/ROUTING.md\n'
+  printf '\nOr run with --ai-setup for AI-guided setup:\n'
+  printf '  curl -sSL ... | bash -s --stack %s --ai-setup\n' "$STACK"
+fi
+
 printf '\nAll files downloaded to: %s\n' "$REPO_DIR"
