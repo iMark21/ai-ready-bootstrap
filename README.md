@@ -20,6 +20,7 @@ A runtime-agnostic **Spec-Driven Development harness** that any AI can operate. 
 - [Why](#why)
 - [Install](#install)
 - [How it works](#how-it-works)
+- [Using it day to day](#using-it-day-to-day)
 - [What you get](#what-you-get)
 - [Proven in a real adoption](#proven-in-a-real-adoption)
 - [Roadmap](#roadmap)
@@ -140,6 +141,121 @@ $ git commit -m 'feat: login spec + view-model'
 
 A short GIF of the same flow: [`docs/demo.gif`](docs/demo.gif).
 
+</details>
+
+## Using it day to day
+
+### Commands
+
+The loop is driven by seven Markdown procedures in `.ai/commands/`. You don't
+"execute" them like binaries — you (or your AI) ask it to *follow that file*.
+Each file has `Usage`, `Inputs`, `Procedure`, `Done criteria`.
+
+| Command | When you run it | Example (what you tell your AI) |
+|---|---|---|
+| `spec <id>` | Turn a backlog story into a spec + acceptance Gherkin | *"Follow `.ai/commands/spec.md` for SH-002"* |
+| `story <id>` | Expand the spec into a file-level implementation plan | *"Follow `.ai/commands/story.md` for SH-002"* |
+| `implement <id>` | Execute the plan, tests-first, respecting your ADR layering | *"Follow `.ai/commands/implement.md` for SH-002"* |
+| `verify <id>` | Check the code against every acceptance scenario | *"Follow `.ai/commands/verify.md` for SH-002"* |
+| `review` | Security + architecture review of the current diff | *"Follow `.ai/commands/review.md`"* |
+| `release [lane]` | Drive your project's own release toolchain | *"Follow `.ai/commands/release.md` beta"* |
+| `phase-close <next>` | Close the phase: update `CONTEXT.md` + `BACKLOG.md` | *"Follow `.ai/commands/phase-close.md` F2"* |
+
+### What the pre-commit hook allows and blocks
+
+`.ai/hooks/pre-commit-spec-check.sh` runs on every commit:
+
+| Situation | Result |
+|---|---|
+| `feat/*` branch, touches code (per `SH_CODE_GLOBS`) **and** a spec/ADR | ✅ allowed |
+| `feat/*` branch, touches code **without** any `.ai/specs/` or `.ai/adrs/` change | ⛔ **blocked** |
+| `feat/*` branch, touches only specs/docs | ✅ allowed |
+| `chore/*`, `docs/*`, `fix/hotfix/*` branch | ✅ exempt — never blocked |
+| Any branch, no code touched | ✅ allowed |
+
+"Code" is whatever `SH_CODE_GLOBS` in [`.ai/hooks/config.sh`](#install) lists —
+tune it to your stack (`src/*`, `app/*`, `Module/app/*`, …). `init` warns at
+install time if your globs match nothing.
+
+**Prohibitions (by design):**
+
+- No feature code on `feat/*` without its spec — the whole point.
+- No silent bypass: the override is explicit and logged in your shell history.
+- The hook never edits your files or auto-writes a spec — it only refuses.
+
+**Documented-exception override:**
+
+```bash
+SH_SDD_SKIP=1 git commit -m 'fix: typo in log message'
+```
+
+Use it for typo fixes, pure renames, generated files — **not** for "I'll write
+the spec later". If you're skipping because the change is real, write the spec.
+
+### Hooks installed
+
+`./.ai/hooks/install.sh` wires two hooks (re-run it after editing `config.sh`):
+
+| Git hook | Script | Does |
+|---|---|---|
+| `pre-commit` | `pre-commit-spec-check.sh` | The gate above. Exit non-zero blocks the commit. |
+| `post-commit` | `post-edit-trace.sh` | Prints which spec/ADR and code files the commit touched — a passive trace for end-of-day reflection. Never blocks. |
+
+### Use cases
+
+<details>
+<summary><strong>1. Greenfield repo</strong></summary>
+
+```bash
+sdd-harness init . --yes
+# fill PRODUCT.md + the first BACKLOG row (or paste .ai/BOOTSTRAP.md to your AI)
+git checkout -b feat/first-feature
+# ask AI: follow .ai/commands/spec.md for FOO-001
+# ask AI: follow .ai/commands/implement.md for FOO-001
+git add .ai/specs/FOO-001*.md src/...   # spec + code together
+git commit -m 'feat: FOO-001 ...'        # hook passes
+```
+</details>
+
+<details>
+<summary><strong>2. Legacy repo nobody remembers (cold-start)</strong></summary>
+
+Paste the [AI-assisted install](#or-let-your-ai-install--audit--fill-it) line.
+The AI audits the repo and fills the context. Then pick a real TODO from the
+migrated backlog and run the loop. This is exactly what was done on
+[`marvel-android`](#proven-in-a-real-adoption) (`MAR-002` pager).
+</details>
+
+<details>
+<summary><strong>3. Swapping or adding an AI runtime</strong></summary>
+
+```bash
+sdd-harness init . --runtimes all      # Claude, Codex, Cursor, Copilot, Gemini
+```
+`.ai/` is unchanged — only the 5-line root pointer files differ. Switching
+assistants is never a migration. See [ADR 0008](.ai/adrs/0008-runtime-agnostic-ai-layer.md).
+</details>
+
+<details>
+<summary><strong>4. A genuine one-line exception</strong></summary>
+
+```bash
+# feat/* branch, fixing a log typo, no behavior change:
+SH_SDD_SKIP=1 git commit -m 'fix: correct typo in error string'
+```
+The skip is visible in history; reviewers can question it.
+</details>
+
+<details>
+<summary><strong>5. Closing a milestone</strong></summary>
+
+```bash
+# ask AI: follow .ai/commands/phase-close.md F2
+git commit -m 'chore: close F1, open F2'   # chore/* is exempt
+```
+`CONTEXT.md` becomes the single place a new contributor (or AI) reads to know
+where the project stands — no git archaeology. See
+[`.ai/notes/governance-mirror.md`](.ai/notes/governance-mirror.md).
 </details>
 
 ## What you get
