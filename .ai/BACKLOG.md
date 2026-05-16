@@ -36,7 +36,7 @@ Stories `SH-NNN`. One story = one acceptance feature in `specs/acceptance/`.
 | SH-F4-109 | README: post-install usage — command flows, hook rules, exemptions, override, hooks, use cases | done | (review) | beta |
 | SH-F4-001 | Public migration: rename repo, sanitize timestamps, ship v1.0.0-alpha | done | (audit + push log in CONTEXT.md F4 block) | F4 |
 | SH-F4-112 | Public-readiness audit: beta metadata, security links, bootstrap/template completeness, generic CI fallback | done | (audit) | beta |
-| SH-F4-113 | Public-readiness fixup: CI badge branch reference (develop → main) | todo | `specs/SH-F4-113-ci-badge-fix.md` / `acceptance/SH-F4-113-ci-badge-fix.feature` | beta |
+| SH-F4-113 | Public-readiness fixup: CI badge branch reference (develop → main) | done | `specs/SH-F4-113-ci-badge-fix.md` / `acceptance/SH-F4-113-ci-badge-fix.feature` | beta |
 
 ## Out of scope (v1.0.0)
 

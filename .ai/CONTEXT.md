@@ -12,7 +12,8 @@
 
 ## Done
 
-### Public launch readiness — pre-LinkedIn audit (2026-05-16)
+### Public launch readiness — post-audit fix (2026-05-16)
+- [x] SH-F4-113: CI badge fix — `README.md` CI status badge now points to `branch=main` instead of `branch=develop`. Spec + acceptance Gherkin documented. Verified and merged to develop.
 - [x] SH-F4-112: public-readiness audit before the scheduled LinkedIn launch. No secrets found; demo-only `token` / `password` references remain in README/demo text.
 - [x] Fixed stale public metadata: CLI version reports `1.0.0-beta`, `SECURITY.md` points to `iMark21/sdd-harness`, assistant installer docs use `main`, and bootstrap examples use the correct `bash -s --` separator.
 - [x] Hardened install surface: missing template ADR 0009 is now shipped, bootstrap downloads fail fast on missing files, `generic.sh` CI fallback is included, and macOS-safe CI timing/parser fixes are synchronized into templates.
