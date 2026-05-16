@@ -5,17 +5,18 @@
 ## Type of change
 
 - [ ] Bug fix
-- [ ] New feature (runtime, project type, command)
+- [ ] New feature (runtime adapter, command, hook, template)
 - [ ] Documentation update
 - [ ] Refactor (no behavior change)
 - [ ] Other:
 
 ## Checklist
 
-- [ ] `bash -n bin/agentlayer` passes
+- [ ] `bash -n bin/sdd-harness` passes
 - [ ] `bash -n install.sh` passes
 - [ ] Smoke tests pass locally (or CI is green)
 - [ ] README and MANUAL updated if behavior changed
 - [ ] CHANGELOG.md updated under `[Unreleased]`
-- [ ] Branch follows `feature/`, `fix/`, `docs/`, `chore/` naming
+- [ ] Branch follows `feat/`, `fix/`, `docs/`, `chore/` naming
+- [ ] For feature branches: spec/ADR touched (the SDD pre-commit hook enforces this; bypass only with documented reason)
 - [ ] Commit format: `[branch_name] type: "title"`

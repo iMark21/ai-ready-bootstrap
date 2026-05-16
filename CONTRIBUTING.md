@@ -33,6 +33,6 @@ Examples:
 
 Before pushing:
 
-- run `bash -n bin/agentlayer`
+- run `bash -n bin/sdd-harness`
 - run the smoke checks you touched
 - keep README and MANUAL aligned with the actual CLI

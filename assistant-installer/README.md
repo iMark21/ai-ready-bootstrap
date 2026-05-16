@@ -1,19 +1,17 @@
-# AI-assisted install
+# assistant-installer
 
-Paste the content of [PROMPT.md](PROMPT.md) into your AI assistant — Codex, Claude Code, Copilot, Cursor, or any other.
+One file: [`PROMPT.md`](PROMPT.md) — a self-contained, tool-agnostic workflow
+that an AI with local repo access follows to **install sdd-harness, audit the
+repository, and fill the judgment-layer files** in a single instruction.
 
-The prompt asks which AI runtime(s) you want, audits the repo, and generates a grounded `.ai/` layer with the standard 8 agents, 4 skills, and context files filled with real project knowledge — not generic placeholders.
+Use it by pasting this into your AI, from inside your target repo:
 
-The adapter formats for all supported runtimes are embedded in the prompt. No web searches needed.
+> Fetch `https://raw.githubusercontent.com/iMark21/sdd-harness/develop/assistant-installer/PROMPT.md`
+> and follow the complete workflow it defines for this repository.
 
-## When to use this instead of the CLI
+If your AI cannot fetch URLs, download the file and tell it to read the local
+copy instead.
 
-- You already work inside an AI with local repo access
-- You want the first install to be repo-specific from the start, not template-first
-- You are bootstrapping one repo interactively
-
-## When to use the CLI instead
-
-- You want deterministic scaffolding from a shell command
-- You need repeatable non-interactive or batch runs
-- You want to standardize many repositories with the same flags
+This is the codified form of the cold-start that proved the framework on a
+real legacy repo — see the "Proven in a real adoption" section of the
+[root README](../README.md).

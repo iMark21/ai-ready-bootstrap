@@ -1,244 +1,100 @@
-Use this prompt in any AI tool that can read and edit the target repository locally.
+# sdd-harness — AI-assisted install
 
-```text
-Install the canonical agentlayer layer in this repository.
+You are an AI assistant with **local read/write access** to a git repository.
+Follow this workflow end to end to install sdd-harness and bootstrap it from
+the repository itself. Do not skip the audit. Do not invent facts the repo
+does not state — ask the human instead.
 
-─────────────────────────────────────────
-STEP 0 — MANDATORY. DO THIS BEFORE ANYTHING ELSE.
-─────────────────────────────────────────
-Ask the user:
+> **Precondition.** You must be able to read and write files in this repo from
+> the user's machine (Claude Code, Codex, Cursor, Copilot CLI, Gemini CLI, or
+> any tool with filesystem access). A cloud chat tool with no repo access
+> cannot run this — tell the user to use a tool that can, or the manual path
+> in the sdd-harness README.
 
-  "Which AI tool or tools will you use in this repo?
-   Options:
-     1. Claude Code only
-     2. Codex only
-     3. GitHub Copilot only
-     4. Cursor only
-     5. Generic (any AI, no vendor-specific adapter)
-     6. Several — tell me which ones
-     7. All of the above
+## Step 0 — Confirm the target
 
-   You can also say 'just one' or 'all'. I will only create the adapters
-   you actually need."
+State the repository you are operating on (its path and `git remote -v` if
+any). Confirm it is a git repository (`git rev-parse --show-toplevel`). If it
+is not, stop and ask the user.
 
-Wait for the answer. Do not create any files until you have it.
-Do not assume. Do not default to all. Do not search the web.
+## Step 1 — Install the harness
 
-─────────────────────────────────────────
-STEP 1 — Audit before writing anything.
-─────────────────────────────────────────
-Inspect:
-- root structure and folder layout
-- build files and dependency manifests
-- module, package, target, or workspace boundaries
-- test directories and CI configuration
-- any existing AI-related files (AGENTS.md, CLAUDE.md, .github/copilot-instructions.md,
-  .cursor/rules/, AGENTLAYER.md, .ai/)
+Assume only `git` and `bash` are available.
 
-Detect the project type from evidence: android, ios, web, backend, or generic.
-If AI-related files already exist, archive them under .ai/archive/ai-assisted-bootstrap-<timestamp>/
-before overwriting active files.
+- If `sdd-harness` is on `PATH`: run `sdd-harness init . --yes`.
+- Otherwise:
+  ```bash
+  git clone https://github.com/iMark21/sdd-harness.git ~/.sdd-harness
+  bash ~/.sdd-harness/install.sh
+  sdd-harness init . --yes
+  ```
 
-─────────────────────────────────────────
-STEP 2 — Create the canonical .ai/ structure.
-─────────────────────────────────────────
-Create these files:
-  .ai/README.md
-  .ai/context.md
-  .ai/context/architecture.md
-  .ai/context/dependencies.md
-  .ai/context/features.md
-  .ai/context/repository.md
-  .ai/context/recent-changes.md
-  .ai/decision-framework.md
-  .ai/rules/              (at minimum: code.md, testing.md)
-  .ai/agents/
-    agent-explore.md
-    agent-context-bootstrap.md
-    agent-plan.md
-    agent-code.md
-    agent-verify.md
-    agent-fix.md
-    agent-tech.md
-    agent-spike.md
-  .ai/skills/
-    context-bootstrap.md
-    context-refresh.md
-    feature-scaffold.md
-    migration-audit.md
-  .ai/features/
-  .ai/archive/
+`init` lays down `.ai/`, the root bootloaders, the SDD pre-commit hook, and
+writes `.ai/BOOTSTRAP.md`. **Capture its output** — in particular any
+`SH_CODE_GLOBS` / `SH_CODE_EXCLUDE_GLOBS` mis-gate warning. You will act on
+it in Step 4.
 
-─────────────────────────────────────────
-STEP 3 — Write grounded content.
-─────────────────────────────────────────
-Fill .ai/context* with real repository knowledge:
-- real module names or paths
-- real architecture boundaries
-- real dependencies
-- real test commands or test directories
-- real repository workflow constraints
-- real feature areas
+## Step 2 — Audit the repository (do not invent)
 
-Do not leave generic placeholder text. If a detail is unclear, write an explicit
-open question in that file instead of inventing details.
+Read, in this order, and take notes:
 
-─────────────────────────────────────────
-STEP 4 — Create only the runtime adapters the user requested.
-─────────────────────────────────────────
-Use EXACTLY the formats below. Do not search the web for adapter formats.
+1. `README*` — stated purpose, TODO / roadmap / checklist sections.
+2. Top-level layout (`git ls-files | sed 's|/.*||' | sort -u`).
+3. Build / manifest files for the ecosystem you find, e.g.
+   `build.gradle*`, `package.json`, `pyproject.toml`, `Cargo.toml`,
+   `go.mod`, `Package.swift`, `pom.xml`, `composer.json`, `Gemfile`.
+4. Source tree — the actual layering (entry points, domain vs. data vs. UI,
+   DI, networking).
+5. `git log --oneline -20` — what shipped recently, what the last commit
+   message implies is unfinished.
+6. Test directories — what is and is not covered.
 
---- CLAUDE CODE adapter (file: CLAUDE.md) ---
-# Claude Adapter
+If the repo does not make something clear, **ask the user**; never fabricate
+vision, scope, or domain terms.
 
-Treat `.ai/` as canonical.
+## Step 3 — Fill the judgment-layer files from the audit
 
-Read order:
-1. `.ai/README.md`
-2. `.ai/context.md`
-3. `.ai/context/architecture.md`
-4. `.ai/context/dependencies.md`
-5. `.ai/context/repository.md`
-6. `.ai/decision-framework.md`
-7. The relevant files under `.ai/rules/`, `.ai/agents/`, and `.ai/skills/`
+Write these from what you actually found (mirror `.ai/BOOTSTRAP.md`):
 
-First pass rule:
-- if `.ai/context.md` still shows `Pending first-pass grounding`, run `.ai/agents/agent-context-bootstrap.md` before implementation work
+- **`.ai/PRODUCT.md`** — tagline, audience, non-goals, and an
+  "architecture as observed" section describing the real layering.
+- **`.ai/BACKLOG.md`** — replace the placeholder with 3–8 real stories. If
+  the README has a TODO / roadmap / checklist, migrate each item into a row
+  using a short uppercase project prefix. Mark anything already implemented
+  as `done`.
+- **`.ai/CONTEXT.md`** — current phase (start at F0), confirm the branch,
+  list what is already done vs. the immediate next thing, from git history.
+- **`.ai/specs/glossary.md`** — the domain terms you encountered in the code.
 
-Do not duplicate routing, workflow, or checklists here.
---- END ---
+Keep every entry short — the SDD loop refines them.
 
---- CODEX adapter (file: AGENTS.md) ---
-# Codex Adapter
+## Step 4 — Confirm the SDD hook actually fires
 
-Treat `.ai/` as canonical.
+The default hook surface protects every tracked non-documentation path, so most
+repos need no tuning. If Step 1's output included the
+`SH_CODE_GLOBS` / `SH_CODE_EXCLUDE_GLOBS` mis-gate warning:
 
-Read order:
-1. `.ai/README.md`
-2. `.ai/context.md`
-3. `.ai/context/architecture.md`
-4. `.ai/context/dependencies.md`
-5. `.ai/context/repository.md`
-6. `.ai/decision-framework.md`
-7. The relevant files under `.ai/rules/`, `.ai/agents/`, and `.ai/skills/`
+1. Edit `.ai/hooks/config.sh` so `SH_CODE_GLOBS` and
+   `SH_CODE_EXCLUDE_GLOBS` leave at least one real implementation path
+   protected.
+2. Re-run `./.ai/hooks/install.sh`.
+3. Verify: a hypothetical `feat/*` or `feature/*` commit touching
+   implementation without a spec would now be blocked. If unsure, state the
+   matched include glob and any relevant exclude glob.
 
-First pass rule:
-- if `.ai/context.md` still shows `Pending first-pass grounding`, run `.ai/agents/agent-context-bootstrap.md` before implementation work
+## Step 5 — Finalize (do not start coding)
 
-Do not maintain duplicate workflow logic here.
---- END ---
+1. Delete `.ai/BOOTSTRAP.md` — it has served its purpose.
+2. Summarize: what you wrote into each file, and the one fact (if any) you
+   had to ask the user about.
+3. Propose the **first story** you would pick up and why — but do **not**
+   implement it. The next step is the human running the SDD loop
+   (`spec → story → implement → verify → review`); read `.ai/ROUTING.md`
+   for that flow.
 
---- GITHUB COPILOT adapter (file: .github/copilot-instructions.md) ---
-# Copilot Adapter
+## Guardrails
 
-Treat `.ai/` as canonical.
-
-Before editing:
-1. Read `.ai/README.md`
-2. Read `.ai/context.md`
-3. Read `.ai/context/architecture.md`
-4. Read `.ai/context/dependencies.md`
-5. Read `.ai/context/repository.md`
-6. Read `.ai/decision-framework.md`
-
-First pass rule:
-- if `.ai/context.md` still shows `Pending first-pass grounding`, follow `.ai/agents/agent-context-bootstrap.md` before implementation work
-
-Do not create a second source of truth under `.github/`.
---- END ---
-
---- CURSOR adapter (file: .cursor/rules/agentlayer.mdc) ---
----
-description: agentlayer adapter for Cursor
-globs:
-alwaysApply: true
----
-
-Treat `.ai/` as canonical.
-
-Read order:
-1. `.ai/README.md`
-2. `.ai/context.md`
-3. `.ai/context/architecture.md`
-4. `.ai/context/dependencies.md`
-5. `.ai/context/repository.md`
-6. `.ai/decision-framework.md`
-7. The relevant files under `.ai/rules/`, `.ai/agents/`, and `.ai/skills/`
-
-If `.ai/context.md` still shows `Pending first-pass grounding`, run `.ai/agents/agent-context-bootstrap.md` first.
-Do not duplicate workflow logic inside Cursor-specific files.
---- END ---
-
---- GENERIC adapter (file: AGENTLAYER.md) ---
-# Generic AI Adapter
-
-Use this file when the runtime does not have a native repo adapter format, or when you want one universal entry point that works across multiple tools.
-
-Treat `.ai/` as canonical.
-
-## Read Order
-
-1. `.ai/README.md`
-2. `.ai/context.md`
-3. `.ai/context/architecture.md`
-4. `.ai/context/dependencies.md`
-5. `.ai/context/repository.md`
-6. `.ai/decision-framework.md`
-7. The relevant files under `.ai/rules/`, `.ai/agents/`, and `.ai/skills/`
-
-## Operating Rules
-
-- Do not create a second source of truth outside `.ai/`
-- Prefer existing project conventions over generic best practices
-- If `.ai/context.md` still shows `Pending first-pass grounding`, run `.ai/agents/agent-context-bootstrap.md` first
-- If key architecture details are still placeholders, audit the repo first and update `.ai/context/`
-- After meaningful work, update `.ai/context/recent-changes.md`
-
-## Suggested First Prompt
-
-Audit this repository against the canonical `.ai/` layer, summarize the real architecture and gaps, and then propose the smallest safe set of updates before changing code.
---- END ---
-
-─────────────────────────────────────────
-STEP 5 — Do not do any of these.
-─────────────────────────────────────────
-- Do not search the web for adapter formats or AI tool documentation
-- Do not edit product code during this install pass
-- Do not create adapters for runtimes the user did not request
-- Do not leave template filler in .ai/context* files
-- Do not create a second source of truth outside .ai/
-
-─────────────────────────────────────────
-STEP 6 — When you finish, summarize and show the user what to do next.
-─────────────────────────────────────────
-First, summarize:
-- project type detected
-- runtimes installed
-- key repo facts used to ground the files
-- open questions that still need confirmation
-
-Then show the user what they can do RIGHT NOW with the installed system.
-Give them concrete, copy-paste-ready examples using their actual project,
-not generic placeholders. For example:
-
-  "Your agentlayer layer is installed. Try it now:
-
-   - To add a new feature:
-     'Use agent-explore. I want to add [a real feature that makes sense for this repo].'
-
-   - To fix a bug:
-     'Use agent-fix. [describe a plausible bug based on what you saw in the code].'
-
-   - To investigate a refactor:
-     'Use agent-spike. Is it worth [a real refactor opportunity you noticed during the audit]?'
-
-   - To refresh the context after a big merge:
-     'Use the context-refresh skill.'
-
-   These agents read the .ai/ layer you just installed, so the AI already
-   knows your architecture, conventions, and recent changes before acting."
-
-Adapt the examples to the real project. Use real module names, real feature areas,
-and real problems you noticed during the audit. The user should be able to copy
-one of these and run it immediately.
-```
+- English for all `.ai/` artifacts (project convention).
+- Never `SH_SDD_SKIP=1` a commit unless the user explicitly asks.
+- Do not push, open PRs, or create branches unless the user asks.
+- Prefer short, true entries over long, speculative ones.
