@@ -20,22 +20,6 @@ CI_DIR="$SCRIPT_DIR/ci"
 # shellcheck source=/dev/null
 . "$CI_DIR/common.sh"
 
-# ---------- defaults ----------
-STACK=""
-LIST_PLUGINS=0
-RUN_ALL=0
-
-# ---------- arg parsing ----------
-while [ $# -gt 0 ]; do
-  case "$1" in
-    --stack)      STACK="${2:-}"; shift 2 ;;
-    --list)       LIST_PLUGINS=1; shift ;;
-    --all)        RUN_ALL=1; shift ;;
-    --help|-h)    usage; exit 0 ;;
-    *)            die "Unknown option: $1 (try: $0 --help)" ;;
-  esac
-done
-
 # ---------- functions ----------
 usage() {
   cat <<EOF
@@ -52,6 +36,22 @@ Environment:
 
 EOF
 }
+
+# ---------- defaults ----------
+STACK=""
+LIST_PLUGINS=0
+RUN_ALL=0
+
+# ---------- arg parsing ----------
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --stack)      STACK="${2:-}"; shift 2 ;;
+    --list)       LIST_PLUGINS=1; shift ;;
+    --all)        RUN_ALL=1; shift ;;
+    --help|-h)    usage; exit 0 ;;
+    *)            die "Unknown option: $1 (try: $0 --help)" ;;
+  esac
+done
 
 list_plugins() {
   log "Available plugins:"
