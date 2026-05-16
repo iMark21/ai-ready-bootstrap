@@ -199,9 +199,10 @@ substitute_placeholders() {
   rm -f "${file}.bak"
 }
 
-# Dry-run the SDD hook's code-glob matching against tracked files. If the
-# repo's SH_CODE_GLOBS match nothing, the hook is mis-gated (it would pass
-# code-only commits silently). Warn — do not fail. See SH-F4-110.
+# Dry-run the SDD hook's implementation-surface matching against tracked
+# files. If SH_CODE_GLOBS, after SH_CODE_EXCLUDE_GLOBS, match nothing, the
+# hook is mis-gated (it would pass code-only commits silently). Warn — do not
+# fail. See SH-F4-110 / SH-F4-111.
 glob_sanity_check() {
   local repo="$1"
   local config="$repo/.ai/hooks/config.sh"
@@ -209,28 +210,51 @@ glob_sanity_check() {
 
   # shellcheck source=/dev/null
   ( . "$config"
-    local matched=0 path pattern
-    while IFS= read -r path; do
-      for pattern in "${SH_CODE_GLOBS[@]}"; do
+    if ! declare -p SH_CODE_EXCLUDE_GLOBS >/dev/null 2>&1; then
+      SH_CODE_EXCLUDE_GLOBS=()
+    fi
+
+    match_globs() {
+      local path="$1"
+      shift
+      local pattern
+      for pattern in "$@"; do
         # shellcheck disable=SC2254
-        case "$path" in $pattern) matched=1; break ;; esac
+        case "$path" in $pattern) return 0 ;; esac
       done
+      return 1
+    }
+
+    path_is_code() {
+      local path="$1"
+      if match_globs "$path" "${SH_CODE_EXCLUDE_GLOBS[@]}"; then
+        return 1
+      fi
+      match_globs "$path" "${SH_CODE_GLOBS[@]}"
+    }
+
+    local matched=0 path
+    while IFS= read -r path; do
+      if path_is_code "$path"; then
+        matched=1
+      fi
       [ "$matched" -eq 1 ] && break
     done < <(git -C "$repo" ls-files 2>/dev/null)
 
     if [ "$matched" -eq 0 ]; then
       printf '\n'
       printf 'WARNING: the SDD pre-commit hook is mis-gated.\n' >&2
-      printf '  None of the SH_CODE_GLOBS in .ai/hooks/config.sh match any\n' >&2
-      printf '  tracked file. Feature commits would NOT be checked for a spec.\n' >&2
-      printf '  Globs: %s\n' "${SH_CODE_GLOBS[*]}" >&2
+      printf '  No tracked file matches SH_CODE_GLOBS after SH_CODE_EXCLUDE_GLOBS.\n' >&2
+      printf '  Feature commits would NOT be checked for a spec.\n' >&2
+      printf '  Include globs: %s\n' "${SH_CODE_GLOBS[*]}" >&2
+      printf '  Exclude globs: %s\n' "${SH_CODE_EXCLUDE_GLOBS[*]}" >&2
       printf '  This repo'\''s top-level entries:\n' >&2
       git -C "$repo" ls-files \
         | sed 's|/.*||' | sort -u \
         | grep -vE '^(\.ai|\.github|\.cursor)$' \
         | head -10 | sed 's/^/    /' >&2
-      printf '  Edit .ai/hooks/config.sh -> SH_CODE_GLOBS to include your code\n' >&2
-      printf '  path (e.g. "Marvel/app/*"), then re-run .ai/hooks/install.sh.\n\n' >&2
+      printf '  Edit .ai/hooks/config.sh -> SH_CODE_GLOBS / SH_CODE_EXCLUDE_GLOBS\n' >&2
+      printf '  so at least one implementation path matches, then re-run .ai/hooks/install.sh.\n\n' >&2
     fi
   )
 }
@@ -277,7 +301,7 @@ Use 'sdd-harness standardize' to back them up and install fresh, or --force."
   if [ "$INSTALL_HOOK" -eq 1 ]; then
     if [ "$DRY_RUN" -eq 1 ]; then
       say "would run $repo/.ai/hooks/install.sh"
-      say "would dry-run the SDD hook globs against tracked files"
+      say "would dry-run the SDD hook surface against tracked files"
     else
       ( cd "$repo" && ./.ai/hooks/install.sh ) || warn "Hook installer exited non-zero; check $repo/.ai/hooks/install.sh"
       glob_sanity_check "$repo"
@@ -292,7 +316,7 @@ Use 'sdd-harness standardize' to back them up and install fresh, or --force."
   log "Done. Next steps:"
   log "  1. Open $repo/.ai/BOOTSTRAP.md — it tells you (or your AI) how to fill"
   log "     PRODUCT/CONTEXT/BACKLOG/glossary from this repo. Delete it when done."
-  log "  2. If a glob warning appeared above, tune $repo/.ai/hooks/config.sh."
+  log "  2. If a glob warning appeared above, review $repo/.ai/hooks/config.sh."
   log "  3. Read $repo/.ai/ROUTING.md (it tells any AI how to operate the project)."
 }
 

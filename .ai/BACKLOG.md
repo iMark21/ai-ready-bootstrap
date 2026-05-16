@@ -30,6 +30,7 @@ Stories `SH-NNN`. One story = one acceptance feature in `specs/acceptance/`.
 | SH-F4-104 | Install: stack detection from manifest (`build.gradle`/`package.json`/`Cargo.toml`/`go.mod`/`Package.swift`) → PRODUCT.md stack stub | todo | TBD | beta |
 | SH-F4-105 | Install: migrate a README `## TODO`/`## Roadmap` checklist into BACKLOG.md rows | todo | TBD | beta |
 | SH-F4-110 | Install completeness: glob-sanity dry-run warning + `{{GIT_BRANCH}}` CONTEXT seed + `.ai/BOOTSTRAP.md` handoff (folds in -102/-103/-106) | done | `acceptance/SH-F4-110-install-completeness.feature` | beta |
+| SH-F4-111 | Universal code-surface default: protect arbitrary repo layouts without stack-specific glob tuning | done | `acceptance/SH-F4-111-universal-code-surface.feature` | beta |
 | SH-F4-107 | README rebalance: value-first, badges, TOC, synced, roadmap fixed | done | (review) | beta |
 | SH-F4-108 | AI-assisted install: fetchable `assistant-installer/PROMPT.md` (install + audit + fill) + README path (c) | done | `acceptance/SH-F4-108-ai-assisted-install.feature` | beta |
 | SH-F4-109 | README: post-install usage — command flows, hook rules, exemptions, override, hooks, use cases | done | (review) | beta |

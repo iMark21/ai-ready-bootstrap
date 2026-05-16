@@ -62,7 +62,7 @@ sdd-harness init
 It does the deterministic work for you and hands off the rest:
 
 - Substitutes project name, story prefix, date, and the **real current git branch** into the templates.
-- **Dry-runs the hook**: if your code paths don't match `SH_CODE_GLOBS`, it warns at install time (instead of the hook silently never firing) and tells you exactly what to edit.
+- **Dry-runs the hook**: if no tracked implementation path matches `SH_CODE_GLOBS` after `SH_CODE_EXCLUDE_GLOBS`, it warns at install time instead of letting the hook silently never fire.
 - Writes **`.ai/BOOTSTRAP.md`** — the precise prompt to fill the judgment-layer files (vision, backlog, glossary) from your repo, by hand or by pasting it to your AI. Nothing shells out to an AI; you stay in control.
 
 Default runtimes are `claude,codex`; `--runtimes all` adds Cursor, Copilot, Gemini. `--help` lists every flag.
@@ -73,17 +73,17 @@ For a repo you don't fully know, you don't have to run anything yourself. From i
 
 > Fetch `https://raw.githubusercontent.com/iMark21/sdd-harness/develop/assistant-installer/PROMPT.md` and follow the complete workflow it defines for this repository.
 
-The AI then installs the harness, **audits the repo** (README, layout, manifests, git history — without inventing), fills `PRODUCT.md` / `BACKLOG.md` / `CONTEXT.md` / glossary from what it found, tunes the hook globs, and proposes the first story. This is the codified form of the cold-start that [proved the framework on a real legacy repo](#proven-in-a-real-adoption) — the CLI still never shells out to an AI; the AI drives, you stay in control.
+The AI then installs the harness, **audits the repo** (README, layout, manifests, git history — without inventing), fills `PRODUCT.md` / `BACKLOG.md` / `CONTEXT.md` / glossary from what it found, reviews the hook surface only if the dry-run warns, and proposes the first story. This is the codified form of the cold-start that [proved the framework on a real legacy repo](#proven-in-a-real-adoption) — the CLI still never shells out to an AI; the AI drives, you stay in control.
 
 ## How it works
 
-Every feature on a `feat/*` branch goes through one loop:
+Every feature on a `feat/*` or `feature/*` branch goes through one loop:
 
 ```
 spec  →  review (human + agent)  →  implement  →  verify against spec  →  merge
 ```
 
-`.ai/hooks/pre-commit-spec-check.sh` enforces the first arrow: touch code under your configured globs without touching `.ai/specs/` or `.ai/adrs/`, and the commit is refused. Branches `chore/*`, `docs/*`, `fix/hotfix/*` are exempt. The full primer is in [`.ai/notes/spec-driven-development.md`](.ai/notes/spec-driven-development.md).
+`.ai/hooks/pre-commit-spec-check.sh` enforces the first arrow: touch implementation surface on a `feat/*` or `feature/*` branch without touching `.ai/specs/` or `.ai/adrs/`, and the commit is refused. By default, implementation surface means every tracked non-documentation path, so iOS, web, backend, monorepos, and unusual layouts are protected without stack-specific setup. Branches `chore/*`, `docs/*`, `fix/hotfix/*` are exempt. The full primer is in [`.ai/notes/spec-driven-development.md`](.ai/notes/spec-driven-development.md).
 
 <details>
 <summary><strong>Walkthrough: installing into a real, unmaintained Android repo</strong></summary>
@@ -167,19 +167,21 @@ Each file has `Usage`, `Inputs`, `Procedure`, `Done criteria`.
 
 | Situation | Result |
 |---|---|
-| `feat/*` branch, touches code (per `SH_CODE_GLOBS`) **and** a spec/ADR | ✅ allowed |
-| `feat/*` branch, touches code **without** any `.ai/specs/` or `.ai/adrs/` change | ⛔ **blocked** |
-| `feat/*` branch, touches only specs/docs | ✅ allowed |
+| `feat/*` or `feature/*` branch, touches implementation surface **and** a spec/ADR | ✅ allowed |
+| `feat/*` or `feature/*` branch, touches implementation surface **without** any `.ai/specs/` or `.ai/adrs/` change | ⛔ **blocked** |
+| `feat/*` or `feature/*` branch, touches only specs/docs | ✅ allowed |
 | `chore/*`, `docs/*`, `fix/hotfix/*` branch | ✅ exempt — never blocked |
 | Any branch, no code touched | ✅ allowed |
 
-"Code" is whatever `SH_CODE_GLOBS` in [`.ai/hooks/config.sh`](#install) lists —
-tune it to your stack (`src/*`, `app/*`, `Module/app/*`, …). `init` warns at
-install time if your globs match nothing.
+"Implementation surface" is whatever `SH_CODE_GLOBS` includes and
+`SH_CODE_EXCLUDE_GLOBS` does not exclude in [`.ai/hooks/config.sh`](#install).
+The default is deliberately broad: include `*`, then exclude `.ai/`, runtime
+metadata, docs, and common text-only files. Narrow it only for known
+repo-specific exceptions. `init` warns at install time if nothing is protected.
 
 **Prohibitions (by design):**
 
-- No feature code on `feat/*` without its spec — the whole point.
+- No feature implementation on `feat/*` or `feature/*` without its spec — the whole point.
 - No silent bypass: the override is explicit and logged in your shell history.
 - The hook never edits your files or auto-writes a spec — it only refuses.
 
@@ -240,7 +242,7 @@ assistants is never a migration. See [ADR 0008](.ai/adrs/0008-runtime-agnostic-a
 <summary><strong>4. A genuine one-line exception</strong></summary>
 
 ```bash
-# feat/* branch, fixing a log typo, no behavior change:
+# feat/* or feature/* branch, fixing a log typo, no behavior change:
 SH_SDD_SKIP=1 git commit -m 'fix: correct typo in error string'
 ```
 The skip is visible in history; reviewers can question it.
@@ -272,7 +274,7 @@ A `.ai/` directory that is the single source of truth for any AI runtime. **Cano
 ├── adrs/           — ships ADR 0008; you add 0009+ as decisions land
 ├── agents/         — ships spec-writer; you add stack-specific reviewers
 ├── commands/       — canonical: spec, story, implement, verify, review, release, phase-close
-├── hooks/          — canonical scripts; you tune config.sh code globs
+├── hooks/          — canonical scripts; you can tune config.sh include/exclude globs
 ├── notes/          — canonical: SDD primer, governance mirror
 └── specs/          — you fill: PRD, glossary, acceptance Gherkin, contracts
 ```
@@ -319,7 +321,7 @@ Not a staged demo. sdd-harness was cold-started for real on the legacy `iMark21/
 
 > See [`marvel-android@develop`](https://github.com/iMark21/marvel-android/tree/develop): [`.ai/specs/MAR-002-pager.md`](https://github.com/iMark21/marvel-android/blob/develop/.ai/specs/MAR-002-pager.md) · [`.ai/CONTEXT.md`](https://github.com/iMark21/marvel-android/blob/develop/.ai/CONTEXT.md)
 
-That adoption surfaced a real product gap — the default hook globs didn't match the repo's nested Gradle module, so the hook would have passed code-only commits silently. It is now caught at install time (the dry-run above). Adoption driving the product is the intended feedback loop.
+That adoption surfaced a real product gap — the original default hook globs didn't match the repo's nested Gradle module, so the hook would have passed code-only commits silently. The default now protects every tracked non-documentation path, and the install dry-run still warns if a repo has no protected implementation surface. Adoption driving the product is the intended feedback loop.
 
 ## Roadmap
 

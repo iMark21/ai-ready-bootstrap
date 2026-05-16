@@ -3,9 +3,10 @@
 #
 # Enforces Spec-Driven Development on feature branches.
 #
-# Rule: any commit on a branch matching `feat/*` that adds or modifies
-# code under the globs declared in `config.sh` MUST also touch at least
-# one file under `.ai/specs/` or `.ai/adrs/`. Otherwise the commit is blocked.
+# Rule: any commit on a branch matching `feat/*` or `feature/*` that adds or
+# modifies implementation surface declared in `config.sh` MUST also touch at
+# least one file under `.ai/specs/` or `.ai/adrs/`. Otherwise the commit is
+# blocked.
 #
 # Branches `chore/*`, `docs/*`, `fix/hotfix/*` are exempted.
 #
@@ -29,7 +30,7 @@ fi
 branch="$(git symbolic-ref --short HEAD 2>/dev/null || echo "detached")"
 
 case "$branch" in
-  feat/*) ;; # subject to the rule
+  feat/*|feature/*) ;; # subject to the rule
   *) exit 0 ;;
 esac
 
@@ -60,8 +61,25 @@ match_globs() {
   return 1
 }
 
+ensure_array() {
+  local name="$1"
+  if ! declare -p "$name" >/dev/null 2>&1; then
+    eval "$name=()"
+  fi
+}
+
+ensure_array SH_CODE_EXCLUDE_GLOBS
+
+path_is_code() {
+  local path="$1"
+  if match_globs "$path" "${SH_CODE_EXCLUDE_GLOBS[@]}"; then
+    return 1
+  fi
+  match_globs "$path" "${SH_CODE_GLOBS[@]}"
+}
+
 while IFS= read -r path; do
-  if match_globs "$path" "${SH_CODE_GLOBS[@]}"; then
+  if path_is_code "$path"; then
     touches_code=1
   fi
   if match_globs "$path" "${SH_SPEC_GLOBS[@]}"; then
@@ -73,7 +91,8 @@ if [[ "$touches_code" -eq 1 && "$touches_spec" -eq 0 ]]; then
   cat <<EOF
 [sdd-check] Spec-Driven Development violation.
 
-This feature commit changes code under one of: ${SH_CODE_GLOBS[*]}
+This feature commit changes implementation surface matched by: ${SH_CODE_GLOBS[*]}
+and not excluded by: ${SH_CODE_EXCLUDE_GLOBS[*]}
 but does not touch any file under .ai/specs/ or .ai/adrs/.
 
 sdd-harness requires every feature change to be accompanied by a spec or

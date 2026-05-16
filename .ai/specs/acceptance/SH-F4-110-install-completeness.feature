@@ -9,14 +9,13 @@ Feature: SH-F4-110 — Install completeness
     Given the sdd-harness CLI is installed
     And a target git repository
 
-  Scenario: Nested code layout triggers the glob sanity warning
-    Given the repo keeps its code under "Marvel/app/src" only
-    And the default SH_CODE_GLOBS do not include "Marvel/app/*"
+  Scenario: Docs-only layout triggers the glob sanity warning
+    Given the repo tracks only excluded documentation files
     When I run "sdd-harness init . --yes"
     Then the install completes with exit code 0
-    And it prints a warning that no tracked file matches SH_CODE_GLOBS
+    And it prints a warning that no tracked implementation file matches SH_CODE_GLOBS after SH_CODE_EXCLUDE_GLOBS
     And the warning lists the repo's top-level directories
-    And the warning names ".ai/hooks/config.sh" and "SH_CODE_GLOBS" as what to edit
+    And the warning names ".ai/hooks/config.sh", "SH_CODE_GLOBS", and "SH_CODE_EXCLUDE_GLOBS" as what to edit
 
   Scenario: Conventional layout produces no warning
     Given the repo keeps code under "src/"
@@ -42,7 +41,7 @@ Feature: SH-F4-110 — Install completeness
     And the output announces that BOOTSTRAP.md and the glob check would run
 
   Scenario: The dry-run matcher cannot disagree with the real hook
-    Given a tracked file path P and the repo's SH_CODE_GLOBS
+    Given a tracked file path P and the repo's SH_CODE_GLOBS / SH_CODE_EXCLUDE_GLOBS
     When the install glob-sanity check evaluates P
     Then it uses the same case-pattern matching as pre-commit-spec-check.sh
     And a path the hook would treat as code is also seen as code by the check

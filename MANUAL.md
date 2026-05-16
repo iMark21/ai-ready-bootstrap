@@ -33,14 +33,14 @@ Each command is a Markdown procedure in `.ai/commands/`. Read the file before ru
 ## Installing the pre-commit hook
 
 ```bash
-# 1. Customize the code globs to match your stack
+# 1. Optional: review the implementation include/exclude globs
 $EDITOR .ai/hooks/config.sh
 
 # 2. Install the hook
 ./.ai/hooks/install.sh
 ```
 
-The hook blocks `feat/*` commits that touch declared code globs without touching `.ai/specs/` or `.ai/adrs/`. Bypass for documented exceptions: `SH_SDD_SKIP=1 git commit ...`.
+The hook blocks `feat/*` and `feature/*` commits that touch implementation surface without touching `.ai/specs/` or `.ai/adrs/`. The default implementation surface is every tracked non-documentation path. Bypass for documented exceptions: `SH_SDD_SKIP=1 git commit ...`.
 
 ## CLI
 

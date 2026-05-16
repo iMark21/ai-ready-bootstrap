@@ -44,6 +44,6 @@ Codex, Cursor, Copilot, Gemini, …) can do this. Paste this prompt:
 ## After bootstrap
 
 Delete this file (`rm .ai/BOOTSTRAP.md`) — it has served its purpose. From
-here, every feature on a `feat/*` branch goes through the SDD loop
+here, every feature on a `feat/*` or `feature/*` branch goes through the SDD loop
 (`spec → story → implement → verify → review`) and the pre-commit hook
 enforces spec-first. Read `.ai/ROUTING.md` for the full flow.

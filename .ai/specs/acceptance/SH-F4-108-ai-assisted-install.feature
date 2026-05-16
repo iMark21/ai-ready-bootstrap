@@ -8,7 +8,7 @@ Feature: SH-F4-108 — AI-assisted install
     Given assistant-installer/PROMPT.md
     When an AI reads only that file and the target repo
     Then it has every step needed: confirm repo, install, audit, fill,
-      tune config, finalize — with no other file required to understand it
+      verify hook surface, finalize — with no other file required to understand it
 
   Scenario: Precondition is stated
     Given a cloud chat tool with no local repo access
@@ -34,9 +34,9 @@ Feature: SH-F4-108 — AI-assisted install
       (PRODUCT, BACKLOG, CONTEXT, glossary) with the same intent
 
   Scenario: Glob mis-gate is handled during AI install
-    Given sdd-harness init printed the SH_CODE_GLOBS mis-gate warning
+    Given sdd-harness init printed the SH_CODE_GLOBS / SH_CODE_EXCLUDE_GLOBS mis-gate warning
     When the AI follows the config step
-    Then it edits .ai/hooks/config.sh to match the real code path
+    Then it edits .ai/hooks/config.sh so implementation surface is protected
       and re-runs .ai/hooks/install.sh and confirms the hook now fires
 
   Scenario: The workflow ends without unprompted implementation

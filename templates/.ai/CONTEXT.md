@@ -16,7 +16,7 @@
 
 - Write `.ai/PRODUCT.md` for this project.
 - Add your first story to `.ai/BACKLOG.md`.
-- Customize `.ai/hooks/config.sh` to match your stack's code paths.
+- If install printed a glob warning, review `.ai/hooks/config.sh`.
 
 ## Decisions taken
 

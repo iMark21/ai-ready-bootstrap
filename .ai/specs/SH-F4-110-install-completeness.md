@@ -2,6 +2,10 @@
 
 > Version: 1.0. Supersedes the deterministic slice of SH-F4-102 / -103 / -106.
 > Story in `../BACKLOG.md`. Driven by the `iMark21/marvel-android` adoption.
+> Note: SH-F4-111 later changed the default code surface from stack-specific
+> positive globs to universal include + documentation excludes. The dry-run
+> contract remains the same, but the warning now means "no implementation
+> surface matched after excludes" rather than "nested code path missed".
 
 ## 1. Problem
 
@@ -24,9 +28,10 @@ explicitly. Zero new dependencies; nothing shells out to an AI (ADR-0008).
 
 1. **Glob sanity dry-run.** After installing the hook, source the freshly
    written `.ai/hooks/config.sh`, list tracked files (`git ls-files`), and
-   test them against `SH_CODE_GLOBS`. If **zero** tracked files match, emit a
-   prominent warning that lists the repo's top-level directories so the user
-   knows what to add to `config.sh`.
+   test them against `SH_CODE_GLOBS` after `SH_CODE_EXCLUDE_GLOBS`. If
+   **zero** implementation files match, emit a prominent warning that lists
+   the repo's top-level directories so the user knows what to adjust in
+   `config.sh`.
 2. **Git-seeded CONTEXT.** Add a `{{GIT_BRANCH}}` placeholder to
    `templates/.ai/CONTEXT.md` and substitute the repo's current branch, so
    the mirror's "Branch:" line is true on day one instead of a hardcoded
@@ -38,8 +43,8 @@ explicitly. Zero new dependencies; nothing shells out to an AI (ADR-0008).
 
 ## 3. Roles
 
-- **Adopter** (human): runs `sdd-harness init`, reads the warning, tunes
-  `config.sh`, pastes `BOOTSTRAP.md` into their AI or fills by hand.
+- **Adopter** (human): runs `sdd-harness init`, reads any warning, reviews
+  `config.sh` if needed, pastes `BOOTSTRAP.md` into their AI or fills by hand.
 - **AI runtime**: consumes `.ai/BOOTSTRAP.md` exactly as it would the README
   prompt.
 
@@ -47,11 +52,12 @@ explicitly. Zero new dependencies; nothing shells out to an AI (ADR-0008).
 
 - **FR-1** Glob check runs only when `INSTALL_HOOK=1` and not in `--dry-run`.
 - **FR-2** "Zero match" is computed against `git ls-files` using the same
-  case-glob matching the hook uses, sourcing the repo's own `config.sh`.
+  include/exclude case-glob matching the hook uses, sourcing the repo's own
+  `config.sh`.
 - **FR-3** On zero match, the warning lists up to 10 top-level entries of the
   repo (excluding `.git`, `.ai`, dotfiles) and names the exact file to edit
-  (`.ai/hooks/config.sh`, `SH_CODE_GLOBS`). Exit code stays 0 (warning, not
-  failure).
+  (`.ai/hooks/config.sh`, `SH_CODE_GLOBS`, `SH_CODE_EXCLUDE_GLOBS`). Exit code
+  stays 0 (warning, not failure).
 - **FR-4** When at least one tracked file matches, no warning is printed.
 - **FR-5** `{{GIT_BRANCH}}` in any template is replaced with
   `git rev-parse --abbrev-ref HEAD` (fallback `develop` if not a git repo /
@@ -65,9 +71,8 @@ explicitly. Zero new dependencies; nothing shells out to an AI (ADR-0008).
 ## 5. Non-functional requirements
 
 - Zero dependencies (bash + git only). No AI invocation.
-- The glob matcher reuses the same `case`-pattern semantics as
-  `pre-commit-spec-check.sh` so the dry-run cannot disagree with the real
-  hook.
+- The glob matcher reuses the same include/exclude `case`-pattern semantics as
+  `pre-commit-spec-check.sh` so the dry-run cannot disagree with the real hook.
 - `--dry-run` remains side-effect free.
 
 ## 6. Out of scope
@@ -75,12 +80,14 @@ explicitly. Zero new dependencies; nothing shells out to an AI (ADR-0008).
 - Stack detection from manifests (SH-F4-104) — heuristic, separate story.
 - README `## TODO` → BACKLOG migration (SH-F4-105) — heuristic, separate.
 - README value-first rebalance (SH-F4-107) — docs, separate.
-- Auto-tuning `config.sh` (only warns; the user decides the globs).
+- Auto-detecting stack-specific paths (SH-F4-111 removes the need for this in
+  the default case by using a universal include with explicit excludes).
 
 ## 7. Contracts
 
-- `.ai/hooks/config.sh` exports `SH_CODE_GLOBS` (array). The dry-run sources
-  it; if the file is absent the check is skipped with a note.
+- `.ai/hooks/config.sh` exports `SH_CODE_GLOBS` and
+  `SH_CODE_EXCLUDE_GLOBS` arrays. The dry-run sources it; if the file is absent
+  the check is skipped with a note.
 - `templates/.ai/CONTEXT.md` gains `{{GIT_BRANCH}}` on the `Branch:` line.
 
 ## 8. Acceptance

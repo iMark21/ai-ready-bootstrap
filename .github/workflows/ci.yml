@@ -181,13 +181,12 @@ jobs:
           test -f "$repo/.github/copilot-instructions.md"
           test -f "$repo/.cursor/rules/sdd-harness.mdc"
 
-      - name: Glob-sanity warns on a nested code layout
+      - name: Glob-sanity warns when no implementation surface exists
         shell: bash
         run: |
           set -euo pipefail
           repo="$(mktemp -d)"
-          mkdir -p "$repo/Marvel/app/src"
-          echo 'class X' > "$repo/Marvel/app/src/X.kt"
+          echo '# Docs-only repo' > "$repo/README.md"
           git -C "$repo" init -q
           git -C "$repo" add -A
           git -C "$repo" -c user.email=a@b.c -c user.name=t commit -qm init
@@ -195,6 +194,7 @@ jobs:
           out="$(bin/sdd-harness init "$repo" --yes 2>&1)"
           echo "$out" | grep -q "the SDD pre-commit hook is mis-gated"
           echo "$out" | grep -q "SH_CODE_GLOBS"
+          echo "$out" | grep -q "SH_CODE_EXCLUDE_GLOBS"
           test -f "$repo/.ai/BOOTSTRAP.md"
           grep -q '^\*\*Branch:\*\* `' "$repo/.ai/CONTEXT.md"
           ! grep -rq '{{GIT_BRANCH}}' "$repo/.ai"
@@ -212,6 +212,52 @@ jobs:
 
           out="$(bin/sdd-harness init "$repo" --yes 2>&1)"
           ! echo "$out" | grep -q "the SDD pre-commit hook is mis-gated"
+
+      - name: Universal code surface covers nested, iOS, and Go layouts
+        shell: bash
+        run: |
+          set -euo pipefail
+          for path in "Marvel/app/src/X.kt" "MyApp/AppDelegate.swift" "cmd/server/main.go"; do
+            repo="$(mktemp -d)"
+            mkdir -p "$repo/$(dirname "$path")"
+            echo 'initial' > "$repo/$path"
+            git -C "$repo" init -q
+            git -C "$repo" add -A
+            git -C "$repo" -c user.email=a@b.c -c user.name=t commit -qm init
+
+            out="$(bin/sdd-harness init "$repo" --yes 2>&1)"
+            ! echo "$out" | grep -q "the SDD pre-commit hook is mis-gated"
+            git -C "$repo" config core.hooksPath .git/hooks
+
+            git -C "$repo" checkout -qb feature/probe
+            echo 'change' >> "$repo/$path"
+            git -C "$repo" add "$path"
+            status=0
+            git -C "$repo" -c user.email=a@b.c -c user.name=t commit -qm code-only || status=$?
+            test "$status" -ne 0
+
+            mkdir -p "$repo/.ai/specs"
+            echo '# Spec' > "$repo/.ai/specs/PROBE-001.md"
+            git -C "$repo" add "$path" ".ai/specs/PROBE-001.md"
+            git -C "$repo" -c user.email=a@b.c -c user.name=t commit -qm spec-and-code
+          done
+
+      - name: Documentation-only feature commits are allowed
+        shell: bash
+        run: |
+          set -euo pipefail
+          repo="$(mktemp -d)"
+          echo '# Project' > "$repo/README.md"
+          git -C "$repo" init -q
+          git -C "$repo" add -A
+          git -C "$repo" -c user.email=a@b.c -c user.name=t commit -qm init
+
+          bin/sdd-harness init "$repo" --yes >/dev/null 2>&1
+          git -C "$repo" config core.hooksPath .git/hooks
+          git -C "$repo" checkout -qb feature/docs
+          echo 'More docs' >> "$repo/README.md"
+          git -C "$repo" add README.md
+          git -C "$repo" -c user.email=a@b.c -c user.name=t commit -qm docs-only
 
       - name: Selective --runtimes installs only the chosen bootloaders
         shell: bash

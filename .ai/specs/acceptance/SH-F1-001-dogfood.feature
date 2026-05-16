@@ -47,15 +47,15 @@ Feature: SH-F1-001 — Dogfood: sdd-harness governs itself via its own .ai/
     Given .ai/hooks/config.sh exists
     And .ai/hooks/pre-commit-spec-check.sh exists
     When the hook is sourced
-    Then it reads SH_CODE_GLOBS and SH_SPEC_GLOBS from config.sh
-    And the hook exits 0 on branches not matching feat/*
-    And the hook blocks feat/* commits that touch SH_CODE_GLOBS without touching SH_SPEC_GLOBS
+    Then it reads SH_CODE_GLOBS, SH_CODE_EXCLUDE_GLOBS, and SH_SPEC_GLOBS from config.sh
+    And the hook exits 0 on branches not matching feat/* or feature/*
+    And the hook blocks feat/* and feature/* commits that touch implementation surface without touching SH_SPEC_GLOBS
 
   Scenario: No legacy v0.5.0 artifacts remain
     Given the repo is at v1.0.0-alpha
     Then no file under .ai/ references agent-explore, agent-plan, agent-code, agent-verify
     And no file under .ai/ references the old `explore→plan→code→verify` flow
-    And the assistant-installer/ directory does not exist
+    And assistant-installer/PROMPT.md, if present, follows the SDD install workflow rather than the v0.5.0 flow
 
   Scenario: No domain-specific references leak from the upstream lineage
     Given the .ai/ layer

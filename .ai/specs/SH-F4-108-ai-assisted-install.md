@@ -23,8 +23,8 @@ that any AI with local repo read/write executes end to end:
    tests.
 4. Fill the judgment-layer files (PRODUCT / BACKLOG / CONTEXT / glossary)
    from the audit.
-5. Tune `.ai/hooks/config.sh` to the real code path (honor the install-time
-   glob warning), re-install the hook.
+5. If the install-time glob warning appears, tune `.ai/hooks/config.sh` so at
+   least one implementation path remains protected, then re-install the hook.
 6. Delete `.ai/BOOTSTRAP.md`, summarize, propose the first story.
 
 Zero-dependency and runtime-agnostic are preserved: the prompt is plain
@@ -55,8 +55,9 @@ Markdown; the *AI* does the work, the CLI never shells out to an AI
   goes in each, mirroring `.ai/BOOTSTRAP.md` so the two never diverge in
   intent.
 - **FR-6** Config step: if `sdd-harness init` printed the glob mis-gate
-  warning, the AI must tune `.ai/hooks/config.sh` and re-run
-  `.ai/hooks/install.sh`, then confirm the hook now matches code.
+  warning, the AI must tune `.ai/hooks/config.sh` include/exclude globs and
+  re-run `.ai/hooks/install.sh`, then confirm the hook now matches
+  implementation surface.
 - **FR-7** Closes by deleting `.ai/BOOTSTRAP.md`, summarizing what was
   written, and proposing the first story — never by starting to implement a
   feature unprompted.

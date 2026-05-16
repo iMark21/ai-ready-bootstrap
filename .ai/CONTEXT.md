@@ -4,12 +4,18 @@
 
 ## Current state
 
-**Phase:** F4 closed — v1.0.0-alpha shipped
-**Branch:** `develop`
+**Phase:** v1.0.0-beta hardening active
+**Branch:** `feature/auto-code-detection`
 **Remote:** `iMark21/sdd-harness` (renamed from `iMark21/agentlayer` during F4)
-**Last update:** 2026-05-15
+**Last update:** 2026-05-16
 
 ## Done
+
+### Beta hardening — universal hook surface (2026-05-16)
+- [x] SH-F4-111: default hook surface now protects every tracked non-documentation path via `SH_CODE_GLOBS=("*")` plus `SH_CODE_EXCLUDE_GLOBS`, so nested Android, iOS, Go, web, backend, and monorepo layouts no longer need manual stack-specific glob tuning.
+- [x] `pre-commit-spec-check.sh`, `post-edit-trace.sh`, and the CLI glob-sanity dry-run now share include/exclude case-pattern semantics; missing `SH_CODE_EXCLUDE_GLOBS` in older configs is treated as empty for compatibility.
+- [x] `feature/*` branches are gated alongside `feat/*`; docs-only feature commits remain allowed by default.
+- [x] CI covers docs-only warning, conventional layout silence, nested Android, iOS, Go, blocked code-only commits, and spec+code commits.
 
 ### F4 — Public migration (closed 2026-05-15)
 - [x] SH-F4-001: security audit passed (no secrets, no co-authored, no internal path leaks, all commits authored as `marques.jm@icloud.com`)
@@ -48,11 +54,10 @@
 
 ## Immediate next
 
-v1.0.0-alpha is shipped. Possible next phases (none active):
-
+- Review and merge `feature/auto-code-detection` into `develop`.
+- Continue beta install helpers if needed: SH-F4-104 stack detection and SH-F4-105 README roadmap migration remain separate heuristic stories.
 - **F2.5 / SH-F2-002**: deterministic CI plugins (`tools/ci.sh` dispatcher + per-stack plugins) — implements ADR-0009.
-- **v1.0.0-beta**: harden the CLI based on adopter feedback, add Cursor/Copilot/Gemini bootloaders, expand acceptance Gherkin.
-- **v1.0.0** (stable): when v1.0.0-alpha has been adopted in ≥ 1 external project and survived contact.
+- **v1.0.0** (stable): after the beta hardening window and multiple external adoptions across different layouts.
 
 ## Decisions taken
 
@@ -69,5 +74,5 @@ v1.0.0-alpha is shipped. Possible next phases (none active):
 | Risk | Mitigation |
 |---|---|
 | Branch `chore/agentic-governance-backlog` still on the remote with the discarded ARB-29..51 backlog | Delete after v1.0.0-alpha tag is announced; not a blocker |
-| No automated test suite for the harness itself; smoke-test is manual | Acceptable for v1.0.0-alpha; revisit if regressions appear |
+| CI is still shell smoke coverage rather than a dedicated unit-test harness | Acceptable for beta; add a focused test harness if shell scenarios become hard to maintain |
 | v0.5.0 users with `~/.agentlayer` clones will see redirects but the binary name changed; manual `git remote set-url` + new install required | Documented in CHANGELOG [1.0.0-alpha] "Changed" section |

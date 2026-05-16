@@ -31,7 +31,8 @@ Assume only `git` and `bash` are available.
 
 `init` lays down `.ai/`, the root bootloaders, the SDD pre-commit hook, and
 writes `.ai/BOOTSTRAP.md`. **Capture its output** — in particular any
-`SH_CODE_GLOBS` mis-gate warning. You will act on it in Step 4.
+`SH_CODE_GLOBS` / `SH_CODE_EXCLUDE_GLOBS` mis-gate warning. You will act on
+it in Step 4.
 
 ## Step 2 — Audit the repository (do not invent)
 
@@ -67,16 +68,19 @@ Write these from what you actually found (mirror `.ai/BOOTSTRAP.md`):
 
 Keep every entry short — the SDD loop refines them.
 
-## Step 4 — Make the SDD hook actually fire
+## Step 4 — Confirm the SDD hook actually fires
 
-If Step 1's output included the `SH_CODE_GLOBS` mis-gate warning (common when
-code is nested, e.g. `Module/app/...`):
+The default hook surface protects every tracked non-documentation path, so most
+repos need no tuning. If Step 1's output included the
+`SH_CODE_GLOBS` / `SH_CODE_EXCLUDE_GLOBS` mis-gate warning:
 
-1. Edit `.ai/hooks/config.sh` → `SH_CODE_GLOBS` to include the real code path
-   (e.g. add `"Module/app/*"`).
+1. Edit `.ai/hooks/config.sh` so `SH_CODE_GLOBS` and
+   `SH_CODE_EXCLUDE_GLOBS` leave at least one real implementation path
+   protected.
 2. Re-run `./.ai/hooks/install.sh`.
-3. Verify: a hypothetical `feat/*` commit touching code without a spec would
-   now be blocked. If unsure, state the matched glob explicitly.
+3. Verify: a hypothetical `feat/*` or `feature/*` commit touching
+   implementation without a spec would now be blocked. If unsure, state the
+   matched include glob and any relevant exclude glob.
 
 ## Step 5 — Finalize (do not start coding)
 

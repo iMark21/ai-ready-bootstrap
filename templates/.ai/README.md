@@ -23,7 +23,7 @@ specs/      → product and protocol contracts
 adrs/       → why the architecture is the way it is
 commands/   → repeatable flows (spec, story, implement, verify, review, release)
 agents/     → reusable roles (start with spec-writer)
-hooks/      → automatic SDD enforcement (Git/CI/IDE) — configure paths in hooks/config.sh
+hooks/      → automatic SDD enforcement (Git/CI/IDE) — configure surface in hooks/config.sh
 notes/      → distilled mini-tutorials
 ```
 
