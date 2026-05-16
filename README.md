@@ -4,7 +4,7 @@
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/github/license/iMark21/sdd-harness" alt="License: MIT"></a>
-  <a href="https://github.com/iMark21/sdd-harness/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/iMark21/sdd-harness/ci.yml?branch=develop&label=CI" alt="CI status"></a>
+  <a href="https://github.com/iMark21/sdd-harness/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/iMark21/sdd-harness/ci.yml?branch=main&label=CI" alt="CI status"></a>
   <a href="https://github.com/iMark21/sdd-harness/releases"><img src="https://img.shields.io/github/v/release/iMark21/sdd-harness?include_prereleases&sort=semver" alt="Latest release"></a>
   <a href="#install"><img src="https://img.shields.io/badge/deps-bash%20%2B%20git-blue" alt="Zero dependencies"></a>
 </p>

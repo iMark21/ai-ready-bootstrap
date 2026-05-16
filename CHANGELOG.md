@@ -4,8 +4,13 @@ All notable changes are documented here.
 
 ## [Unreleased]
 
+(No unreleased changes.)
+
+## [1.0.0-rc1] - 2026-05-16
+
 ### Fixed
-- Public-readiness hardening after the beta tag: CLI version now reports `1.0.0-beta`; `SECURITY.md` points at the renamed repo; bootstrap download examples use the correct `bash -s --` separator; missing ADR/CI templates are synchronized; and the generic CI fallback is installed with the rest of the stack plugins.
+- Public-readiness audit fixup (SH-F4-113): CI status badge in README now correctly references `branch=main` (not `branch=develop`), so new GitHub visitors see the public release branch's health, not the development branch's transient state.
+- Public-readiness hardening (SH-F4-112): CLI version now reports `1.0.0-beta`; `SECURITY.md` points at the renamed repo; bootstrap download examples use the correct `bash -s --` separator; missing ADR/CI templates are synchronized; and the generic CI fallback is installed with the rest of the stack plugins.
 
 ## [1.0.0-beta] - 2026-05-16
 
