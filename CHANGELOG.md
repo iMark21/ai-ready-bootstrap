@@ -5,6 +5,7 @@ All notable changes are documented here.
 ## [Unreleased]
 
 ### Added — toward v1.0.0-beta
+- **AI-assisted install (SH-F4-108)**: `assistant-installer/PROMPT.md` — a self-contained, tool-agnostic workflow an AI with local repo access runs end to end: install → **audit the repo** (README, layout, manifests, git log; no fabrication) → fill PRODUCT/BACKLOG/CONTEXT/glossary → tune hook globs → propose the first story. Paste one fetch line; the CLI still never shells out to an AI (ADR-0008 intact). README "Install" gains path (c). This is the codified form of the marvel-android cold-start that proved beta gate #2.
 - **Install completeness (SH-F4-110)**: `init` now finishes the deterministic work and hands off the judgment work instead of dropping empty templates.
   - **Glob-sanity dry-run**: after installing the hook, the repo's `SH_CODE_GLOBS` are matched against `git ls-files`. If nothing matches, a prominent warning lists the repo's top-level dirs and names `.ai/hooks/config.sh` to edit — catching the silent mis-gate that the marvel-android adoption hit (nested `Marvel/app/*`). Uses the same case-pattern matcher as the hook, so the dry-run cannot disagree with it.
   - **`{{GIT_BRANCH}}` seed**: `CONTEXT.md`'s Branch line is the repo's real current branch (`git symbolic-ref`, works pre-first-commit), not a hardcoded `develop`.

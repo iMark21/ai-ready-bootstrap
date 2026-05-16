@@ -66,6 +66,14 @@ It does the deterministic work for you and hands off the rest:
 
 Default runtimes are `claude,codex`; `--runtimes all` adds Cursor, Copilot, Gemini. `--help` lists every flag.
 
+### Or: let your AI install + audit + fill it
+
+For a repo you don't fully know, you don't have to run anything yourself. From inside the target repo, paste this into any AI with local repo access (Claude Code, Codex, Cursor, Copilot CLI, Gemini CLI):
+
+> Fetch `https://raw.githubusercontent.com/iMark21/sdd-harness/develop/assistant-installer/PROMPT.md` and follow the complete workflow it defines for this repository.
+
+The AI then installs the harness, **audits the repo** (README, layout, manifests, git history — without inventing), fills `PRODUCT.md` / `BACKLOG.md` / `CONTEXT.md` / glossary from what it found, tunes the hook globs, and proposes the first story. This is the codified form of the cold-start that [proved the framework on a real legacy repo](#proven-in-a-real-adoption) — the CLI still never shells out to an AI; the AI drives, you stay in control.
+
 ## How it works
 
 Every feature on a `feat/*` branch goes through one loop:

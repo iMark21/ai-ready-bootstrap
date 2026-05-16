@@ -31,6 +31,8 @@ Stories `SH-NNN`. One story = one acceptance feature in `specs/acceptance/`.
 | SH-F4-105 | Install: migrate a README `## TODO`/`## Roadmap` checklist into BACKLOG.md rows | todo | TBD | beta |
 | SH-F4-110 | Install completeness: glob-sanity dry-run warning + `{{GIT_BRANCH}}` CONTEXT seed + `.ai/BOOTSTRAP.md` handoff (folds in -102/-103/-106) | done | `acceptance/SH-F4-110-install-completeness.feature` | beta |
 | SH-F4-107 | README rebalance: value-first, badges, TOC, synced, roadmap fixed | done | (review) | beta |
+| SH-F4-108 | AI-assisted install: fetchable `assistant-installer/PROMPT.md` (install + audit + fill) + README path (c) | done | `acceptance/SH-F4-108-ai-assisted-install.feature` | beta |
+| SH-F4-109 | README: post-install usage — command flows, hook rules/prohibitions, exemptions, override, use cases, examples | todo | TBD | beta |
 | SH-F4-001 | Public migration: rename repo, sanitize timestamps, ship v1.0.0-alpha | done | (audit + push log in CONTEXT.md F4 block) | F4 |
 
 ## Out of scope (v1.0.0)
