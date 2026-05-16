@@ -393,6 +393,7 @@ Use 'sdd-harness standardize' to back them up and install fresh, or --force."
   [ "$DRY_RUN" -eq 1 ] && log "  Mode: DRY RUN (no files will be written)"
 
   copy_tree "$TEMPLATES_DIR/.ai" "$repo/.ai"
+  copy_tree "$TEMPLATES_DIR/tools" "$repo/tools"
 
   for r in $(echo "$RUNTIMES" | tr ',' ' '); do
     case "$r" in
