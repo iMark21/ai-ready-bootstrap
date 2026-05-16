@@ -10,7 +10,7 @@
 set -euo pipefail
 
 INSTALL_DIR="${HOME}/.sdd-harness"
-GITHUB_RAW="https://raw.githubusercontent.com/iMark21/sdd-harness/main"
+GITHUB_RAW="https://raw.githubusercontent.com/iMark21/sdd-harness/develop"
 
 printf '=== sdd-harness installer ===\n'
 printf 'Installing to: %s\n' "$INSTALL_DIR"

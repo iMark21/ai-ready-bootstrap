@@ -4,8 +4,8 @@
 
 ## Current state
 
-**Phase:** v1.0.0-beta hardening active
-**Branch:** `develop`
+**Phase:** v1.0.0-beta shipped (2026-05-16); v1.0.0 planning
+**Branch:** `develop` → `main` (release/v1.0.0-beta in flight)
 **Remote:** `iMark21/sdd-harness` (renamed from `iMark21/agentlayer` during F4)
 **Last update:** 2026-05-16
 
@@ -69,10 +69,10 @@
 
 ## Immediate next
 
-- **Beta validation**: real-world testing on multi-stack adoption (Swift/iOS, Android, Python, Node, Go repos)
-- **Minor plugins**: add android (gradle), rust (cargo) if time permits before v1.0.0
-- **GitHub Actions template**: wire `tools/ci.sh` into a `.github/workflows/ci.yml` template
-- **v1.0.0 release**: after multiple external adoptions across different stacks confirm robustness
+- **Push v1.0.0-beta to GitHub**: tag and announce the release
+- **v1.0.0 criteria**: full `MANUAL.md`, contributor playbook, explicit SemVer/deprecation policy
+- **Adopter outreach**: confirm ≥ 3 external adopters across different stacks (Swift, Android, Python, Node, Go) before v1.0.0 GA
+- **Optional enhancements** (post-v1.0.0): android/rust CI plugins, GitHub Actions template, IDE extensions
 
 ## Decisions taken
 

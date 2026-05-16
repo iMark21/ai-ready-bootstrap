@@ -4,7 +4,11 @@ All notable changes are documented here.
 
 ## [Unreleased]
 
-### Added — toward v1.0.0-beta
+## [1.0.0-beta] - 2026-05-16
+
+> **Per-project bootstrap, stack detection, AI-assisted setup, CI plugins.** Heuristic install helpers and deterministic CI tooling ship. Stack-specific plugins (swift, python, js, go) integrate seamlessly. AI-guided bootstrap (`--ai-setup`) codifies the cold-start workflow proved on marvel-android. External adoption gates cleared.
+
+### Added — shipped in v1.0.0-beta
 - **AI-assisted install (SH-F4-108)**: `assistant-installer/PROMPT.md` — a self-contained, tool-agnostic workflow an AI with local repo access runs end to end: install → **audit the repo** (README, layout, manifests, git log; no fabrication) → fill PRODUCT/BACKLOG/CONTEXT/glossary → verify the hook surface if the dry-run warns → propose the first story. Paste one fetch line; the CLI still never shells out to an AI (ADR-0008 intact). README "Install" gains path (c). This is the codified form of the marvel-android cold-start that proved beta gate #2.
 - **Install completeness (SH-F4-110)**: `init` now finishes the deterministic work and hands off the judgment work instead of dropping empty templates.
   - **Glob-sanity dry-run**: after installing the hook, the repo's `SH_CODE_GLOBS` are matched against `git ls-files` after `SH_CODE_EXCLUDE_GLOBS`. If nothing is protected, a prominent warning lists the repo's top-level dirs and names `.ai/hooks/config.sh` to edit. Uses the same case-pattern matcher as the hook, so the dry-run cannot disagree with it.
