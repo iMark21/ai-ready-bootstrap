@@ -1,17 +1,15 @@
-<!-- wordmark -->
-```
-┌──────────────────────────────────────────────────────┐
-│   s d d · h a r n e s s                               │
-│   spec-driven development · runtime-agnostic           │
-└──────────────────────────────────────────────────────┘
-```
+<p align="center">
+  <img src="docs/banner.svg" alt="sdd-harness — spec-driven development, runtime-agnostic" width="100%">
+</p>
+
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/iMark21/sdd-harness" alt="License: MIT"></a>
+  <a href="https://github.com/iMark21/sdd-harness/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/iMark21/sdd-harness/ci.yml?branch=develop&label=CI" alt="CI status"></a>
+  <a href="https://github.com/iMark21/sdd-harness/releases"><img src="https://img.shields.io/github/v/release/iMark21/sdd-harness?include_prereleases&sort=semver" alt="Latest release"></a>
+  <a href="#install"><img src="https://img.shields.io/badge/deps-bash%20%2B%20git-blue" alt="Zero dependencies"></a>
+</p>
 
 # sdd-harness
-
-[![License](https://img.shields.io/github/license/iMark21/sdd-harness)](LICENSE)
-[![CI](https://img.shields.io/github/actions/workflow/status/iMark21/sdd-harness/ci.yml?branch=develop&label=CI)](https://github.com/iMark21/sdd-harness/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/github/v/release/iMark21/sdd-harness?include_prereleases&sort=semver)](https://github.com/iMark21/sdd-harness/releases)
-[![Zero deps](https://img.shields.io/badge/deps-bash%20%2B%20git-blue)](#install)
 
 A runtime-agnostic **Spec-Driven Development harness** that any AI can operate. Drop it into a repo and the team — humans and AIs alike — follow one disciplined loop: **spec first, code second, verify against spec**. The pre-commit hook makes it non-optional.
 
