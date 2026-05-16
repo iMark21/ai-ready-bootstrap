@@ -42,38 +42,35 @@ It is **zero-dependency** (bash + git only) and ships nothing stack-specific —
 
 ## Install
 
-```bash
-# 1. Get the CLI (clone somewhere persistent — not /tmp)
-git clone https://github.com/iMark21/sdd-harness.git ~/.sdd-harness
-cd ~/.sdd-harness && bash install.sh
+### Per-project (recommended)
 
-# 2. In your target repo
-cd /path/to/your-repo
-sdd-harness init
+No global installation needed. In any repository:
+
+```bash
+curl -sSL https://raw.githubusercontent.com/iMark21/sdd-harness/main/bootstrap.sh | bash -s -- --stack python
 ```
 
-`sdd-harness init` auto-routes:
+Replace `python` with your stack: `swift`, `android`, `node`, `go`, `rust`, or `generic`.
 
-| Repo state | Action |
-|---|---|
-| No AI files | **install** — lays down `.ai/`, root bootloaders, the SDD hook |
-| Already has AI files | **standardize** — backs them up under `.ai-backup-<timestamp>/`, then installs |
+This downloads all templates, tools, and hooks directly into your repo. Then:
+- **With AI:** `bash -s -- --stack python --ai-setup` downloads `.ai/BOOTSTRAP-AI.md`. Open it with any AI that has repo access.
+- **Manual:** `cat .ai/BOOTSTRAP.md` to fill `PRODUCT.md` / `BACKLOG.md` / `CONTEXT.md` / glossary by hand.
 
-It does the deterministic work for you and hands off the rest:
+### Global installation (optional)
 
-- Substitutes project name, story prefix, date, and the **real current git branch** into the templates.
-- **Dry-runs the hook**: if no tracked implementation path matches `SH_CODE_GLOBS` after `SH_CODE_EXCLUDE_GLOBS`, it warns at install time instead of letting the hook silently never fire.
-- Writes **`.ai/BOOTSTRAP.md`** — the precise prompt to fill the judgment-layer files (vision, backlog, glossary) from your repo, by hand or by pasting it to your AI. Nothing shells out to an AI; you stay in control.
+If you want `sdd-harness` CLI on PATH:
 
-Default runtimes are `claude,codex`; `--runtimes all` adds Cursor, Copilot, Gemini. `--help` lists every flag.
+```bash
+git clone https://github.com/iMark21/sdd-harness.git ~/.sdd-harness
+bash ~/.sdd-harness/install.sh
+sdd-harness init /path/to/repo --stack python
+```
 
-### Or: let your AI install + audit + fill it
+Or one-command clone + init:
 
-For a repo you don't fully know, you don't have to run anything yourself. From inside the target repo, paste this into any AI with local repo access (Claude Code, Codex, Cursor, Copilot CLI, Gemini CLI):
-
-> Fetch `https://raw.githubusercontent.com/iMark21/sdd-harness/develop/assistant-installer/PROMPT.md` and follow the complete workflow it defines for this repository.
-
-The AI then installs the harness, **audits the repo** (README, layout, manifests, git history — without inventing), fills `PRODUCT.md` / `BACKLOG.md` / `CONTEXT.md` / glossary from what it found, reviews the hook surface only if the dry-run warns, and proposes the first story. This is the codified form of the cold-start that [proved the framework on a real legacy repo](#proven-in-a-real-adoption) — the CLI still never shells out to an AI; the AI drives, you stay in control.
+```bash
+bash ~/.sdd-harness/quick-start.sh user/repo --stack python
+```
 
 ## How it works
 
@@ -144,6 +141,37 @@ A short GIF of the same flow: [`docs/demo.gif`](docs/demo.gif).
 </details>
 
 ## Using it day to day
+
+### Development workflow
+
+**Branches and commits:**
+
+- **Branch from** `develop`, never from `main`.
+- **Branch naming**: `type/short-description` (e.g., `feat/login-pager`, `fix/timeout-race`).
+- **Commit message**: `[branch_name] type: "title"` (e.g., `[feat/login-pager] feat: "add infinite scroll"`).
+- **Merge back to `develop`**: squash merge, always.
+- **Promote to `main`**: once per release, from `develop` only. Squash merge the entire release.
+
+**Pre-commit hook:**
+
+`.ai/hooks/pre-commit-spec-check.sh` enforces spec-first on `feat/*` and `feature/*` branches:
+
+- Touch code **without** touching `.ai/specs/` or `.ai/adrs/` → commit **blocked**.
+- Update a spec, then commit code → commit **passes**.
+- `chore/*`, `docs/*`, `fix/hotfix/*` branches are **exempt**.
+- Override (documented exceptions only): `SH_SDD_SKIP=1 git commit ...`
+
+**Versioning and release:**
+
+Release process lives in `.ai/commands/release.md`. Typical flow:
+
+1. **Propose the release**: `git checkout -b release/vX.Y.Z develop`
+2. **Ask AI to follow `.ai/commands/release.md`** — updates version numbers, CHANGELOG, etc.
+3. **Merge to main**: `git checkout main && git merge --squash release/vX.Y.Z && git commit -m "release: vX.Y.Z"`
+4. **Tag**: `git tag vX.Y.Z && git push origin main --tags`
+5. **Back-merge to develop**: `git checkout develop && git merge main && git push`
+
+Use **semantic versioning** (MAJOR.MINOR.PATCH). Releases are tagged on `main` only.
 
 ### Commands
 
