@@ -11,6 +11,14 @@
 
 ## Done
 
+### F2.5 — Deterministic CI plugins (2026-05-16)
+- [x] SH-F2-002: `tools/ci.sh` dispatcher (~130 lines) reads stack from CONTEXT.md or `--stack` flag
+- [x] Dispatcher supports: `--list`, `--all`, `--stack override`, explicit plugin routing
+- [x] `tools/ci/common.sh` shared helpers: logging (log/warn/die), timing (step_start/step_done)
+- [x] 4 initial stack plugins: swift (XcodeGen), python (ruff/pytest), js (npm), go (go test/vet)
+- [x] Each plugin implements: `plugin_check`, `plugin_lint`, `plugin_test`, `plugin_build`
+- [x] Acceptance spec `SH-F2-002-ci-stack-plugins.feature` covers 20+ scenarios (dispatcher, plugins, integration)
+
 ### Beta install helpers — stack detection + README migration (2026-05-16)
 - [x] SH-F4-104: `--stack` flag (explicit, not heuristic) for swift, android, python, node, go, rust, generic
 - [x] SH-F4-105: README `## TODO` / `## Roadmap` sections auto-migrate to `.ai/BACKLOG.md` rows
@@ -61,9 +69,10 @@
 
 ## Immediate next
 
-- **F2.5 / SH-F2-002**: deterministic CI plugins (`tools/ci.sh` dispatcher + per-stack plugins for swift/android/python/node/go) — implements ADR-0009. Stack detection helps CI scaffold match the declared stack.
-- **Beta validation**: test SH-F4-104/105 on multi-stack adoption (Android, iOS, Go, Python repos) before closing beta.
-- **v1.0.0** (stable): after the beta hardening window, multiple external adoptions across different layouts confirmed, and F2.5 CI plugins shipped.
+- **Beta validation**: real-world testing on multi-stack adoption (Swift/iOS, Android, Python, Node, Go repos)
+- **Minor plugins**: add android (gradle), rust (cargo) if time permits before v1.0.0
+- **GitHub Actions template**: wire `tools/ci.sh` into a `.github/workflows/ci.yml` template
+- **v1.0.0 release**: after multiple external adoptions across different stacks confirm robustness
 
 ## Decisions taken
 

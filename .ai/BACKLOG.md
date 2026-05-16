@@ -20,7 +20,7 @@ Stories `SH-NNN`. One story = one acceptance feature in `specs/acceptance/`.
 | SH-F1-004 | Governance templates (CONTEXT/PRODUCT/ROUTING/BACKLOG/README) rewritten for sdd-harness | done | `acceptance/SH-F1-001-dogfood.feature` | F1 |
 | SH-F1-005 | Runtime bootloaders (CLAUDE.md, AGENTS.md) | done | `acceptance/SH-F1-001-dogfood.feature` | F1 |
 | SH-F2-001 | CLI rewrite: `bin/agentlayer` → `bin/sdd-harness` + templates/ pattern | done | `acceptance/SH-F2-001-cli-init.feature` | F2 |
-| SH-F2-002 | Deterministic CI scaffolding (stack-plugin pattern: swift/python/js/go) | todo | TBD | F2.5 |
+| SH-F2-002 | Deterministic CI scaffolding (stack-plugin pattern: swift/python/js/go) | done | `acceptance/SH-F2-002-ci-stack-plugins.feature` | F2.5 |
 | SH-F2-003 | Multi-runtime bootloaders: Cursor (`.cursor/rules/`), Copilot (`.github/copilot-instructions.md`), Gemini (`GEMINI.md`); `--runtimes all` alias | done | CI smoke (`--runtimes all` + selective `cursor`) | F2.5 |
 | SH-F3-001 | `phase-close` command (canonical + template) | done | `acceptance/SH-F3-001-phase-close.feature` | F3 |
 | SH-F3-002 | CONTEXT.md schema formalized in templates/ | done | `acceptance/SH-F3-001-phase-close.feature` | F3 |
