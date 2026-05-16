@@ -5,11 +5,18 @@
 ## Current state
 
 **Phase:** v1.0.0-beta hardening active
-**Branch:** `feature/auto-code-detection`
+**Branch:** `develop`
 **Remote:** `iMark21/sdd-harness` (renamed from `iMark21/agentlayer` during F4)
 **Last update:** 2026-05-16
 
 ## Done
+
+### Beta install helpers — stack detection + README migration (2026-05-16)
+- [x] SH-F4-104: `--stack` flag (explicit, not heuristic) for swift, android, python, node, go, rust, generic
+- [x] SH-F4-105: README `## TODO` / `## Roadmap` sections auto-migrate to `.ai/BACKLOG.md` rows
+- [x] Acceptance spec `SH-F4-104-105-install-helpers.feature` covers all scenarios
+- [x] Templates updated: PRODUCT.md "Tech Stack" section + CONTEXT.md "Stack:" line both use `{{STACK}}` placeholder
+- [x] All acceptance scenarios verified manually (stack selection, rejection, migration, listing)
 
 ### Beta hardening — universal hook surface (2026-05-16)
 - [x] SH-F4-111: default hook surface now protects every tracked non-documentation path via `SH_CODE_GLOBS=("*")` plus `SH_CODE_EXCLUDE_GLOBS`, so nested Android, iOS, Go, web, backend, and monorepo layouts no longer need manual stack-specific glob tuning.
@@ -54,10 +61,9 @@
 
 ## Immediate next
 
-- Review and merge `feature/auto-code-detection` into `develop`.
-- Continue beta install helpers if needed: SH-F4-104 stack detection and SH-F4-105 README roadmap migration remain separate heuristic stories.
-- **F2.5 / SH-F2-002**: deterministic CI plugins (`tools/ci.sh` dispatcher + per-stack plugins) — implements ADR-0009.
-- **v1.0.0** (stable): after the beta hardening window and multiple external adoptions across different layouts.
+- **F2.5 / SH-F2-002**: deterministic CI plugins (`tools/ci.sh` dispatcher + per-stack plugins for swift/android/python/node/go) — implements ADR-0009. Stack detection helps CI scaffold match the declared stack.
+- **Beta validation**: test SH-F4-104/105 on multi-stack adoption (Android, iOS, Go, Python repos) before closing beta.
+- **v1.0.0** (stable): after the beta hardening window, multiple external adoptions across different layouts confirmed, and F2.5 CI plugins shipped.
 
 ## Decisions taken
 
